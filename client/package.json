@@ -4,6 +4,10 @@
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.16",
+    "@mui/material": "^5.14.16",
     "assert": "^2.1.0",
     "buffer": "^6.0.3",
     "crypto-js": "^4.1.1",
