@@ -12,6 +12,6 @@ router.post('/verifyCode',AuthController.verifyCode)
 router.post('/updatePass',AuthController.updatePasscode)
 router.post('/updateUsername', AuthController.updateUsername)
 router.post('/updateEmail', AuthController.updateEmail)
-router.post('deleteAccount', AuthController.deleteAccount)
+router.post('/deleteAccount', AuthController.deleteAccount)
 
 module.exports = router
