@@ -4,6 +4,7 @@ import axios from 'axios'
 
 function APITester() {
   const [request, setRequest] = useState("")
+  const [response, setResponse] = useState("")
   const [form, setForm] = useState({
     id: "",
     type: "",
@@ -187,7 +188,8 @@ function APITester() {
           console.error('Invalid request');
           return;
       }
-
+      
+      setResponse(response)
       console.log('Response:', response);
     } catch (error) {
       console.error('Error:', error);
@@ -269,6 +271,7 @@ function APITester() {
 
         {renderTextInputFields()}
         <input type="submit" value="Submit" />
+        <p>{response}</p>
       </form>
     </>
   );
