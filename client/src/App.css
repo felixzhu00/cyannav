@@ -36,3 +36,59 @@
     transform: rotate(360deg);
   }
 }
+
+
+.map-container{
+  background-color: #D9D9D9;
+  width:343px;
+  height:367px;
+  border: black 1px solid;
+}
+
+.map-image{
+  background-color: #7A7A7A;
+  font-size: 40px;
+  width:320px;
+  height:247px;
+  margin: 10px 10px;
+  text-align: center;
+  border: black 1px solid;
+}
+
+.map-text{
+  margin: 0px 10px 0px 10px;
+  border: black 1px solid;
+  width: 80%;
+  display: inline-block;
+  
+
+}
+
+.map-util{
+  vertical-align:middle;
+  border: black 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kebab-container{
+  background: gray;
+  width:40px;
+  height: 60px;
+  margin: 10px 00px;
+  display: inline-block;
+  border: black 1px solid;
+  /* vertical-align:middle; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  
+}
+
+.kebab-icon{
+  margin: 0 auto;
+  /* vertical-align:middle; */
+  width: 40px;
+}
