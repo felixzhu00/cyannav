@@ -271,7 +271,7 @@ function APITester() {
 
         {renderTextInputFields()}
         <input type="submit" value="Submit" />
-        <p>{response}</p>
+        <p>Response code: {response.status ? response.status : ""}</p>
       </form>
     </>
   );
