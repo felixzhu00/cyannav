@@ -21,6 +21,9 @@ app.use(express.json())
 const authRouter = require('./routes/auth-router')
 app.use('/auth', authRouter)
 
+// Initialize database connection
+const db = require('./db')
+db.on('error', console.error.bind(console, 'MongoDB connection failed'))
 
 // Run server
 app.listen(port, () => console.log(`Server running on port ${port}`))

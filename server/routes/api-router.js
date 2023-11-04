@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const mapGraphicSchemaController = require('../controllers/api-controller')
+const auth = require('../auth') // auth_manager
 
 
 //Handles getting an existing map(by ID) request
