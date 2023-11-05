@@ -8,17 +8,17 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
-
+    runs-on: self-hosted'
+    
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js latest
-      uses: actions/setup-node@v1
-      with:
-        node-version: latest
-    - run:
-        cd client
-        npm i
-        npm run build
-        cd ../server
-        npm i
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+      - run:
+          cd client
+          npm i
+          npm run build
+          cd ../server
+          npm i
