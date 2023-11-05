@@ -20,5 +20,7 @@ jobs:
           cd client;
           npm i;
           npm run build
+          sudo service nginx restart
           cd ../server
           npm i
+          node index.js
