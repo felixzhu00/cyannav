@@ -12,7 +12,7 @@ const app = express()
 // MIDDLE WARE
 app.use(express.urlencoded({extend: true}))
 app.use(cors({
-  origin: ["http://localhost:3000"],
+  origin: ["http://129.213.145.105:3000"],
   credentials: true
 }))
 app.use(express.json())
