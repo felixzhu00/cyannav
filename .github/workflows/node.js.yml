@@ -23,4 +23,5 @@ jobs:
           sudo service nginx restart
           cd ../server
           npm i
-          node index.js
+          pm2 stop 0
+          pm2 start 0
