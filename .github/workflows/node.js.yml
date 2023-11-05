@@ -16,9 +16,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
-      - run:
-          cd client
-          npm i
+      - run: |
+          cd client;
+          npm i;
           npm run build
           cd ../server
           npm i
