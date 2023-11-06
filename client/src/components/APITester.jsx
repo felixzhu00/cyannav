@@ -264,7 +264,7 @@ function APITester() {
 
   return (
     <>
-      <h1>API Tester</h1>
+      <h1 class="title0">API Tester</h1>
       <form onSubmit={handleSubmit}>
         <p>Please select API Request:</p>
         {radioInputs}
