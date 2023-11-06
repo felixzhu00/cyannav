@@ -5,7 +5,7 @@ import axios from "axios"
 function APITester() {
 
   const isLocal = false
-  const hostname = isLocal ? `129.213.145.105` : `localhost`
+  const hostname = isLocal ? `localhost` : `129.213.145.105` 
   const port = 8000
 
   const http = `http://${hostname}:${port}`
