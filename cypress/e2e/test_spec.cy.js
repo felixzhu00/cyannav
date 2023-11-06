@@ -1,4 +1,4 @@
-describe('example to-do app', () => {
+describe('preliminary front end specs', () => {
   beforeEach(() => {
     cy.visit('129.213.145.105')
   })
