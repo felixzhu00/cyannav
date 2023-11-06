@@ -188,44 +188,44 @@ function APITester() {
           console.error('Invalid request');
           return;
       }
+ 
+      setResponse(response.data)
       
-      setResponse(response)
-      console.log('Response:', response);
+      console.log('Response:', JSON.stringify(response.data, null, 2));
     } catch (error) {
       console.error('Error:', error);
     }
 
-    setForm({
-      id: "",
-      type: "",
-      template: "",
-      json: "",
-      name: "",
-      tag: "",
-      status: "",
-      email: "",
-      password: "",
-      passwordVerify: "",
-      verificationCode: "",
-      code: "",
-      loginToken: "",
-      newUsername: "",
-      newEmail: ""
+    setForm(prevState => {
+      const newState = { ...prevState };
+      for (const key in newState) {
+        console.log(key)
+        if (newState.hasOwnProperty(key) && key != "name") {
+          newState[key] = "";
+        }
+      }
+      console.log(newState)
+      return newState;
     });
 
   };
-
   const updateField = (e) => {
+    console.log(e.target.name)
+    console.log(e.target.id)
+    console.log(form)
+
     if (e.target.name == "request") {
       setRequest({
         [e.target.name]: e.target.id
       });
+
     } else {
       setForm({
         ...form,
         [e.target.name]: e.target.value
       });
     }
+
   };
 
 
@@ -271,7 +271,7 @@ function APITester() {
 
         {renderTextInputFields()}
         <input type="submit" value="Submit" />
-        <p>Response code: {response.status ? response.status : ""}</p>
+        <p style={{ whiteSpace: 'pre-line' }}>{JSON.stringify(response, null, "\t")}</p>
       </form>
     </>
   );
