@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import axios from "axios"
 
 function APITester() {
@@ -12,6 +12,7 @@ function APITester() {
 
   const [request, setRequest] = useState("")
   const [response, setResponse] = useState("")
+  const [hasError, setError] = useState("")
   const [form, setForm] = useState({
     id: "",
     type: "",
@@ -31,17 +32,17 @@ function APITester() {
     
   });
   const requests = [
-    "getUserMaps(id)",
-    "getAllMaps()",
-    "getMapJsonById(id)",
-    "createNewMap(type, template, json)",
-    "createDuplicateMapById(id)",
-    "createForkMapById(id)",
-    "deleteMapById(id)",
-    "updateMapNameById(id, name)",
-    "updateMapTag(id, tag)",
-    "updateMapPublishStatus(id, status)",
-    "updateMapJson(id, json)",
+    // "getUserMaps(id)",
+    // "getAllMaps()",
+    // "getMapJsonById(id)",
+    // "createNewMap(type, template, json)",
+    // "createDuplicateMapById(id)",
+    // "createForkMapById(id)",
+    // "deleteMapById(id)",
+    // "updateMapNameById(id, name)",
+    // "updateMapTag(id, tag)",
+    // "updateMapPublishStatus(id, status)",
+    // "updateMapJson(id, json)",
     "getLoggedIn()",
     "loginUser(email, password)",
     "logoutUser()",
@@ -54,12 +55,18 @@ function APITester() {
     "deleteAccount(loginToken)"
   ];
 
+  useEffect(() => {
+    // This code will execute whenever hasError changes
+    // You can add any additional logic you want here
+  }, [request, response, form, hasError ]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setError("")
+    setResponse("")
     try {
       let response;
-      console.log(form)
       switch (request.request) {
 
         case `getMapById(id)`:
@@ -127,6 +134,7 @@ function APITester() {
           break;
         case `getLoggedIn()`:
           response = await axios.get(`${http}/auth/loggedIn`);
+          console.log(response)
           break;
 
         case `loginUser(email, password)`:
@@ -195,32 +203,31 @@ function APITester() {
           console.error(`Invalid request`);
           return;
       }
- 
-      setResponse(response.data)
       
-      console.log(`Response:`, JSON.stringify(response.data, null, 2));
+      const combinedData = {
+        status: response.status,
+        data: response.data
+      };
+      setResponse(combinedData)
+
+      console.log(`Response:`, JSON.stringify(combinedData, null, 2));
     } catch (error) {
-      console.error(`Error:`, error);
+      setError(error.message)
+      console.log(`Error:`, error.message);
     }
 
     setForm(prevState => {
       const newState = { ...prevState };
       for (const key in newState) {
-        console.log(key)
         if (newState.hasOwnProperty(key) && key != "name") {
           newState[key] = "";
         }
       }
-      console.log(newState)
       return newState;
     });
 
   };
   const updateField = (e) => {
-    console.log(e.target.name)
-    console.log(e.target.id)
-    console.log(form)
-
     if (e.target.name == "request") {
       setRequest({
         [e.target.name]: e.target.id
@@ -279,6 +286,7 @@ function APITester() {
         {renderTextInputFields()}
         <input type="submit" value="Submit" />
         <p style={{ whiteSpace: `pre-line` }}>{JSON.stringify(response, null, "\t")}</p>
+        <p >{hasError}</p>
       </form>
     </>
   );
