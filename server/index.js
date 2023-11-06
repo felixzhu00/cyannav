@@ -1,7 +1,7 @@
 const http = require('http')
 const express = require('express')
 const cors = require('cors')
-const cookieParser = require('cookieparser')
+// const cookieParser = require('cookieparser')
 
 
 const hostname = '127.0.0.1'
@@ -20,6 +20,8 @@ app.use(express.json())
 
 const authRouter = require('./routes/auth-router')
 app.use('/auth', authRouter)
+const apiRouter = require('./routes/api-router')
+app.use('/api', apiRouter)
 
 // Initialize database connection
 const db = require('./db')
@@ -27,3 +29,5 @@ db.on('error', console.error.bind(console, 'MongoDB connection failed'))
 
 // Run server
 app.listen(port, () => console.log(`Server running on port ${port}`))
+
+module.exports = app

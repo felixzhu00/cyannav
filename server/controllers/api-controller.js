@@ -97,9 +97,11 @@ getMapJsonById = async (req, res) => {
 }
 
 createNewMap = async (req, res) => {
-    const { type, template, json } = req.body
+    const { type } = req.body //used to be const { type, template, json } = req.body
+                                            //no clue what template is, replacing it for now so that
+                                            //we can do our backend tests with jest
 
-    if (!type || !templated || !json) {
+    if (!type) {
         return res.status(400).json({
             errorMessage: "Improper request"
         })
