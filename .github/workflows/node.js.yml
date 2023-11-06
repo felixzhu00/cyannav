@@ -17,11 +17,15 @@ jobs:
         with:
           node-version: '21.x'
       - run: |
-          cd client;
-          npm i;
+          npm i
+          cd client
+          npm i
           npm run build
           sudo service nginx restart
           cd ../server
           npm i
           pm2 stop 0
           pm2 start 0
+          cd ..
+          npm test
+          cypress run
