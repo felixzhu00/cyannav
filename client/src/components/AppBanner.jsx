@@ -13,7 +13,8 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import logo from '../assets/cyannav_logo.png'
 import { ThumbUp, ThumbUpAltOff, ThumbDownAltOff, ThumbDown } from '@mui/icons-material';
-import { border } from '@mui/system';
+import { useLocation } from 'react-router-dom';
+
 
 const settings = ['Account Settings', 'Logout'];
 const mapTitle = ['MAP TITLE']
@@ -24,6 +25,14 @@ const downvoteCount = 50
 function AppBanner() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const location = useLocation(); // Get access to the location object
+  const { pathname } = location; // Destructure pathname from location object
+
+  // Check if the current pathname is '/login' or '/register'
+  // and return null (don't render anything) if it's a match
+  if (pathname === '/login/' || pathname === '/register/') {
+    return null;
+  }
 
   // const handleOpenNavMenu = (event) => {
   //   setAnchorElNav(event.currentTarget);
