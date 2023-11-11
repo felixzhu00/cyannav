@@ -16,13 +16,13 @@ import { ThumbUp, ThumbUpAltOff, ThumbDownAltOff, ThumbDown } from '@mui/icons-m
 import { useLocation } from 'react-router-dom';
 
 
-const settings = ['Account Settings', 'Logout'];
-const mapTitle = ['MAP TITLE']
-const mapAuthor = ['MAP AUTHOR']
-const upvoteCount = 100
-const downvoteCount = 50
 
 function AppBanner() {
+  const settings = ['Account Settings', 'Logout'];
+  const mapTitle = ['MAP TITLE']
+  const mapAuthor = ['MAP AUTHOR']
+  const upvoteCount = 100
+  const downvoteCount = 50
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const location = useLocation(); // Get access to the location object
@@ -50,7 +50,7 @@ function AppBanner() {
   };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: 'grey' }}>
+    <AppBar position="static" sx={{ backgroundColor: 'cyan' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Box component="img"
@@ -105,21 +105,20 @@ function AppBanner() {
             <IconButton aria-label="upvote">
               <ThumbUp sx={{ color: 'black' }} />
             </IconButton>
-            <Typography variant="body1" sx={{ color: 'black' }}>{upvoteCount}</Typography>
+            <Typography variant="body1" sx={{ display: { xs: 'none', md: 'block' }, color: 'black' }}>{upvoteCount}</Typography>
 
             <IconButton aria-label="downvote">
               <ThumbDown sx={{ color: 'black' }} />
             </IconButton>
-            <Typography variant="body1" sx={{ color: 'black' }}>{downvoteCount}</Typography>
+            <Typography variant="body1" sx={{ display: { xs: 'none', md: 'block' }, color: 'black' }}>{downvoteCount}</Typography>
 
           </Box>
+          <Typography variant='h5' sx={{ paddingRight: '10px', color: 'black', fontWeight: 'bold', display: { xs: 'none', md: 'block' } }}>Username</Typography>
 
           <Box sx={{ flexGrow: 0 }}>
-            {/* <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton>
-            </Tooltip>
+            <IconButton onClick={handleOpenUserMenu} sx={{}}>
+              <Avatar alt="profile_picture" src="/static/images/avatar/2.jpg" />
+            </IconButton>
             <Menu
               sx={{ mt: '45px' }}
               id="menu-appbar"
@@ -141,9 +140,10 @@ function AppBanner() {
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
               ))}
-            </Menu> */}
+            </Menu>
 
-            <Button
+            {/* <------ Logging in and Registering ------> */}
+            {/* <Button
               variant='outlined'
               sx={{
                 margin: '2px',
@@ -177,8 +177,9 @@ function AppBanner() {
                 },
               }}>
               <Typography fontWeight={'bold'}>Register</Typography>
+            </Button> */}
 
-            </Button>
+
           </Box>
         </Toolbar>
       </Container>
