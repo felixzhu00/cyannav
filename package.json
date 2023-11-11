@@ -1,7 +1,18 @@
 {
   "devDependencies": {
+    "cypress": "^13.4.0",
+    "jest": "^29.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^5.0.1",
+    "supertest": "^6.3.3"
+  },
+  "scripts": {
+    "test": "jest --force-exit"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.0"
   }
 }

@@ -14,7 +14,7 @@ router.get('/api/user:userId', auth.verify, mapGraphicSchemaController.getUserMa
 router.get('/api/allmap', auth.verify, mapGraphicSchemaController.getAllMaps) 
 
 //Handles getting all existing maps request
-router.get('/api/mapjson:id', auth.verify, mapGraphicSchemaController.getMapJsonbyId)
+router.get('/api/mapjson:id', auth.verify, mapGraphicSchemaController.getMapJsonById)
 
 //Handles creating a new map request
 router.post('/api/newmap', auth.verify, mapGraphicSchemaController.createNewMap)
@@ -32,7 +32,7 @@ router.delete('/map:id', auth.verify, mapGraphicSchemaController.deleteMapById)
 router.put('/api/mapname:id', auth.verify, mapGraphicSchemaController.updateMapNameById)
 
 //Handles updating a map's tags request
-router.put('/api/maptag:id', auth.verify, mapGraphicSchemaController.upateMapTag)
+router.put('/api/maptag:id', auth.verify, mapGraphicSchemaController.updateMapTag)
 
 //Handles updating a map's publish status request(created? unfinished? published? etc)
 router.put('/api/mapstatus', auth.verify, mapGraphicSchemaController.updateMapPublishStatus)
