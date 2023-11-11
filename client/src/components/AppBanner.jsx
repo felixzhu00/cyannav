@@ -30,7 +30,7 @@ function AppBanner() {
 
   // Check if the current pathname is '/login' or '/register'
   // and return null (don't render anything) if it's a match
-  if (pathname === '/login/' || pathname === '/register/') {
+  if (pathname === '/login/' || pathname === '/login' || pathname === '/register/' || pathname === '/register' || pathname === '/forget/' || pathname === '/forget') {
     return null;
   }
 
