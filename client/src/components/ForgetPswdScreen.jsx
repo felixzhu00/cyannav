@@ -11,19 +11,6 @@ import Logo from '../assets/cyannav_logo_wo_name.png'
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom'
 
-function Copyright(props) {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center" {...props}>
-            {'Copyright © '}
-            <Link color="inherit" href="127.0.0.1">
-                CyanNav
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
-
 export default function ForgetPswdScreen() {
     const [step, setStep] = useState('emailStep');
     const [email, setEmail] = useState('');
@@ -153,7 +140,6 @@ export default function ForgetPswdScreen() {
                     </Grid>
                 </Grid>
             </Box>
-            <Copyright sx={{ mt: 8, mb: 4 }} />
         </Container>
     );
 }

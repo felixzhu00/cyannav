@@ -9,20 +9,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import RegisterLogo from '../assets/cyannav_logo_wo_name.png'
 
-function Copyright(props) {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center" {...props}>
-            {'Copyright © '}
-            <Link color="inherit" href="127.0.0.1">
-                CyanNav
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
-
-export default function SignUp() {
+export default function RegisterScreen() {
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -100,7 +87,6 @@ export default function SignUp() {
 
                 </Box>
             </Box>
-            <Copyright sx={{ mt: 5 }} />
         </Container>
     );
 }
