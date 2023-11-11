@@ -17,14 +17,6 @@ const theme = createTheme({
   },
 });
 
-// function App() {
-//   return (
-//     <ThemeProvider theme={theme}>
-//       <RegisterScreen />
-
-//       );
-// }
-
 const App = () => {
   return (
     <BrowserRouter>
