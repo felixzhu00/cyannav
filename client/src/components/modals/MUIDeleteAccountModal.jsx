@@ -79,19 +79,26 @@ export default function MUIDeleteAccountModal() {
                             type="password"
                             id="password"
                         />
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2, mr: 2 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
                             <Button
                                 onClick={handleClose}
                                 variant="contained"
                                 sx={{
                                     backgroundColor: "red",
                                     color: "black",
-                                    '&:hover': {
-                                        backgroundColor: 'green'
-                                    }
+                                    mr: '10px'
                                 }}
                             >
                                 DELETE
+                            </Button>
+                            <Button
+                                onClick={handleClose}
+                                variant="outlined"
+                                sx={{
+                                    color: "black",
+                                }}
+                            >
+                                CANCEL
                             </Button>
                         </Box>
                     </Box>

@@ -45,30 +45,26 @@ export default function MUIDeleteAccountModal(props) {
                         Please confirm if you would like to delete this map.<br></br>
                         Note: This map will be permanently deleted.
                     </Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2, mr: 2 }}>
-                        <Button
-                            onClick={handleClose} /* MUST CHANGE ONCLICK! */
-                            variant="contained"
-                            sx={{
-                                backgroundColor: "cyan",
-                                color: "black",
-                                mr: "10px"
-                            }}
-                        >
-                            CANCEL
-                        </Button>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
                         <Button
                             onClick={handleClose}
                             variant="contained"
                             sx={{
                                 backgroundColor: "red",
                                 color: "black",
-                                '&:hover': {
-                                    backgroundColor: 'green'
-                                }
+                                mr: "10px"
                             }}
                         >
                             DELETE
+                        </Button>
+                        <Button
+                            onClick={handleClose} /* MUST CHANGE ONCLICK! */
+                            variant="outlined"
+                            sx={{
+                                color: "black",
+                            }}
+                        >
+                            CANCEL
                         </Button>
                     </Box>
                 </Box>

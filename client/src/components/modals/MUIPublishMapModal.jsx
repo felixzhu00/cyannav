@@ -45,9 +45,10 @@ export default function MUIPublishMapModal(props) {
                         Please confirm if you would like to publish this map.<br></br>
                         Note: Once published, it can no longer be edited.
                     </Typography>
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2, mr: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
+
                         <Button
-                            onClick={handleClose} /* MUST CHANGE ONCLICK! */
+                            onClick={handleClose}
                             variant="contained"
                             sx={{
                                 backgroundColor: "cyan",
@@ -55,18 +56,16 @@ export default function MUIPublishMapModal(props) {
                                 mr: "10px"
                             }}
                         >
-                            CANCEL
+                            PUBLISH
                         </Button>
                         <Button
-                            onClick={handleClose}
-                            variant="contained"
+                            onClick={handleClose} /* MUST CHANGE ONCLICK! */
+                            variant="outlined"
                             sx={{
-                                backgroundColor: "lightGreen",
                                 color: "black",
-
                             }}
                         >
-                            PUBLISH
+                            CANCEL
                         </Button>
                     </Box>
                 </Box>

@@ -1,19 +1,23 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Typography, Box, InputBase, Menu, MenuItem, Paper, InputAdornment, Button, IconButton, ListItemIcon, Select, TextField, Grid } from '@mui/material';
-import { ZoomIn, ZoomOut, Undo, Redo, Delete, KeyboardArrowDown, SecurityUpdateWarningRounded } from '@mui/icons-material';
+import { Typography, Box, InputBase, Menu, MenuItem, Paper, InputAdornment, Button, IconButton, ListItemIcon, Select, TextField, Grid, Tabs, Tab } from '@mui/material';
+import { ZoomIn, ZoomOut, Undo, Redo, Delete, KeyboardArrowDown } from '@mui/icons-material';
+
 import MUIExportMapModal from './modals/MUIExportMapModal'
 import MUIPublishMapModal from './modals/MUIPublishMapModal'
 import MUIAddFieldModal from './modals/MUIAddFieldModal'
 import MUICommentModal from './modals/MUICommentModal'
 
 function MapViewingPage() {
-
+    const [value, setValue] = useState('1');
     const [fields, setFields] = useState([
         { id: 1, text: 'Temperature', value: '' },
         { id: 2, text: 'Population', value: '' },
         { id: 3, text: 'GDP', value: '' },
     ]);
     const [currentModel, setCurrentModel] = useState('');
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
     const [maptype, setMapType] = useState('Choropleth Map')
 
     const [choroplethOptions, setChoroplethOptions] = useState(fields.map((field) => field.text));
@@ -85,15 +89,16 @@ function MapViewingPage() {
                     display: 'flex',
                     justifyContent: 'flex-end',
                     alignItems: 'center',
-                    bgcolor: 'primary.light', // Adjust the background color as needed
+                    bgcolor: '#15B5B0',
                     padding: '10px',
+                    height: 'relative'
                 }}
             >
                 <Box>
-                    <Button variant="contained" onClick={handleExport} sx={{ width: '100px' }}>
+                    <Button variant="contained" onClick={handleExport} sx={{ width: '100px', marginRight: '10px', backgroundColor: 'cyan', color: 'black' }}>
                         Export
                     </Button>
-                    <Button variant="contained" onClick={handlePublish} sx={{ width: '100px', marginRight: '10px' }}>
+                    <Button variant="contained" onClick={handlePublish} sx={{ width: '100px', backgroundColor: 'cyan', color: 'black' }}>
                         Publish
                     </Button>
                 </Box>
@@ -106,26 +111,27 @@ function MapViewingPage() {
                 gridArea={'topbar'}
                 sx={{
                     boxSizing: 'border-box',
-                    width: '100%',
                     display: 'flex',
                     justifyContent: 'flex-end',
-                    alignItems: 'center',
-                    bgcolor: 'primary.light', // Adjust the background color as needed
-                    padding: '10px',
+                    bgcolor: '#F9BDC0',
+                    padding: '4px',
                 }}
             >
-                <Box>
-                    <Button variant="contained" onClick={handleComments} sx={{ width: '100px', marginLeft: '0px' }}>
-                        Comments
-                    </Button>
-                    <Button variant="contained" onClick={handleEdit} sx={{ width: '100px', marginLeft: '0px' }}>
-                        Edit
-                    </Button>
+                <Box sx={{ width: '100%', height: "relative" }}>
+                    <Tabs
+                        value={value}
+                        onChange={handleChange}
+                        variant="fullWidth"
+                        aria-label="edit-comment-tab-bar"
+                    >
+                        <Tab sx={{ '&.Mui-selected': { color: 'black' } }} onClick={handleEdit} value="1" label="Edit" />
+                        <Tab sx={{ '&.Mui-selected': { color: 'black' } }} onClick={handleEdit} value="2" label="Comment" />
+                    </Tabs>
                 </Box>
             </Box>
         )
     }
-
+    
 
     const mapView = () => {
         return (
@@ -134,7 +140,7 @@ function MapViewingPage() {
                 sx={{
                     flex: '1',
                     width: '100%',
-                    height: `calc(100vh - 61px)`,
+                    height: `calc(100vh - 56px)`,
                     backgroundColor: '#87CEEB', // Light blue color
                     // position: 'relative', // You can remove this line
                     display: 'flex',
@@ -256,82 +262,88 @@ function MapViewingPage() {
 
     const sideBar = () => {
         return (
-            <Box gridArea={'sidebar'}
+            <Box
+                gridArea={'sidebar'}
                 sx={{
                     boxSizing: 'border-box',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between', // Adjust to space out elements
                     height: `100%`,
                     width: '100%', // Adjust the width as needed
                     padding: '10px',
                     backgroundColor: '#f0f0f0', // Set background color
-                    top: '60px', // Adjust the top value based on the height of your topBar
-                    right: 0,
-                    bottom: 0, // Make the bottom touch the bottom of the screen
+
                 }}
             >
+                <Box>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            textAlign: 'center',
+                        }}
+                    >
+                        <Typography variant='h6'>Chosen Map Type:</Typography>
+                        <Typography sx={{ marginBottom: "20px" }}>{maptype}</Typography>
+                    </Box>
+                    {fields.map((field) => (
+                        <Box
+                            key={field.id}
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                marginBottom: '10px',
+                            }}
+                        >
+                            <Box sx={{ alignSelf: 'center', marginRight: '10px' }}><Typography>{field.text}:</Typography></Box>
+                            <Box sx={{ display: 'flex', flexDirection: 'row', alignSelf: 'flex-end' }}>
+                                <TextField
+                                    value={field.value}
+                                    onChange={(e) => handleInputChange(field.id, e.target.value)}
+                                />
+                                <IconButton onClick={() => handleDeleteField(field.id)}>
+                                    <Delete />
+                                </IconButton>
+                            </Box>
+                        </Box>
+                    ))}
+                </Box>
+
                 <Box
                     sx={{
                         display: 'flex',
-                        justifyContent: 'center',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        textAlign: 'center',
+                        marginBottom: '10px', // Adjust as needed
                     }}
-                >
-
-                    <Typography>Chosen Map Type</Typography>
-                    <Typography>{maptype}</Typography>
-                </Box>
-                {fields.map((field) => (
-                    <Box
-                        key={field.id}
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between', // Adjust as needed
-                            marginBottom: '10px',
-                        }}
-                    >
-                        <Box sx={{ alignSelf: 'center', marginRight: '10px' }}><Typography>{field.text}:</Typography></Box>
-                        <Box sx={{ display: 'flex', flexDirection: 'row', alignSelf: 'flex-end' }}>
-                            <TextField
-                                value={field.value}
-                                onChange={(e) => handleInputChange(field.id, e.target.value)}
-                            />
-                            <IconButton onClick={() => handleDeleteField(field.id)}>
-                                <Delete />
-                            </IconButton>
-                        </Box>
-                    </Box>
-                ))}
-
-                <Box
-                    sx={{ position: 'relative', bottom: '-60vh' }}
                 >
                     <Button
                         variant="contained"
                         color="primary"
                         onClick={handleAddField}
                         sx={{
-                            marginTop: 'auto',
-                            marginLeft: '50%',
-                            transform: 'translateX(-50%)',
-
+                            marginBottom: '10px',
+                            color: 'black',
+                            backgroundColor: 'cyan'
                         }}
                     >
-                        +Add Field
+                        + Add Field
                     </Button>
 
                     <Box
                         sx={{
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'space-between',
-                            marginBottom: '10px',
+                            width: '100%', // Ensure it takes up the full width
                         }}
                     >
-                        <Typography>Choropleth Map by:</Typography>
+                        <Typography sx={{ m: "5px" }}>Choropleth Map by:</Typography>
                         <Box sx={{ textAlign: 'right' }}>
-                            <Button onClick={handleChoroplethClick} variant="contained">
+                            <Button onClick={handleChoroplethClick} variant="contained" sx={{ color: "black", backgroundColor: "cyan" }}>
                                 {selectedChoropleth}<KeyboardArrowDown />
                             </Button>
                             <Menu
@@ -356,16 +368,18 @@ function MapViewingPage() {
                         </Box>
                     </Box>
                 </Box>
-
             </Box>
         );
     }
+
     return (
         <Box
             sx={{
                 display: 'grid',
-                gridTemplateColumns: '3fr 1fr', // Adjust the ratio as needed
-                gridTemplateRows: 'auto 1fr',
+                gridTemplateColumns: '3fr 1fr', // 3:1 ratio for main content and sidebar
+                // gridTemplateRows: '7vh auto', // Allocate 10vh for top bar, rest for content
+                height: 'auto', // Ensure the total height is 100vh
+                overflow: 'hidden' // Prevent any overflow
             }}
         >
             <Box sx={{ gridColumn: '1', gridRow: '1', textAlign: 'left' }}>{topLeft()}</Box>
