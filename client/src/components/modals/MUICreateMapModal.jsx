@@ -4,9 +4,10 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
-import { Close } from '@mui/icons-material';
+import { Close, PropaneSharp } from '@mui/icons-material';
 import { FormControl, RadioGroup, Radio, FormControlLabel, FormGroup, Select, MenuItem, InputLabel } from '@mui/material';
 import { DropzoneArea } from 'material-ui-dropzone';
+import { useEffect, useState } from 'react';
 
 const style = {
     position: 'absolute',
@@ -20,16 +21,21 @@ const style = {
     p: 4,
 };
 
-export default function MUICreateMapModal() {
-    const [open, setOpen] = React.useState(true);
+export default function MUICreateMapModal(props) {
+    const [open, setOpen] = React.useState(props.open);
     const [template, setTemplate] = React.useState('');
     const [files, setFiles] = React.useState([]);
 
-    const handleClose = () => setOpen(false);
+    const handleClose = () => {
+        setOpen(false)
+        props.onClose()
+    };
     const handleTemplateChange = (event) => setTemplate(event.target.value);
     const handleFileChange = (files) => {
         setFiles(files);
     };
+
+
 
     return (
         <div>
