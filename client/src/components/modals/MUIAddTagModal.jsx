@@ -69,10 +69,10 @@ export default function TagModal() {
                             autoFocus // Automatically focus when the modal opens
                         />
                         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
-                            <Button onClick={handleAddTag} variant="contained">
+                            <Button onClick={handleAddTag} sx={{ backgroundColor: "cyan", color: "black" }} variant="contained">
                                 Add Tag
                             </Button>
-                            <Button onClick={handleClose} variant="outlined">
+                            <Button onClick={handleClose} sx={{ color: "black" }} variant="outlined">
                                 Cancel
                             </Button>
                         </Box>

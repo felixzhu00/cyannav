@@ -65,8 +65,8 @@ export default function MUIExportMapModal() {
                         </FormGroup>
 
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                            <Button onClick={handleClose} variant="contained" sx={{ backgroundColor: "cyan", color: "black", mr: '7px' }}>Export</Button>
-                            <Button onClick={handleClose} variant="contained" sx={{ backgroundColor: "cyan", color: "black", ml: '7px' }}>Cancel</Button> {/* CHANGE THE ONCLICK! */}
+                            <Button onClick={handleClose} variant="contained" sx={{ backgroundColor: "cyan", color: "black", mr: '5px' }}>Export</Button>
+                            <Button onClick={handleClose} variant="outlined" sx={{ color: "black", ml: '5px' }}>Cancel</Button> {/* CHANGE THE ONCLICK! */}
                         </Box>
                     </Box>
                 </Box>

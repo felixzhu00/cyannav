@@ -106,8 +106,8 @@ export default function MUICreateMapModal() {
                         </Box>
 
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                            <Button onClick={handleClose} variant="contained" sx={{ backgroundColor: "cyan", color: "black", mr: '7px' }}>Cancel</Button>
-                            <Button onClick={handleClose} variant="contained" sx={{ backgroundColor: "cyan", color: "black", ml: '7px' }}>Create</Button> {/* CHANGE THE ONCLICK! */}
+                            <Button onClick={handleClose} variant="outlined" sx={{ color: "black", mr: '5px' }}>Cancel</Button>
+                            <Button onClick={handleClose} variant="contained" sx={{ backgroundColor: "cyan", color: "black", ml: '5px' }}>Create</Button> {/* CHANGE THE ONCLICK! */}
                         </Box>
                     </Box>
                 </Box>
