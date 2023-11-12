@@ -8,8 +8,11 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import LoginLogo from '../assets/cyannav_logo_wo_name.png'
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginScreen() {
+    const navigate = useNavigate();
+
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -17,6 +20,7 @@ export default function LoginScreen() {
             email: data.get('email'),
             password: data.get('password'),
         });
+        navigate('/browsepage');
     };
 
     return (

@@ -19,9 +19,12 @@ const style = {
     p: 4,
 };
 
-export default function MUICommentModal() {
-    const [open, setOpen] = React.useState(true);
-    const handleClose = () => setOpen(false);
+export default function MUICommentModal(props) {
+    const [open, setOpen] = React.useState(props.open);
+    const handleClose = () => {
+        setOpen(false)
+        props.onClose()
+    };
 
     return (
         <div>

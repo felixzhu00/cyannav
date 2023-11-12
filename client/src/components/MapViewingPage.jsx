@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Typography, Box, InputBase, Menu, MenuItem, Paper, InputAdornment, Button, IconButton, ListItemIcon, Select, TextField, Grid } from '@mui/material';
-import { ZoomIn, ZoomOut, Undo, Redo, Delete, KeyboardArrowDown } from '@mui/icons-material';
-
+import { ZoomIn, ZoomOut, Undo, Redo, Delete, KeyboardArrowDown, SecurityUpdateWarningRounded } from '@mui/icons-material';
+import MUIExportMapModal from './modals/MUIExportMapModal'
+import MUIPublishMapModal from './modals/MUIPublishMapModal'
+import MUIAddFieldModal from './modals/MUIAddFieldModal'
+import MUICommentModal from './modals/MUICommentModal'
 
 function MapViewingPage() {
 
@@ -10,7 +13,7 @@ function MapViewingPage() {
         { id: 2, text: 'Population', value: '' },
         { id: 3, text: 'GDP', value: '' },
     ]);
-
+    const [currentModel, setCurrentModel] = useState('');
     const [maptype, setMapType] = useState('Choropleth Map')
 
     const [choroplethOptions, setChoroplethOptions] = useState(fields.map((field) => field.text));
@@ -45,13 +48,13 @@ function MapViewingPage() {
     };
 
     const handleExport = () => {
-        // Handle export logic
+        setCurrentModel("export")
     };
     const handlePublish = () => {
-        // Handle publish logic
+        setCurrentModel("publish")
     };
     const handleComments = () => {
-        // Handle comments logic
+        setCurrentModel("comment")
     };
     const handleEdit = () => {
         // Handle edit logic
@@ -68,7 +71,9 @@ function MapViewingPage() {
     const handleZoomOut = () => {
         // Handle edit logic
     };
-    const handleAddField = () => { }
+    const handleAddField = () => {
+        setCurrentModel("addfield")
+    }
 
     const topLeft = () => {
         return (
@@ -120,7 +125,7 @@ function MapViewingPage() {
             </Box>
         )
     }
-    
+
 
     const mapView = () => {
         return (
@@ -367,6 +372,19 @@ function MapViewingPage() {
             <Box sx={{ gridColumn: '2', gridRow: '1', textAlign: 'right' }}>{topRight()}</Box>
             <Box sx={{ gridColumn: '1', gridRow: '2' }}>{mapView()}</Box>
             <Box sx={{ gridColumn: '2', gridRow: '2' }}>{sideBar()}</Box>
+            {currentModel === 'export' && <MUIExportMapModal
+                open={currentModel === 'export'}
+                onClose={() => setCurrentModel("")} />}
+            {currentModel === 'publish' && <MUIPublishMapModal
+                open={currentModel === 'publish'}
+                onClose={() => setCurrentModel("")} />}
+            {currentModel === 'comment' && <MUICommentModal
+                open={currentModel === 'comment'}
+                onClose={() => setCurrentModel("")} />}
+            {currentModel === 'addfield' && <MUIAddFieldModal
+                open={currentModel === 'addfield'}
+                onClose={() => setCurrentModel("")} />}
+            
         </Box>
     );
 

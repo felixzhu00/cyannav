@@ -1,17 +1,32 @@
 
 import Map from './Map'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Typography, Box, InputBase, Menu, MenuItem, Paper, InputAdornment, Button, IconButton, ListItemIcon, Select } from '@mui/material';
-import { Search, KeyboardArrowDown, Home, Store } from '@mui/icons-material';
+import { Search, KeyboardArrowDown, Home, Store, Add } from '@mui/icons-material';
+import { Link, MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
+import Pagination from '@mui/material/Pagination';
+import PaginationItem from '@mui/material/PaginationItem';
+import MUICreateMapModal from './modals/MUICreateMapModal';
+import MUIPublishMapModal from './modals/MUIPublishMapModal';
+import MUIDeleteMapModal from './modals/MUIDeleteMapModal';
+
+import MUIAddTagModal from './modals/MUIAddTagModal';
 
 function BrowsePage() {
-  const [anchorElSort, setAnchorElSort] = React.useState(null);
-  const [anchorElOption, setAnchorElOption] = React.useState(null);
+  const [anchorElSort, setAnchorElSort] = useState(null);
+  const [anchorElOption, setAnchorElOption] = useState(null);
 
-  const [selectedOption, setSelectedOption] = React.useState('By Map Name');
-  const [selectedSort, setSelectedSort] = React.useState('recent');
+  const [selectedOption, setSelectedOption] = useState('By Map Name');
+  const [selectedSort, setSelectedSort] = useState('recent');
+  const [currentModel, setCurrentModel] = useState('');
 
-  const [activeItem, setActiveItem] = useState('MyMaps');
+  const [activeItem, setActiveItem] = useState('My Maps');
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   const handleClick = (item) => {
     setActiveItem(item);
@@ -39,7 +54,6 @@ function BrowsePage() {
     setSelectedSort(sortOption);
     handleClose();
   };
-
 
   const searchAndSort = () => {
     return (
@@ -118,18 +132,23 @@ function BrowsePage() {
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          height: '100%',
+          gridTemplateAreas: `"side map map map map""side map map map map"`,
+          gridTemplateColumns: '1fr 10fr 10fr 10fr 10fr',
+          gridTemplateRows: '1fr 1fr',
           gap: 2,
         }}
       >
-        <Map />
-        <Map />
-        <Map />
-        <Map />
-        <Map />
-        <Map />
-        <Map />
-        <Map />
+        <Box gridArea={"side"}>{sideBar()}</Box>
+        <Map handleModal={(e) => setCurrentModel(e)} gridArea={"map"} />
+        {/* <Map handleModel={() => setCurrentModel} gridArea={"map"} />
+        <Map handleModel={() => setCurrentModel} gridArea={"map"} />
+        <Map handleModel={() => setCurrentModel} gridArea={"map"} />
+        <Map handleModel={() => setCurrentModel} gridArea={"map"} />
+        <Map handleModel={() => setCurrentModel} gridArea={"map"} />
+        <Map handleModel={() => setCurrentModel} gridArea={"map"} />
+        <Map handleModel={() => setCurrentModel} gridArea={"map"} /> */}
+
       </Box>
     )
   }
@@ -139,30 +158,30 @@ function BrowsePage() {
       <Box
         sx={{
           width: '80px',
-          height: '70vh',
+          height: '100%',
           backgroundColor: '#3f51b5', // Sidebar background color
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          borderRadius: '0 10px 10px 0', // Curved border on the right side
+          borderRadius: '10px', // Curved border on the right side
         }}
       >
         <IconButton
-          sx={{ color: activeItem === 'MyMaps' ? '#fff' : '#a5a5a5', fontSize: '38px', marginBottom: '10vh',  }}
-          onClick={() => handleClick('MyMaps')}
+          sx={{ color: activeItem === 'My Maps' ? '#fff' : '#a5a5a5', fontSize: '38px', marginBottom: '10vh', }}
+          onClick={() => handleClick('My Maps')}
         >
-          <Home 
-          sx={{fontSize: '38px', borderRadius: '50%', backgroundColor: '#ADD8E6'}}
+          <Home
+            sx={{ fontSize: '38px', borderRadius: '50%', backgroundColor: '#ADD8E6' }}
           />
         </IconButton>
 
         <IconButton
-          sx={{ color: activeItem === 'MarketPlace' ? '#fff' : '#a5a5a5', fontSize: '38px', marginTop: '10vh' }}
-          onClick={() => handleClick('MarketPlace')}
+          sx={{ color: activeItem === 'Marketplace' ? '#fff' : '#a5a5a5', fontSize: '38px', marginTop: '10vh' }}
+          onClick={() => handleClick('Marketplace')}
         >
-          <Store 
-          sx={{fontSize: '38px',  borderRadius: '50%', backgroundColor: '#ADD8E6'}}
+          <Store
+            sx={{ fontSize: '38px', borderRadius: '50%', backgroundColor: '#ADD8E6' }}
           />
         </IconButton>
       </Box>
@@ -172,28 +191,70 @@ function BrowsePage() {
 
 
   return (
-    <>
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, min-content)',
-          gridTemplateAreas: `"togglemenu title searchsort"
-                          "togglemenu mapdisplay mapdisplay"`,
-          gap: 2, p: 2
-        }}
-      >
+    <Box
+      sx={{
+        height: `calc(100vh - 161px)`,
+        display: 'grid',
+        gridTemplateColumns: '10fr 10fr',
+        gridTemplateRows: '1fr 10fr 1fr',
+        gridTemplateAreas: `"title searchsort"
+                          "mapdisplay mapdisplay"
+                          "page page"
+                          `,
+        alignItems: 'center', // Center horizontally
+        justifyContent: 'center', // Center vertically
+        gap: 2, p: 2
+      }}
 
 
-        <Typography gridArea={'title'}>My Maps</Typography>
 
-        <Box gridArea={'mapdisplay'}>{mapGrid()}</Box>
-        <Box gridArea={'searchsort'}>{searchAndSort()}</Box>
-        <Box gridArea={'togglemenu'}>{sideBar()}</Box>
+    >
+
+      <Typography variant="h1" gridArea={'title'}>{activeItem}</Typography>
+      <Box gridArea={'mapdisplay'}>
+        {mapGrid()}
+      </Box>
+      <Box gridArea={'searchsort'}>{searchAndSort()}</Box>
+
+      <Box gridArea={'page'} alignSelf="center">
+        <Pagination
+          count={10}
+          page={currentPage}  // Specify the current page
+          onChange={(event, page) => handlePageChange(page)}
+          renderItem={(item) => (
+            <PaginationItem
+              component={Button} // Use a Button component for each pagination item
+              onClick={() => handlePageChange(item.page)}
+              {...item}
+            />
+          )}
+        />
+      </Box>
+      <Box sx={{ position: 'absolute', bottom: '100px', right: '100px' }}>
+        <IconButton
+          sx={{ borderRadius: '50%', backgroundColor: '#ADD8E6' }}
+          onClick={() => setCurrentModel("create")}
+        >
+          <Add sx={{ fontSize: '100px' }} />
+        </IconButton>
       </Box>
 
-    </>
 
+      {currentModel === 'create' && <MUICreateMapModal
+        open={currentModel === 'create'}
+        onClose={() => setCurrentModel("")} />}
+      {currentModel === 'addtag' && <MUIAddTagModal
+        open={currentModel === 'addtag'}
+        onClose={() => setCurrentModel("")} />}
+      {currentModel === 'publish' && <MUIPublishMapModal
+        open={currentModel === 'publish'}
+        onClose={() => setCurrentModel("")} />}
+      {currentModel === 'delete' && <MUIDeleteMapModal
+        open={currentModel === 'delete'}
+        onClose={() => setCurrentModel("")} />}
+    </Box >
   );
 }
 
 export default BrowsePage;
+
