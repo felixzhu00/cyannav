@@ -115,6 +115,7 @@ function MapViewingPage() {
                     justifyContent: 'flex-end',
                     bgcolor: '#F9BDC0',
                     padding: '4px',
+                    boxShadow: 4
                 }}
             >
                 <Box sx={{ width: '100%', height: "relative" }}>
@@ -131,7 +132,7 @@ function MapViewingPage() {
             </Box>
         )
     }
-    
+
 
     const mapView = () => {
         return (
@@ -268,12 +269,12 @@ function MapViewingPage() {
                     boxSizing: 'border-box',
                     display: 'flex',
                     flexDirection: 'column',
-                    justifyContent: 'space-between', // Adjust to space out elements
+                    justifyContent: 'space-between',
                     height: `100%`,
-                    width: '100%', // Adjust the width as needed
+                    width: '100%',
                     padding: '10px',
-                    backgroundColor: '#f0f0f0', // Set background color
-
+                    backgroundColor: '#FFFFFF',
+                    boxShadow: 4
                 }}
             >
                 <Box>
@@ -398,7 +399,7 @@ function MapViewingPage() {
             {currentModel === 'addfield' && <MUIAddFieldModal
                 open={currentModel === 'addfield'}
                 onClose={() => setCurrentModel("")} />}
-            
+
         </Box>
     );
 
