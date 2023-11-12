@@ -22,13 +22,16 @@ const style = {
     maxHeight: '300px'
 };
 
-export default function TagModal() {
-    const [open, setOpen] = React.useState(true);
+export default function TagModal(props) {
+    const [open, setOpen] = React.useState(props.open);
     const [tags, setTags] = React.useState([]);
     const [inputValue, setInputValue] = React.useState('');
     const inputRef = React.useRef(null); // Create a ref for the input field
 
-    const handleClose = () => setOpen(false);
+    const handleClose = () => {
+        setOpen(false)
+        props.onClose()
+    };
     const handleAddTag = () => {
         if (inputValue.trim() !== '') {
             setTags([...tags, inputValue]);

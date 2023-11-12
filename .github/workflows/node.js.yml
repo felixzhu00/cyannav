@@ -17,13 +17,13 @@ jobs:
         with:
           node-version: '21.x'
       - run: |
-          npm i
+          npm i --force
           cd client
-          npm i
+          npm i --force
           npm run build
           sudo service nginx restart
           cd ../server
-          npm i
+          npm i --force
           pm2 stop 0
           pm2 start 0
           cd ..

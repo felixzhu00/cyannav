@@ -6,6 +6,7 @@ import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import { Close } from '@mui/icons-material';
 import { TextField } from '@mui/material';
+import { useEffect, useState } from 'react';
 
 const style = {
     position: 'absolute',
@@ -19,9 +20,12 @@ const style = {
     p: 4,
 };
 
-export default function MUIAddFieldModal() {
-    const [open, setOpen] = React.useState(true);
-    const handleClose = () => setOpen(false);
+export default function MUIAddFieldModal(props) {
+    const [open, setOpen] = useState(props.open);
+    const handleClose = () => { 
+        setOpen(false)
+        props.onClose()
+    };
 
     return (
         <div>
