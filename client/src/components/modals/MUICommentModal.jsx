@@ -58,7 +58,7 @@ export default function MUICommentModal() {
                         />
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
                             <Button onClick={handleClose} variant="contained" sx={{ backgroundColor: "cyan", color: "black", mr: "5px" }}>Send </Button> {/* CHANGE ONCLICK! */}
-                            <Button onClick={handleClose} variant="contained" sx={{ backgroundColor: "cyan", color: "black", ml: "5px" }}>Cancel</Button>
+                            <Button onClick={handleClose} variant="outlined" sx={{ color: "black", ml: "5px" }}>Cancel</Button>
                         </Box>
                     </Box>
                 </Box>

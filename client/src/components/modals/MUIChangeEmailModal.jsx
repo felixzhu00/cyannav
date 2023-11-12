@@ -64,8 +64,9 @@ export default function MUIChangeEmailModal() {
                             defaultValue=""
                             fullWidth
                         />
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2, mr: 2 }}>
-                            <Button onClick={handleClose} variant="contained" sx={{ backgroundColor: "cyan", color: "black" }}>Save</Button>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
+                            <Button onClick={handleClose} variant="contained" sx={{ backgroundColor: "cyan", color: "black", mr: "10px", width: "90px" }}>Save</Button>
+                            <Button onClick={handleClose} variant="outlined" sx={{ color: "black" }}>Cancel</Button>
                         </Box>
                     </Box>
                 </Box>
