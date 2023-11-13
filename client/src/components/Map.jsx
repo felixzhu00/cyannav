@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import { IconButton, MenuList, ListItemText, Typography, Box, TextField, Menu, MenuItem, Card, CardMedia, CardContent, CardActions, Button } from '@mui/material';
-import { MoreVert, Publish } from '@mui/icons-material';
+import { Co2Sharp, MoreVert, Publish } from '@mui/icons-material';
 import logo from "../assets/map_sample.jpg"
 import { useNavigate } from 'react-router-dom';
 
@@ -10,8 +10,6 @@ function Map(props) {
     const [isEditing, setIsEditing] = useState(false);
     const [mapName, setMapName] = useState('NAME OF MAP');
 
-    const [modal, setModal] = useState(props.modal);
-
 
     const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
@@ -20,11 +18,14 @@ function Map(props) {
     const handleMenuClose = (e) => {
         props.handleModal(e)
         setAnchorEl(null);
+
     };
 
     const handleNameClick = () => {
-        setIsEditing(true);
         setAnchorEl(null);
+        console.log(isEditing)
+        setIsEditing(true);
+
     };
 
     const handleNameChange = (event) => {
@@ -37,7 +38,13 @@ function Map(props) {
     const handleClickMap = () => {
         navigate('/mapview');
     }
-
+    useEffect(() => {
+        //Runs only on the first render
+        console.log(anchorEl)
+        console.log(mapName)
+        console.log(isEditing)
+      }, [isEditing]);
+    
     return (
         <Card
 
@@ -76,8 +83,7 @@ function Map(props) {
                         defaultValue="Small"
                         value={mapName}
                         onChange={handleNameChange}
-                        onBlur={mapName.trim() !== '' ? handleNameBlur : undefined}
-                        error={mapName.trim() === ''} // Set error to true if the field is empty
+                        // error={mapName.trim() === ''} // Set error to true if the field is empty
                         // helperText={mapName.trim() === '' ? 'Field cannot be empty' : ''}
                         // backgroundColor={'secondary.dark'}
                         autoFocus
@@ -88,11 +94,12 @@ function Map(props) {
                             }
                         }}
                     />
+
                 ) : (
                     <Typography variant="h5" gridArea={'name'} onDoubleClick={handleNameClick}>
                         {mapName}
                     </Typography>)}
-                {props.showPublish && (
+                {false && (
                     <Publish
                         sx={{
                             position: 'relative',
@@ -132,7 +139,7 @@ function Map(props) {
                     onClose={handleMenuClose}
                 >
                     <MenuList>
-                        <MenuItem onClick={() => handleNameClick}>
+                        <MenuItem onClick={() => handleNameClick()}>
                             <ListItemText id="renameOption" primary="Rename" />
                         </MenuItem>
                         <MenuItem onClick={() => handleMenuClose("addtag")}>
