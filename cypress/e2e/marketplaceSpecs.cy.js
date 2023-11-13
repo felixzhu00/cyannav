@@ -24,6 +24,7 @@ describe('marketplace specs', () => {
   it('map info displays correctly', () => {
     cy.get("#createdByUser")
     .should("have.text", "CREATED BY USER")
+    
   })
 
   it('by username/mapName info displays correctly', () => {
