@@ -65,6 +65,7 @@ export default function LoginScreen(props) {
 
                     <Button
                         onClick={()=>{props.handleGuest(false)}}
+                        id="signInBtn"
                         type="submit"
                         fullWidth
                         variant="contained"

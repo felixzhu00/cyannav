@@ -2,7 +2,7 @@ const app = require('../../index.js');
 const request = require('supertest')
 
 describe('newMap', () => {
-    it('returns code 201 if map added to db, otherwise 400', async () => {
+    it('returns code 201 if map added to db, otherwise 404', async () => {
         const res = await request(app).post('/api/newmap').send({ type: "map" });
     
         expect(res.statusCode).toEqual(404);

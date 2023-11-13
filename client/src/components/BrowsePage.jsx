@@ -89,6 +89,7 @@ function BrowsePage() {
             {selectedSort}<KeyboardArrowDown />
           </Button>
           <Menu
+            id="outerSortByMenuBtn"
             anchorEl={anchorElSort}
             open={Boolean(anchorElSort)}
             onClose={handleClose}
@@ -101,8 +102,8 @@ function BrowsePage() {
               horizontal: 'left',
             }}
           >
-            <MenuItem onClick={() => handleSortSelect('recent')}>Recent</MenuItem>
-            <MenuItem onClick={() => handleSortSelect('name')}>Name</MenuItem>
+            <MenuItem id="recentSortSelect" onClick={() => handleSortSelect('recent')}>Recent</MenuItem>
+            <MenuItem id="nameSortSelect" onClick={() => handleSortSelect('name')}>Name</MenuItem>
           </Menu>
         </Box>
         <Box gridArea={'searchoption'} sx={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
@@ -110,6 +111,7 @@ function BrowsePage() {
             {selectedOption}<KeyboardArrowDown />
           </Button>
           <Menu
+            id="outerMenuByName"
             anchorEl={anchorElOption}
             open={Boolean(anchorElOption)}
             onClose={handleClose}
@@ -122,8 +124,8 @@ function BrowsePage() {
               horizontal: 'left',
             }}
           >
-            <MenuItem onClick={() => handleOptionSelect('By Map Name')}>By Map Name</MenuItem>
-            <MenuItem onClick={() => handleOptionSelect('By Username')}>By Username</MenuItem>
+            <MenuItem id="byMapNameBtn" onClick={() => handleOptionSelect('By Map Name')}>By Map Name</MenuItem>
+            <MenuItem id="byUsernameBtn" onClick={() => handleOptionSelect('By Username')}>By Username</MenuItem>
           </Menu>
         </Box>
       </Box>
@@ -179,6 +181,7 @@ function BrowsePage() {
         </IconButton>
 
         <IconButton
+          id="marketplaceBtn"
           sx={{ color: activeItem === 'Marketplace' ? '#000000' : '#a5a5a5', fontSize: '45px', marginTop: '10vh' }}
           onClick={() => handleClick('Marketplace')}
         >
