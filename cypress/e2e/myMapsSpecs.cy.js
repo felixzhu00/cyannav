@@ -7,9 +7,6 @@ describe('my maps specs', () => {
     it('import map button ', () => {
         cy.get("#createMapOuterBtn")
         .click()
-        cy.get(" [control=radio] ")
-        .first()
-        .click()
         cy.get("#createMapBtnFromMyMaps")
         .should("have.text", "Create")
         .click();
