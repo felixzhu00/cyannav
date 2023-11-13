@@ -6,7 +6,7 @@ import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import { Close, PropaneSharp } from '@mui/icons-material';
 import { FormControl, RadioGroup, Radio, FormControlLabel, FormGroup, Select, MenuItem, InputLabel } from '@mui/material';
-import { DropzoneArea } from 'material-ui-dropzone';
+import { DropzoneArea } from 'react-mui-dropzone'
 import { useEffect, useState } from 'react';
 
 const style = {
@@ -34,8 +34,6 @@ export default function MUICreateMapModal(props) {
     const handleFileChange = (files) => {
         setFiles(files);
     };
-
-
 
     return (
         <div>

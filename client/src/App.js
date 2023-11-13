@@ -36,16 +36,18 @@ const theme = createTheme({
 const App = () => {
   return (
     <BrowserRouter>
-      <AppBanner />
-      <Routes>
-        <Route path="/" element={<LoginScreen />} />
-        <Route path="/login/" element={<LoginScreen />} />
-        <Route path="/register/" element={<RegisterScreen />} />
-        <Route path="/forget/" element={<ForgetPswdScreen />} />
-        <Route path="/profile/" element={<ProfileScreen />} />
-        <Route path="/browsepage/" element={<BrowsePage />} />
-        <Route path="/mapview/" element={<MapViewingPage />} />
-      </Routes>
+      <ThemeProvider theme={theme}>
+        <AppBanner />
+        <Routes>
+          <Route path="/" element={<LoginScreen />} />
+          <Route path="/login/" element={<LoginScreen />} />
+          <Route path="/register/" element={<RegisterScreen />} />
+          <Route path="/forget/" element={<ForgetPswdScreen />} />
+          <Route path="/profile/" element={<ProfileScreen />} />
+          <Route path="/browsepage/" element={<BrowsePage />} />
+          <Route path="/mapview/" element={<MapViewingPage />} />
+        </Routes>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }
@@ -54,38 +56,38 @@ const App = () => {
 
 
 
-  // return (
-  //   <BrowserRouter>
-      {/* <AuthContextProvider> */}
-      {/* <GlobalStoreContextProvider> */}
-      // <ThemeProvider theme={theme}>
-        
+// return (
+//   <BrowserRouter>
+{/* <AuthContextProvider> */ }
+{/* <GlobalStoreContextProvider> */ }
+// <ThemeProvider theme={theme}>
 
-        {/* <ProfileScreen /> */}
-        {/* <MUIChangeUsernameModal /> */}
-        {/* <MUIChangeEmailModal /> */}
-        {/* <MUIChangePasswordModal /> */}
-        {/* <MUIDeleteAccountModal /> */}
-        {/* <MUICreateMapModal /> */}
-        {/* <MUIDeleteMapModal /> */}
-        {/* <MUIPublishMapModal /> */}
-        {/* <MUIAddFieldModal /> */}
-        {/* <MUIExportMapModal /> */}
-        {/* <MUICommentModal /> */}
-        {/* <MUIAddTagModal /> */}
-        
 
-      //   <Routes>
-      //   <AppBanner />
-      //   <Route path="/" element={<LoginScreen />} />
-      //     <Route path="/login/" element={<LoginScreen />} />
-      //     <Route path="/register/" element={<RegisterScreen />} />
-      //     <Route path="/forget/" element={<ForgetPswdScreen />} />
-      //   </Routes>
-      // </ThemeProvider>
+{/* <ProfileScreen /> */ }
+{/* <MUIChangeUsernameModal /> */ }
+{/* <MUIChangeEmailModal /> */ }
+{/* <MUIChangePasswordModal /> */ }
+{/* <MUIDeleteAccountModal /> */ }
+{/* <MUICreateMapModal /> */ }
+{/* <MUIDeleteMapModal /> */ }
+{/* <MUIPublishMapModal /> */ }
+{/* <MUIAddFieldModal /> */ }
+{/* <MUIExportMapModal /> */ }
+{/* <MUICommentModal /> */ }
+{/* <MUIAddTagModal /> */ }
 
-      {/* </GlobalStoreContextProvider> */}
-      {/* </AuthContextProvider> */}
+
+//   <Routes>
+//   <AppBanner />
+//   <Route path="/" element={<LoginScreen />} />
+//     <Route path="/login/" element={<LoginScreen />} />
+//     <Route path="/register/" element={<RegisterScreen />} />
+//     <Route path="/forget/" element={<ForgetPswdScreen />} />
+//   </Routes>
+// </ThemeProvider>
+
+{/* </GlobalStoreContextProvider> */ }
+{/* </AuthContextProvider> */ }
 //     </BrowserRouter>
 //   )
 // }
