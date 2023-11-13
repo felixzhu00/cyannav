@@ -13,11 +13,12 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import logo from '../assets/cyannav_logo.png'
 import { ThumbUp, ThumbUpAltOff, ThumbDownAltOff, ThumbDown } from '@mui/icons-material';
-import { useLocation } from 'react-router-dom';
-
+import { useLocation, useNavigate } from 'react-router-dom';
 
 
 function AppBanner() {
+  const navigate = useNavigate();
+
   const settings = ['Account Settings', 'Logout'];
   const mapTitle = ['MAP TITLE']
   const mapAuthor = ['MAP AUTHOR']
@@ -45,7 +46,14 @@ function AppBanner() {
   //   setAnchorElNav(null);
   // };
 
-  const handleCloseUserMenu = () => {
+  const handleCloseUserMenu = (setting) => {
+    if(setting == 'Account Settings'){
+      navigate('/profile')
+    }
+
+    if(setting == 'Logout'){
+      navigate('/login')
+    }
     setAnchorElUser(null);
   };
 
@@ -53,14 +61,17 @@ function AppBanner() {
     <AppBar position="static" sx={{ backgroundColor: 'cyan' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <Box component="img"
-            sx={{
-              width: '200px',
-              borderRadius: 2,
-              flexGrow: 0
-            }}
-            src={logo}
-          />
+          <Button onClick={()=>{navigate('/browsepage')}}>
+            <Box component="img"
+              sx={{
+                width: '200px',
+                borderRadius: 2,
+                flexGrow: 0
+              }}
+              src={logo}
+            />
+          </Button>
+
           <Typography
             variant="h5"
             noWrap
@@ -136,7 +147,7 @@ function AppBanner() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <MenuItem key={setting} onClick={() => handleCloseUserMenu(setting)}>
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
               ))}

@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -6,6 +5,7 @@ import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import { Close } from '@mui/icons-material';
 import { TextField } from '@mui/material';
+import React, { useState, useRef, useEffect } from 'react';
 
 const style = {
     position: 'absolute',
@@ -19,9 +19,12 @@ const style = {
     p: 4,
 };
 
-export default function MUIChangeEmailModal() {
-    const [open, setOpen] = React.useState(true);
-    const handleClose = () => setOpen(false);
+export default function MUIChangeEmailModal(props) {
+    const [open, setOpen] = React.useState(props.open);
+    const handleClose = () => { 
+        setOpen(false)
+        props.onClose()
+    };
 
     return (
         <div>

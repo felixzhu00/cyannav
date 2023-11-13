@@ -61,8 +61,8 @@ function BrowsePage() {
         justifyContent: 'flex-end',
         display: 'grid',
         gridTemplateColumns: 'repeat(3, min-content)',
-        gridTemplateAreas: `"searchtext searchbox searchoption"
-                          ". sorttext sortoption"`,
+        gridTemplateAreas: `"searchbox searchoption"
+                          "sorttext sortoption"`,
         gap: 2, p: 2
       }}>
         <Typography gridArea={'searchtext'} sx={{ textAlign: 'right' }}>Search</Typography>
