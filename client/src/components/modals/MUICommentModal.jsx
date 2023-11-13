@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -24,6 +25,12 @@ export default function MUICommentModal(props) {
     const handleClose = () => {
         setOpen(false)
         props.onClose()
+    };
+
+    const [commentText, setCommentText] = useState("");
+    const handleSend = () => {
+        props.onAddComment(commentText); // Call the passed function with the comment text
+        handleClose();
     };
 
     return (
@@ -58,9 +65,10 @@ export default function MUICommentModal(props) {
                             multiline
                             rows={4}
                             variant="standard"
+                            onChange={(e) => setCommentText(e.target.value)}
                         />
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
-                            <Button onClick={handleClose} variant="contained" sx={{ backgroundColor: "cyan", color: "black", mr: "5px" }}>Send </Button> {/* CHANGE ONCLICK! */}
+                            <Button onClick={handleSend} variant="contained" sx={{ backgroundColor: "cyan", color: "black", mr: "5px" }}>Send </Button>
                             <Button onClick={handleClose} variant="outlined" sx={{ color: "black", ml: "5px" }}>Cancel</Button>
                         </Box>
                     </Box>
