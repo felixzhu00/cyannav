@@ -44,7 +44,6 @@ export default function LoginScreen(props) {
                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
                     <TextField
                         margin="normal"
-                        required
                         fullWidth
                         id="email"
                         label="Email Address"
@@ -54,7 +53,6 @@ export default function LoginScreen(props) {
                     />
                     <TextField
                         margin="normal"
-                        required
                         fullWidth
                         name="password"
                         label="Password"
@@ -89,7 +87,7 @@ export default function LoginScreen(props) {
                             </Link>
                         </Grid>
                         <Grid item>
-                            <Link href="/register" variant="body2">
+                            <Link id="registerLink" href="/register" variant="body2">
                                 {"Don't have an account? Sign Up"}
                             </Link>
                         </Grid>
