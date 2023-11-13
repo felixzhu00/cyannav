@@ -31,7 +31,7 @@ describe('marketplace specs', () => {
     cy.get("#outerMenuByName")
     .click()
     cy.get("#byUsernameBtn")
-    .should("have.text", "BY USERNAME")
+    .should("have.text", "By Username")
     .click()
   })
 
@@ -39,7 +39,7 @@ describe('marketplace specs', () => {
     cy.get("#outerMenuByName")
     .click()
     cy.get("#byMapNameBtn")
-    .should("have.text", "BY MAP NAME")
+    .should("have.text", "By Map Name")
     .click()
   })
 })
