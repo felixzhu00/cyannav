@@ -6,12 +6,16 @@ describe('marketplace specs', () => {
   })
 
   it('sort by recent button displays correctly', () => {
+    cy.get("#outerSortByMenuBtn")
+    .click()
     cy.get("#recentSortSelect")
     .should("have.text", "Recent")
     .click();
   })
 
   it('sort by name button displays correctly', () => {
+    cy.get("#outerSortByMenuBtn")
+    .click()
     cy.get("#nameSortSelect")
     .should("have.text", "Name")
     .click();
@@ -23,15 +27,18 @@ describe('marketplace specs', () => {
   })
 
   it('by username/mapName info displays correctly', () => {
+    cy.get("#outerMenuByName")
+    .click()
     cy.get("#byUsernameBtn")
     .should("have.text", "BY USERNAME")
     .click()
   })
 
   it('by username/mapName info displays correctly', () => {
+    cy.get("#outerMenuByName")
+    .click()
     cy.get("#byMapNameBtn")
     .should("have.text", "BY MAP NAME")
     .click()
   })
-
 })

@@ -89,6 +89,7 @@ function BrowsePage() {
             {selectedSort}<KeyboardArrowDown />
           </Button>
           <Menu
+            id="outerSortByMenuBtn"
             anchorEl={anchorElSort}
             open={Boolean(anchorElSort)}
             onClose={handleClose}
@@ -110,6 +111,7 @@ function BrowsePage() {
             {selectedOption}<KeyboardArrowDown />
           </Button>
           <Menu
+            id="outerMenuByName"
             anchorEl={anchorElOption}
             open={Boolean(anchorElOption)}
             onClose={handleClose}
