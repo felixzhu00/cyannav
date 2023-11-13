@@ -18,11 +18,31 @@ function MapViewingPage() {
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
-    const [maptype, setMapType] = useState('Choropleth Map')
+    const [maptype, setMapType] = useState('Choropleth Map');
 
     const [choroplethOptions, setChoroplethOptions] = useState(fields.map((field) => field.text));
     const [selectedChoropleth, setSelectedChoropleth] = useState('');
     const [anchorElChoropleth, setAnchorElChoropleth] = useState(null);
+
+    const [comments, setComments] = useState([]); // Used to store comments
+    const addComment = (newCommentText) => {
+        const newComment = {
+            text: newCommentText,
+            timestamp: new Date().toISOString()
+        };
+        setComments([...comments, newComment]);
+    };
+
+
+    // Comment bubble styling
+    const commentBubbleStyle = {
+        margin: '10px',
+        padding: '10px',
+        backgroundColor: '#04ECF0', // Light grey background
+        borderRadius: '15px', // Rounded corners for bubble effect
+        boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.2)', // Slight shadow for depth
+        maxWidth: '90%', // Max width of the bubble
+    };
 
     const handleInputChange = (id, value) => {
         const updatedFields = fields.map((field) =>
@@ -32,7 +52,6 @@ function MapViewingPage() {
     };
 
     const handleDeleteField = (id) => {
-        // Implement your logic to delete a field
         const updatedFields = fields.filter((field) => field.id !== id);
         setFields(updatedFields);
         setChoroplethOptions(updatedFields.map((field) => field.text));
@@ -91,7 +110,7 @@ function MapViewingPage() {
                     alignItems: 'center',
                     bgcolor: '#15B5B0',
                     padding: '10px',
-                    height: 'relative'
+                    height: 'relative',
                 }}
             >
                 <Box>
@@ -142,8 +161,7 @@ function MapViewingPage() {
                     flex: '1',
                     width: '100%',
                     height: `calc(100vh - 121px)`,
-                    backgroundColor: '#87CEEB', // Light blue color
-                    // position: 'relative', // You can remove this line
+                    backgroundColor: '#87CEEB',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between', // Add space between children
@@ -219,47 +237,47 @@ function MapViewingPage() {
             </Box>
         );
     }
-
-
-    const textBox = () => {
-        <Box
-            sx={{
-                width: '400px', // Adjust the width as needed
-                padding: '10px',
-                backgroundColor: '#f0f0f0', // Set background color
-                position: 'fixed',
-                top: 0,
-                right: 0,
-                height: '100vh', // Adjust the height as needed
-                overflowY: 'auto', // Add vertical scroll if needed
-            }}
-        >
-            {fields.map((field) => (
-                <Box
-                    key={field.id}
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between', // Adjust as needed
-                        marginBottom: '10px',
-                    }}
-                >
-                    <Box sx={{ alignSelf: 'center', marginRight: '10px' }}>{field.text}:</Box>
-                    <Box sx={{ display: 'flex', flexDirection: 'row', alignSelf: 'flex-end' }}>
-                        <TextField
-                            value={field.value}
-                            onChange={(e) => handleInputChange(field.id, e.target.value)}
-                        />
-                        <IconButton onClick={() => handleDeleteField(field.id)}>
-                            <Delete />
-                        </IconButton>
-                    </Box>
+    const commentSide = () => {
+        return (
+            <Box
+                sx={{
+                    boxSizing: 'border-box',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-start',
+                    padding: '10px',
+                    height: '100%',
+                    width: '100%',
+                    // backgroundColor: '#FFFFFF', // Change color as needed
+                }}
+            >
+                <Box>
+                    {/* Map through the comments and display them */}
+                    {comments.map((comment, index) => (
+                        <Paper key={index} sx={commentBubbleStyle}>
+                            <Typography variant="body1" key={index}>{comment.text}</Typography>
+                            <Typography variant="caption" sx={{ display: 'block', marginTop: '5px' }}>
+                                <Typography variant='caption'>Username</Typography><br></br>
+                                {new Date(comment.timestamp).toLocaleString()}
+                            </Typography>
+                        </Paper>
+                    ))}
                 </Box>
-            ))}
-        </Box>
-    }
-
-
+                <Button
+                    variant="contained"
+                    sx={{
+                        mt: 'auto', // This ensures the margin is applied to the top, pushing the button to the bottom
+                        width: '100%', // Button takes full width of the sidebar
+                        color: "black",
+                        bgcolor: "cyan"
+                    }}
+                    onClick={handleComments} // Replace with your own event handler
+                >
+                    Add Comment
+                </Button>
+            </Box>
+        );
+    };
     const sideBar = () => {
         return (
             <Box
@@ -272,7 +290,7 @@ function MapViewingPage() {
                     height: `calc(100vh - 121px)`,
                     width: '100%',
                     padding: '10px',
-                    backgroundColor: '#FFFFFF',
+                    // backgroundColor: '#FFFFFF',
                     boxShadow: 4
                 }}
             >
@@ -387,7 +405,7 @@ function MapViewingPage() {
             <Box sx={{ gridColumn: '1', gridRow: '1', textAlign: 'left', paddingTop: '1px' }}>{topLeft()}</Box>
             <Box sx={{ gridColumn: '2', gridRow: '1', textAlign: 'right', paddingTop: '1px' }}>{topRight()}</Box>
             <Box sx={{ gridColumn: '1', gridRow: '2' }}>{mapView()}</Box>
-            <Box sx={{ gridColumn: '2', gridRow: '2' }}>{sideBar()}</Box>
+            <Box sx={{ gridColumn: '2', gridRow: '2' }}>{value === '1' ? sideBar() : commentSide()}</Box>
             {
                 currentModel === 'export' && <MUIExportMapModal
                     open={currentModel === 'export'}
@@ -401,7 +419,8 @@ function MapViewingPage() {
             {
                 currentModel === 'comment' && <MUICommentModal
                     open={currentModel === 'comment'}
-                    onClose={() => setCurrentModel("")} />
+                    onClose={() => setCurrentModel("")}
+                    onAddComment={addComment} />
             }
             {
                 currentModel === 'addfield' && <MUIAddFieldModal
