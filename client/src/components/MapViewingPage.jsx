@@ -141,7 +141,7 @@ function MapViewingPage() {
                 sx={{
                     flex: '1',
                     width: '100%',
-                    height: `calc(100vh - 56px)`,
+                    height: `calc(100vh - 121px)`,
                     backgroundColor: '#87CEEB', // Light blue color
                     // position: 'relative', // You can remove this line
                     display: 'flex',
@@ -218,7 +218,6 @@ function MapViewingPage() {
                 </Box>
             </Box>
         );
-
     }
 
 
@@ -270,7 +269,7 @@ function MapViewingPage() {
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
-                    height: `100%`,
+                    height: `calc(100vh - 121px)`,
                     width: '100%',
                     padding: '10px',
                     backgroundColor: '#FFFFFF',
@@ -339,13 +338,15 @@ function MapViewingPage() {
                         sx={{
                             display: 'flex',
                             alignItems: 'center',
-                            width: '100%', // Ensure it takes up the full width
                         }}
                     >
-                        <Typography sx={{ m: "5px" }}>Choropleth Map by:</Typography>
+                        <Typography sx={{ m: "10px" }}>{maptype} by:</Typography>
                         <Box sx={{ textAlign: 'right' }}>
-                            <Button onClick={handleChoroplethClick} variant="contained" sx={{ color: "black", backgroundColor: "cyan" }}>
-                                {selectedChoropleth}<KeyboardArrowDown />
+                            <Button onClick={handleChoroplethClick} variant="contained" sx={{ color: "black", backgroundColor: "cyan", width: '150px' }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                    <span>{selectedChoropleth}</span>
+                                    <KeyboardArrowDown />
+                                </Box>
                             </Button>
                             <Menu
                                 anchorEl={anchorElChoropleth}
@@ -383,24 +384,32 @@ function MapViewingPage() {
                 overflow: 'hidden' // Prevent any overflow
             }}
         >
-            <Box sx={{ gridColumn: '1', gridRow: '1', textAlign: 'left' }}>{topLeft()}</Box>
-            <Box sx={{ gridColumn: '2', gridRow: '1', textAlign: 'right' }}>{topRight()}</Box>
+            <Box sx={{ gridColumn: '1', gridRow: '1', textAlign: 'left', paddingTop: '1px' }}>{topLeft()}</Box>
+            <Box sx={{ gridColumn: '2', gridRow: '1', textAlign: 'right', paddingTop: '1px' }}>{topRight()}</Box>
             <Box sx={{ gridColumn: '1', gridRow: '2' }}>{mapView()}</Box>
             <Box sx={{ gridColumn: '2', gridRow: '2' }}>{sideBar()}</Box>
-            {currentModel === 'export' && <MUIExportMapModal
-                open={currentModel === 'export'}
-                onClose={() => setCurrentModel("")} />}
-            {currentModel === 'publish' && <MUIPublishMapModal
-                open={currentModel === 'publish'}
-                onClose={() => setCurrentModel("")} />}
-            {currentModel === 'comment' && <MUICommentModal
-                open={currentModel === 'comment'}
-                onClose={() => setCurrentModel("")} />}
-            {currentModel === 'addfield' && <MUIAddFieldModal
-                open={currentModel === 'addfield'}
-                onClose={() => setCurrentModel("")} />}
+            {
+                currentModel === 'export' && <MUIExportMapModal
+                    open={currentModel === 'export'}
+                    onClose={() => setCurrentModel("")} />
+            }
+            {
+                currentModel === 'publish' && <MUIPublishMapModal
+                    open={currentModel === 'publish'}
+                    onClose={() => setCurrentModel("")} />
+            }
+            {
+                currentModel === 'comment' && <MUICommentModal
+                    open={currentModel === 'comment'}
+                    onClose={() => setCurrentModel("")} />
+            }
+            {
+                currentModel === 'addfield' && <MUIAddFieldModal
+                    open={currentModel === 'addfield'}
+                    onClose={() => setCurrentModel("")} />
+            }
 
-        </Box>
+        </Box >
     );
 
 }
