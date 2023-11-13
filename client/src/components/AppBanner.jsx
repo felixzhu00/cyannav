@@ -151,8 +151,8 @@ function AppBanner() {
                 onClose={handleCloseUserMenu}
               >
                 {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={()=>{handleCloseUserMenu(setting)}}>
-                    <Typography textAlign="center">{setting}</Typography>
+                  <MenuItem id="settingsDropdown" key={setting} onClick={()=>{handleCloseUserMenu(setting)}}>
+                    <Typography id="settingsDropdownOption" textAlign="center">{setting}</Typography>
                   </MenuItem>
                 ))}
               </Menu>
