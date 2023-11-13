@@ -55,6 +55,7 @@ function BrowsePage() {
     handleClose();
   };
 
+
   const searchAndSort = () => {
     return (
       <Box sx={{
@@ -174,7 +175,7 @@ function BrowsePage() {
           onClick={() => handleClick('My Maps')}
         >
           <Home
-            sx={{ fontSize: '45px', borderRadius: '50%', backgroundColor: '#00FFFF' }}
+            sx={{ fontSize: '45px', borderRadius: '50%', backgroundColor: activeItem === 'My Maps' ? '#00FFFF' : '#FFFFFF' }}
           />
         </IconButton>
 
@@ -183,7 +184,7 @@ function BrowsePage() {
           onClick={() => handleClick('Marketplace')}
         >
           <Store
-            sx={{ fontSize: '45px', borderRadius: '50%', backgroundColor: '#00FFFF', }}
+            sx={{ fontSize: '45px', borderRadius: '50%', backgroundColor: activeItem === 'Marketplace' ? '#00FFFF' : '#FFFFFF', }}
           />
         </IconButton>
       </Box>
@@ -212,7 +213,7 @@ function BrowsePage() {
 
     >
 
-      <Typography variant="h1" gridArea={'title'}>{activeItem}</Typography>
+      <Typography variant="h1" sx={{ fontWeight: '900' }} gridArea={'title'}>{activeItem}</Typography>
       <Box gridArea={'mapdisplay'}>
         {mapGrid()}
       </Box>
