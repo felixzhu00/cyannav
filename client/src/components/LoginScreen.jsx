@@ -62,7 +62,7 @@ export default function LoginScreen(props) {
                     />
 
                     <Button
-                        onClick={()=>{props.handleGuest(false)}}
+                        onClick={() => { props.handleGuest(false) }}
                         id="signInBtn"
                         type="submit"
                         fullWidth
@@ -72,13 +72,13 @@ export default function LoginScreen(props) {
                         Sign In
                     </Button>
                     <Button
-                        onClick={()=>{props.handleGuest(true)}}
+                        onClick={() => { props.handleGuest(true) }}
                         type="submit"
                         fullWidth
                         variant="contained"
                         sx={{ mt: 1, mb: 2 }}
                     >
-                        Continue as Guest
+                        Continue as Guest!
                     </Button>
                     <Grid container>
                         <Grid item xs>
