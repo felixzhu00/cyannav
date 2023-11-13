@@ -8,8 +8,10 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import RegisterLogo from '../assets/cyannav_logo_wo_name.png'
+import { useNavigate } from 'react-router-dom';
 
 export default function RegisterScreen() {
+    const navigate = useNavigate();
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -18,6 +20,7 @@ export default function RegisterScreen() {
             username: data.get('username'),
             password: data.get('password'),
         });
+        navigate('/login');
     };
 
     return (
