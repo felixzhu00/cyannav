@@ -65,13 +65,12 @@ function BrowsePage() {
                           "sorttext sortoption"`,
         gap: 2, p: 2
       }}>
-        <Typography gridArea={'searchtext'} sx={{ textAlign: 'right' }}>Search</Typography>
-        <Typography gridArea={'sorttext'} sx={{ textAlign: 'right' }}>Sort By</Typography>
-        <Box gridArea={'searchbox'} sx={{ textAlign: 'right' }}>
+        <Box gridArea={'searchbox'} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
           <Paper component="form" elevation={3} sx={{ display: 'flex', justifyContent: 'flex-end', width: '280px', margin: 0 }}>
             <InputBase
               fullWidth
               placeholder="Search"
+              sx={{ paddingLeft: '10px' }}
               endAdornment={
                 <InputAdornment position="start">
                   <Search />
@@ -80,9 +79,13 @@ function BrowsePage() {
             />
           </Paper>
         </Box>
+        <Box gridArea={'sorttext'} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+          <Typography variant="body1" sx={{ textAlign: 'right' }}>Sort By:</Typography>
+        </Box>
 
-        <Box gridArea={'sortoption'} sx={{ textAlign: 'right' }}>
-          <Button onClick={handleSortClick} variant="contained">
+        <Box gridArea={'sortoption'} sx={{ textAlign: 'left' }}>
+          <Button onClick={handleSortClick} variant="contained" sx={{ color: 'black', bgcolor: 'cyan' }}
+          >
             {selectedSort}<KeyboardArrowDown />
           </Button>
           <Menu
@@ -103,7 +106,7 @@ function BrowsePage() {
           </Menu>
         </Box>
         <Box gridArea={'searchoption'} sx={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-          <Button onClick={handleOptionClick} variant="contained">
+          <Button onClick={handleOptionClick} variant="contained" sx={{ color: 'black', bgcolor: 'cyan' }}>
             {selectedOption}<KeyboardArrowDown />
           </Button>
           <Menu
@@ -141,14 +144,13 @@ function BrowsePage() {
       >
         <Box gridArea={"side"}>{sideBar()}</Box>
         <Map handleModal={(e) => setCurrentModel(e)} gridArea={"map"} />
-        {/* <Map handleModel={() => setCurrentModel} gridArea={"map"} />
-        <Map handleModel={() => setCurrentModel} gridArea={"map"} />
-        <Map handleModel={() => setCurrentModel} gridArea={"map"} />
-        <Map handleModel={() => setCurrentModel} gridArea={"map"} />
-        <Map handleModel={() => setCurrentModel} gridArea={"map"} />
-        <Map handleModel={() => setCurrentModel} gridArea={"map"} />
-        <Map handleModel={() => setCurrentModel} gridArea={"map"} /> */}
-
+        <Map handleModal={(e) => setCurrentModel(e)} gridArea={"map"} />
+        <Map handleModal={(e) => setCurrentModel(e)} gridArea={"map"} />
+        <Map handleModal={(e) => setCurrentModel(e)} gridArea={"map"} />
+        <Map handleModal={(e) => setCurrentModel(e)} gridArea={"map"} />
+        <Map handleModal={(e) => setCurrentModel(e)} gridArea={"map"} />
+        <Map handleModal={(e) => setCurrentModel(e)} gridArea={"map"} />
+        <Map handleModal={(e) => setCurrentModel(e)} gridArea={"map"} />
       </Box>
     )
   }
@@ -157,31 +159,31 @@ function BrowsePage() {
     return (
       <Box
         sx={{
-          width: '80px',
+          width: '60px',
           height: '100%',
-          backgroundColor: '#3f51b5', // Sidebar background color
+          backgroundColor: '#BCECE0', // Sidebar background color
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          borderRadius: '10px', // Curved border on the right side
+          borderRadius: '100px', // Curved border on the right side
         }}
       >
         <IconButton
-          sx={{ color: activeItem === 'My Maps' ? '#fff' : '#a5a5a5', fontSize: '38px', marginBottom: '10vh', }}
+          sx={{ color: activeItem === 'My Maps' ? '#000000' : '#a5a5a5', fontSize: '45px', marginBottom: '10vh', }}
           onClick={() => handleClick('My Maps')}
         >
           <Home
-            sx={{ fontSize: '38px', borderRadius: '50%', backgroundColor: '#ADD8E6' }}
+            sx={{ fontSize: '45px', borderRadius: '50%', backgroundColor: '#00FFFF' }}
           />
         </IconButton>
 
         <IconButton
-          sx={{ color: activeItem === 'Marketplace' ? '#fff' : '#a5a5a5', fontSize: '38px', marginTop: '10vh' }}
+          sx={{ color: activeItem === 'Marketplace' ? '#000000' : '#a5a5a5', fontSize: '45px', marginTop: '10vh' }}
           onClick={() => handleClick('Marketplace')}
         >
           <Store
-            sx={{ fontSize: '38px', borderRadius: '50%', backgroundColor: '#ADD8E6' }}
+            sx={{ fontSize: '45px', borderRadius: '50%', backgroundColor: '#00FFFF', }}
           />
         </IconButton>
       </Box>
@@ -216,14 +218,14 @@ function BrowsePage() {
       </Box>
       <Box gridArea={'searchsort'}>{searchAndSort()}</Box>
 
-      <Box gridArea={'page'} alignSelf="center">
+      <Box gridArea={'page'} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Pagination
           count={10}
-          page={currentPage}  // Specify the current page
+          page={currentPage}
           onChange={(event, page) => handlePageChange(page)}
           renderItem={(item) => (
             <PaginationItem
-              component={Button} // Use a Button component for each pagination item
+              component={Button}
               onClick={() => handlePageChange(item.page)}
               {...item}
             />
