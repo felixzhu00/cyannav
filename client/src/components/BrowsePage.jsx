@@ -84,12 +84,11 @@ function BrowsePage() {
         </Box>
 
         <Box gridArea={'sortoption'} sx={{ textAlign: 'left' }}>
-          <Button onClick={handleSortClick} variant="contained" sx={{ color: 'black', bgcolor: 'cyan' }}
+          <Button id="outerSortByMenuBtn" onClick={handleSortClick} variant="contained" sx={{ color: 'black', bgcolor: 'cyan' }}
           >
             {selectedSort}<KeyboardArrowDown />
           </Button>
           <Menu
-            id="outerSortByMenuBtn"
             anchorEl={anchorElSort}
             open={Boolean(anchorElSort)}
             onClose={handleClose}
@@ -107,11 +106,10 @@ function BrowsePage() {
           </Menu>
         </Box>
         <Box gridArea={'searchoption'} sx={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-          <Button onClick={handleOptionClick} variant="contained" sx={{ color: 'black', bgcolor: 'cyan' }}>
+          <Button id="outerMenuByName" onClick={handleOptionClick} variant="contained" sx={{ color: 'black', bgcolor: 'cyan' }}>
             {selectedOption}<KeyboardArrowDown />
           </Button>
           <Menu
-            id="outerMenuByName"
             anchorEl={anchorElOption}
             open={Boolean(anchorElOption)}
             onClose={handleClose}
