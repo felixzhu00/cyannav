@@ -97,7 +97,7 @@ function Map(props) {
                         }}
                     />
                 )}
-                <Typography gridArea={'user'} variant="body2" color="text.secondary">
+                <Typography id="createdByUser" gridArea={'user'} variant="body2" color="text.secondary">
                     CREATED BY USER
                 </Typography>
                 <IconButton

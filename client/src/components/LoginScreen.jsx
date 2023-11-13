@@ -62,6 +62,7 @@ export default function LoginScreen() {
                     />
 
                     <Button
+                        id="signInBtn"
                         type="submit"
                         fullWidth
                         variant="contained"
