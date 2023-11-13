@@ -236,6 +236,7 @@ function BrowsePage() {
       </Box>
       <Box sx={{ position: 'absolute', bottom: '100px', right: '100px' }}>
         <IconButton
+          id="createMapOuterBtn"
           sx={{ borderRadius: '50%', backgroundColor: '#ADD8E6' }}
           onClick={() => setCurrentModel("create")}
         >
