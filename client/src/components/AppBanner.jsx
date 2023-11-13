@@ -13,11 +13,12 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import logo from '../assets/cyannav_logo.png'
 import { ThumbUp, ThumbUpAltOff, ThumbDownAltOff, ThumbDown } from '@mui/icons-material';
-import { useLocation } from 'react-router-dom';
-
+import { useLocation, useNavigate } from 'react-router-dom';
 
 
 function AppBanner() {
+  const navigate = useNavigate();
+
   const settings = ['Account Settings', 'Logout'];
   const mapTitle = ['MAP TITLE']
   const mapAuthor = ['MAP AUTHOR']
@@ -45,15 +46,27 @@ function AppBanner() {
   //   setAnchorElNav(null);
   // };
 
-  const handleCloseUserMenu = () => {
+  const handleCloseUserMenu = (setting) => {
+    if(setting == 'Account Settings'){
+      navigate('/profile')
+    }
+
+    if(setting == 'Logout'){
+      navigate('/login')
+    }
     setAnchorElUser(null);
   };
 
   return (
+    // <AppBar position="static" sx={{ backgroundColor: 'cyan' }}>
+    //   <Container maxWidth="xl">
+    //     <Toolbar disableGutters>
+    //       <Button onClick={()=>{navigate('/browsepage')}}>
     <AppBar position="static" sx={{ backgroundColor: 'cyan', width: "100%" }}>
       <Container maxWidth="false">
         <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Button onClick={()=>{navigate('/browsepage')}}>
             <Box component="img"
               sx={{
                 width: '200px',
@@ -62,6 +75,7 @@ function AppBanner() {
               }}
               src={logo}
             />
+            </Button>
             <Typography
               variant="h5"
               noWrap

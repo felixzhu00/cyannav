@@ -61,8 +61,8 @@ function BrowsePage() {
         justifyContent: 'flex-end',
         display: 'grid',
         gridTemplateColumns: 'repeat(3, min-content)',
-        gridTemplateAreas: `"searchtext searchbox searchoption"
-                          ". sorttext sortoption"`,
+        gridTemplateAreas: `"searchbox searchoption"
+                          "sorttext sortoption"`,
         gap: 2, p: 2
       }}>
         <Box gridArea={'searchbox'} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
@@ -144,14 +144,13 @@ function BrowsePage() {
       >
         <Box gridArea={"side"}>{sideBar()}</Box>
         <Map handleModal={(e) => setCurrentModel(e)} gridArea={"map"} />
-        {/* <Map handleModel={() => setCurrentModel} gridArea={"map"} />
-        <Map handleModel={() => setCurrentModel} gridArea={"map"} />
-        <Map handleModel={() => setCurrentModel} gridArea={"map"} />
-        <Map handleModel={() => setCurrentModel} gridArea={"map"} />
-        <Map handleModel={() => setCurrentModel} gridArea={"map"} />
-        <Map handleModel={() => setCurrentModel} gridArea={"map"} />
-        <Map handleModel={() => setCurrentModel} gridArea={"map"} /> */}
-
+        <Map handleModal={(e) => setCurrentModel(e)} gridArea={"map"} />
+        <Map handleModal={(e) => setCurrentModel(e)} gridArea={"map"} />
+        <Map handleModal={(e) => setCurrentModel(e)} gridArea={"map"} />
+        <Map handleModal={(e) => setCurrentModel(e)} gridArea={"map"} />
+        <Map handleModal={(e) => setCurrentModel(e)} gridArea={"map"} />
+        <Map handleModal={(e) => setCurrentModel(e)} gridArea={"map"} />
+        <Map handleModal={(e) => setCurrentModel(e)} gridArea={"map"} />
       </Box>
     )
   }
