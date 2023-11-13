@@ -13,11 +13,12 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import logo from '../assets/cyannav_logo.png'
 import { ThumbUp, ThumbUpAltOff, ThumbDownAltOff, ThumbDown } from '@mui/icons-material';
-import { useLocation } from 'react-router-dom';
-
+import { useLocation, useNavigate } from 'react-router-dom';
 
 
 function AppBanner() {
+  const navigate = useNavigate();
+
   const settings = ['Account Settings', 'Logout'];
   const mapTitle = ['MAP TITLE']
   const mapAuthor = ['MAP AUTHOR']
@@ -45,38 +46,51 @@ function AppBanner() {
   //   setAnchorElNav(null);
   // };
 
-  const handleCloseUserMenu = () => {
+  const handleCloseUserMenu = (setting) => {
+    if(setting == 'Account Settings'){
+      navigate('/profile')
+    }
+
+    if(setting == 'Logout'){
+      navigate('/login')
+    }
     setAnchorElUser(null);
   };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: 'cyan' }}>
-      <Container maxWidth="xl">
-        <Toolbar disableGutters>
-          <Box component="img"
-            sx={{
-              width: '200px',
-              borderRadius: 2,
-              flexGrow: 0
-            }}
-            src={logo}
-          />
-          <Typography
-            variant="h5"
-            noWrap
-            href="#app-bar-with-responsive-menu"
-            sx={{
-              mr: 2,
-              display: { xs: 'none', md: 'flex', paddingLeft: '25px' },
-              fontFamily: 'inter',
-              fontWeight: 'bold',
-              color: 'black',
-              textDecoration: 'none',
-            }}
-          >
-            {mapTitle} by {mapAuthor}
-          </Typography>
-
+    // <AppBar position="static" sx={{ backgroundColor: 'cyan' }}>
+    //   <Container maxWidth="xl">
+    //     <Toolbar disableGutters>
+    //       <Button onClick={()=>{navigate('/browsepage')}}>
+    <AppBar position="static" sx={{ backgroundColor: 'cyan', width: "100%" }}>
+      <Container maxWidth="false">
+        <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Button onClick={()=>{navigate('/browsepage')}}>
+            <Box component="img"
+              sx={{
+                width: '200px',
+                borderRadius: 2,
+                flexGrow: 0
+              }}
+              src={logo}
+            />
+            </Button>
+            <Typography
+              variant="h5"
+              noWrap
+              href="#app-bar-with-responsive-menu"
+              sx={{
+                mr: 2,
+                display: { xs: 'none', md: 'flex', paddingLeft: '25px' },
+                fontWeight: 'bold',
+                color: 'black',
+                textDecoration: 'none',
+              }}
+            >
+              {mapTitle} by {mapAuthor}
+            </Typography>
+          </Box>
 
           <Typography
             variant="h5"
@@ -96,51 +110,53 @@ function AppBanner() {
             {mapTitle}
           </Typography>
 
-          {/* Spacer Box to push everything else to the right */}
+          {/* Spacer Box to push everything else to the right
           <Box sx={{ flexGrow: 1 }}>
-          </Box>
+          </Box> */}
 
           {/* ThumbDown and ThumbUp icons */}
-          <Box sx={{ display: 'flex', alignItems: 'center', paddingRight: '20px' }}>
-            <IconButton aria-label="upvote">
-              <ThumbUp sx={{ color: 'black' }} />
-            </IconButton>
-            <Typography variant="body1" sx={{ display: { xs: 'none', md: 'block' }, color: 'black' }}>{upvoteCount}</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', paddingRight: '20px' }}>
+              <IconButton aria-label="upvote">
+                <ThumbUp sx={{ color: 'black' }} />
+              </IconButton>
+              <Typography variant="body1" sx={{ display: { xs: 'none', md: 'block' }, color: 'black' }}>{upvoteCount}</Typography>
 
-            <IconButton aria-label="downvote">
-              <ThumbDown sx={{ color: 'black' }} />
-            </IconButton>
-            <Typography variant="body1" sx={{ display: { xs: 'none', md: 'block' }, color: 'black' }}>{downvoteCount}</Typography>
+              <IconButton aria-label="downvote">
+                <ThumbDown sx={{ color: 'black' }} />
+              </IconButton>
+              <Typography variant="body1" sx={{ display: { xs: 'none', md: 'block' }, color: 'black' }}>{downvoteCount}</Typography>
 
-          </Box>
-          <Typography variant='h5' sx={{ paddingRight: '10px', color: 'black', fontWeight: 'bold', display: { xs: 'none', md: 'block' } }}>Username</Typography>
+            </Box>
+            <Typography variant='h5' sx={{ paddingRight: '10px', color: 'black', fontWeight: 'bold', display: { xs: 'none', md: 'block' } }}>Username</Typography>
 
-          <Box sx={{ flexGrow: 0 }}>
-            <IconButton onClick={handleOpenUserMenu} sx={{}}>
-              <Avatar alt="profile_picture" src="/static/images/avatar/2.jpg" />
-            </IconButton>
-            <Menu
-              sx={{ mt: '45px' }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
+            <Box sx={{ flexGrow: 0 }}>
+              <IconButton onClick={handleOpenUserMenu} sx={{}}>
+                <Avatar alt="profile_picture" src="/static/images/avatar/2.jpg" />
+              </IconButton>
+              <Menu
+                sx={{ mt: '45px' }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                {settings.map((setting) => (
+                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                    <Typography textAlign="center">{setting}</Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
 
             {/* <------ Logging in and Registering ------> */}
             {/* <Button

@@ -1,12 +1,17 @@
-import * as React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Typography, TextField, InputAdornment, IconButton, Button } from '@mui/material';
 import { AccountCircle, Email, Lock, Edit, DeleteForever } from '@mui/icons-material';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import LoginLogo from '../assets/cyannav_logo_wo_name.png'
+import MUIChangeEmailModal from './modals/MUIChangeEmailModal';
+import MUIChangePasswordModal from './modals/MUIChangePasswordModal';
+import MUIChangeUsernameModal from './modals/MUIChangeUsernameModal';
+import MUIDeleteAccountModal from './modals/MUIDeleteAccountModal';
 
 export default function ProfileScreen() {
+    const [currentModel, setCurrentModel] = useState('');
     // Example user data, replace with actual data as needed
     const userData = {
         username: 'User123',
@@ -17,6 +22,7 @@ export default function ProfileScreen() {
         // Implement account deletion logic
         console.log('Delete account');
     };
+
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
@@ -48,7 +54,7 @@ export default function ProfileScreen() {
                             endAdornment: (
                                 <InputAdornment position="end">
                                     <IconButton>
-                                        <Edit />
+                                        <Edit onClick={()=> {setCurrentModel("username")}}/>
                                     </IconButton>
                                 </InputAdornment>
                             ),
@@ -71,7 +77,7 @@ export default function ProfileScreen() {
                             endAdornment: (
                                 <InputAdornment position="end">
                                     <IconButton>
-                                        <Edit />
+                                        <Edit onClick={()=> {setCurrentModel("email")}} />
                                     </IconButton>
                                 </InputAdornment>
                             ),
@@ -94,7 +100,7 @@ export default function ProfileScreen() {
                             endAdornment: (
                                 <InputAdornment position="end">
                                     <IconButton>
-                                        <Edit />
+                                        <Edit onClick={()=> {setCurrentModel("password")}}/>
                                     </IconButton>
                                 </InputAdornment>
                             ),
@@ -112,10 +118,23 @@ export default function ProfileScreen() {
                         mt: "15px"
                     }}
                     startIcon={<DeleteForever />}
-                    onClick={handleDeleteAccount}
+                    onClick={() => {setCurrentModel("delete")}}
                 >
                     Delete your account
                 </Button>
+
+                {currentModel === 'email' && <MUIChangeEmailModal
+                    open={currentModel === 'email'}
+                    onClose={() => setCurrentModel("")} />}
+                {currentModel === 'password' && <MUIChangePasswordModal
+                    open={currentModel === 'password'}
+                    onClose={() => setCurrentModel("")} />}
+                {currentModel === 'username' && <MUIChangeUsernameModal
+                    open={currentModel === 'username'}
+                    onClose={() => setCurrentModel("")} />}
+                {currentModel === 'delete' && <MUIDeleteAccountModal
+                    open={currentModel === 'delete'}
+                    onClose={() => setCurrentModel("")} />}
             </Box>
         </Container >
     );

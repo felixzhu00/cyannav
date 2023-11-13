@@ -19,9 +19,13 @@ const style = {
     p: 4,
 };
 
-export default function MUIChangeUsernameModal() {
-    const [open, setOpen] = React.useState(true);
-    const handleClose = () => setOpen(false);
+export default function MUIChangeUsernameModal(props) {
+
+    const [open, setOpen] = React.useState(props.open);
+    const handleClose = () => { 
+        setOpen(false)
+        props.onClose()
+    };
 
     return (
         <div>
