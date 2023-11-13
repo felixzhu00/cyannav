@@ -42,7 +42,6 @@ export default function RegisterScreen() {
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TextField
-                                required
                                 fullWidth
                                 id="email"
                                 label="Email Address"
@@ -52,7 +51,6 @@ export default function RegisterScreen() {
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
-                                required
                                 fullWidth
                                 id="username"
                                 label="Username (visible to public)"
@@ -62,7 +60,6 @@ export default function RegisterScreen() {
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
-                                required
                                 fullWidth
                                 name="password"
                                 label="Password"

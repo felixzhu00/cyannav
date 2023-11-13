@@ -6,11 +6,11 @@ describe('register page specs', () => {
   
     it('checks that email is displayed', () => {
         cy.get('label[for="email"]')
-        .should('have.text', 'Email Address *');
+        .should('have.text', 'Email Address');
     })
     it('checks that password is displayed', () => {
         cy.get('label[for="password"]')
-        .should('have.text', 'Password*');
+        .should('have.text', 'Password');
     })
     it('checks that username is displayed', () => {
         cy.get('label[for="username"]')
