@@ -31,7 +31,7 @@ function AppBanner(props) {
   const { pathname } = location; // Destructure pathname from location object
   // Check if the current pathname is '/login' or '/register'
   // and return null (don't render anything) if it's a match
-  if (pathname === '/login/' || pathname === '/login' || pathname === '/register/' || pathname === '/register' || pathname === '/forget/' || pathname === '/forget') {
+  if (pathname === '/' || pathname === '/login/' || pathname === '/login' || pathname === '/register/' || pathname === '/register' || pathname === '/forget/' || pathname === '/forget') {
     
     return null;
   }
@@ -201,8 +201,9 @@ function AppBanner(props) {
           </Box> */}
 
           {/* ThumbDown and ThumbUp icons */}
+          
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', paddingRight: '20px' }}>
+          {pathname === '/mapview' && <Box sx={{ display: 'flex', alignItems: 'center', paddingRight: '20px' }}>
               <IconButton aria-label="upvote">
                 <ThumbUp sx={{ color: 'black' }} />
               </IconButton>
@@ -212,9 +213,8 @@ function AppBanner(props) {
                 <ThumbDown sx={{ color: 'black' }} />
               </IconButton>
               <Typography variant="body1" sx={{ display: { xs: 'none', md: 'block' }, color: 'black' }}>{downvoteCount}</Typography>
-
-            </Box>
-
+            </Box>}
+            
             {!props.guest ? userAccount() : guestAccount()}
             {/* <------ Logging in and Registering ------> */}
 
