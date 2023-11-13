@@ -127,14 +127,14 @@ export default function ForgetPswdScreen() {
                 </Box>
                 <Grid container justifyContent="center">
                     <Grid item>
-                        <Link href="/login/" variant="body2">
+                        <Link onClick={()=>{navigate('/login')}} variant="body2">
                             Remember your password? Sign in
                         </Link>
                     </Grid>
                 </Grid>
                 <Grid container justifyContent="center">
                     <Grid item>
-                        <Link href="/register/" variant="body2">
+                        <Link onClick={()=>{navigate('/register')}} variant="body2">
                             Don't have an account? Sign up
                         </Link>
                     </Grid>
