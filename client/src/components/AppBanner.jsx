@@ -111,7 +111,7 @@ function AppBanner(props) {
         <Typography variant='h5' sx={{ paddingRight: '10px', color: 'black', fontWeight: 'bold', display: { xs: 'none', md: 'block' } }}>Username</Typography>
 
         <Box sx={{ flexGrow: 0 }}>
-          <IconButton onClick={handleOpenUserMenu} sx={{}}>
+          <IconButton id="settingsDropdown" onClick={handleOpenUserMenu} sx={{}}>
             <Avatar alt="profile_picture" src="/static/images/avatar/2.jpg" />
           </IconButton>
           <Menu
@@ -131,8 +131,8 @@ function AppBanner(props) {
             onClose={handleCloseUserMenu}
           >
             {settings.map((setting) => (
-              <MenuItem id="settingsDropdown" key={setting} onClick={()=>{handleCloseUserMenu(setting)}}>
-              <Typography id="settingsDropdownOption" textAlign="center">{setting}</Typography>
+              <MenuItem id="settingsDropdownOption" key={setting} onClick={()=>{handleCloseUserMenu(setting)}}>
+              <Typography textAlign="center">{setting}</Typography>
               </MenuItem>
             ))}
           </Menu>

@@ -9,6 +9,7 @@ import MUIChangeEmailModal from './modals/MUIChangeEmailModal';
 import MUIChangePasswordModal from './modals/MUIChangePasswordModal';
 import MUIChangeUsernameModal from './modals/MUIChangeUsernameModal';
 import MUIDeleteAccountModal from './modals/MUIDeleteAccountModal';
+import MUIChangeProfilePicModal from './modals/MUIChangeProfilePicModal';
 
 export default function ProfileScreen() {
     const [currentModel, setCurrentModel] = useState('');
@@ -23,6 +24,9 @@ export default function ProfileScreen() {
         console.log('Delete account');
     };
 
+    const [showProfilePicModal, setShowProfilePicModal] = useState(false);
+    const [profilePicUrl, setProfilePicUrl] = useState(LoginLogo);
+
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
@@ -34,7 +38,52 @@ export default function ProfileScreen() {
                     alignItems: 'center',
                 }}
             >
-                <Box component='img' sx={{ m: 2 }} src={LoginLogo}></Box>
+                <Box
+                    sx={{
+                        position: 'relative',
+                        m: 5,
+                        width: 200,
+                        height: 200,
+                        borderRadius: '50%',
+                        cursor: 'pointer',
+                        '&:hover > .overlay': {
+                            display: 'flex',
+                        }
+                    }}
+                    onClick={() => setShowProfilePicModal(true)}
+                >
+                    <Box
+                        component="img"
+                        sx={{
+                            width: 200,
+                            height: 200,
+                            borderRadius: '50%',
+                            objectFit: 'cover',
+                            border: '2px solid',
+                            borderColor: 'primary.main'
+                        }}
+                        src={profilePicUrl}
+                    />
+                    <Box
+                        className="overlay"
+                        sx={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            borderRadius: '50%',
+                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                            display: 'none',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'white',
+                        }}
+                    >
+                        {/* Overlay content, such as an icon or text */}
+                        <Typography variant="h6">Change Picture</Typography>
+                    </Box>
+                </Box>
                 <Typography component="h1" variant="h5">
                     Your Profile
                 </Typography>
@@ -54,7 +103,7 @@ export default function ProfileScreen() {
                             endAdornment: (
                                 <InputAdornment position="end">
                                     <IconButton>
-                                        <Edit id="usernameEditBtn" onClick={()=> {setCurrentModel("username")}}/>
+                                        <Edit id="usernameEditBtn" onClick={() => { setCurrentModel("username") }} />
                                     </IconButton>
                                 </InputAdornment>
                             ),
@@ -77,7 +126,7 @@ export default function ProfileScreen() {
                             endAdornment: (
                                 <InputAdornment position="end">
                                     <IconButton>
-                                        <Edit id="emailEditBtn" onClick={()=> {setCurrentModel("email")}} />
+                                        <Edit id="emailEditBtn" onClick={() => { setCurrentModel("email") }} />
                                     </IconButton>
                                 </InputAdornment>
                             ),
@@ -100,7 +149,7 @@ export default function ProfileScreen() {
                             endAdornment: (
                                 <InputAdornment position="end">
                                     <IconButton>
-                                        <Edit id="passwordEditBtn" onClick={()=> {setCurrentModel("password")}}/>
+                                        <Edit id="passwordEditBtn" onClick={() => { setCurrentModel("password") }} />
                                     </IconButton>
                                 </InputAdornment>
                             ),
@@ -119,7 +168,7 @@ export default function ProfileScreen() {
                         mt: "15px"
                     }}
                     startIcon={<DeleteForever />}
-                    onClick={() => {setCurrentModel("delete")}}
+                    onClick={() => { setCurrentModel("delete") }}
                 >
                     Delete your account
                 </Button>
@@ -136,6 +185,11 @@ export default function ProfileScreen() {
                 {currentModel === 'delete' && <MUIDeleteAccountModal
                     open={currentModel === 'delete'}
                     onClose={() => setCurrentModel("")} />}
+                {showProfilePicModal && <MUIChangeProfilePicModal
+                    open={showProfilePicModal}
+                    onClose={() => setShowProfilePicModal(false)}
+                    onSave={(newUrl) => setProfilePicUrl(newUrl)}
+                />}
             </Box>
         </Container >
     );
