@@ -103,7 +103,7 @@ export default function ProfileScreen() {
                             endAdornment: (
                                 <InputAdornment position="end">
                                     <IconButton>
-                                        <Edit onClick={() => { setCurrentModel("username") }} />
+                                        <Edit id="usernameEditBtn" onClick={() => { setCurrentModel("username") }} />
                                     </IconButton>
                                 </InputAdornment>
                             ),
@@ -126,7 +126,7 @@ export default function ProfileScreen() {
                             endAdornment: (
                                 <InputAdornment position="end">
                                     <IconButton>
-                                        <Edit onClick={() => { setCurrentModel("email") }} />
+                                        <Edit id="emailEditBtn" onClick={() => { setCurrentModel("email") }} />
                                     </IconButton>
                                 </InputAdornment>
                             ),
@@ -149,7 +149,7 @@ export default function ProfileScreen() {
                             endAdornment: (
                                 <InputAdornment position="end">
                                     <IconButton>
-                                        <Edit onClick={() => { setCurrentModel("password") }} />
+                                        <Edit id="passwordEditBtn" onClick={() => { setCurrentModel("password") }} />
                                     </IconButton>
                                 </InputAdornment>
                             ),
@@ -162,6 +162,7 @@ export default function ProfileScreen() {
 
                 </Box>
                 <Button
+                    id="deleteAccountBtn"
                     sx={{
                         color: "red",
                         mt: "15px"

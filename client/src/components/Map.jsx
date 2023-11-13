@@ -102,10 +102,11 @@ function Map(props) {
                         }}
                     />
                 )}
-                <Typography gridArea={'user'} variant="body2" color="text.secondary">
+                <Typography id="createdByUser" gridArea={'user'} variant="body2" color="text.secondary">
                     CREATED BY USER
                 </Typography>
-                <IconButton
+                <IconButton 
+                    id="moreInfoMapIcon"
                     sx={{
                         display: 'flex',
                         gridArea: 'kebab',
@@ -132,19 +133,19 @@ function Map(props) {
                 >
                     <MenuList>
                         <MenuItem onClick={() => handleNameClick}>
-                            <ListItemText primary="Rename" />
+                            <ListItemText id="renameOption" primary="Rename" />
                         </MenuItem>
                         <MenuItem onClick={() => handleMenuClose("addtag")}>
-                            <ListItemText primary="Add Tag" />
+                            <ListItemText id="addTagOption" primary="Add Tag" />
                         </MenuItem>
                         <MenuItem onClick={() => handleMenuClose("publish")}>
-                            <ListItemText primary="Publish" />
+                            <ListItemText id="publishOption" primary="Publish" />
                         </MenuItem>
                         <MenuItem onClick={() => handleMenuClose("duplicate")}>
-                            <ListItemText primary="Duplicate" />
+                            <ListItemText id="duplicateOption" primary="Duplicate" />
                         </MenuItem>
                         <MenuItem onClick={() => handleMenuClose("delete")}>
-                            <ListItemText primary="Delete" />
+                            <ListItemText id="deleteOption" primary="Delete" />
                         </MenuItem>
                     </MenuList>
                 </Menu>

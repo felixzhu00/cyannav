@@ -1,7 +1,6 @@
 import './App.css';
 import APITester from './components/APITester.jsx';
 import Map from './components/Map.jsx'
-import React from 'react';
 import AppBanner from './components/AppBanner.jsx'
 import LoginScreen from './components/LoginScreen.jsx'
 import RegisterScreen from './components/RegisterScreen.jsx'
@@ -23,6 +22,8 @@ import MUIAddTagModal from './components/modals/MUIAddTagModal.jsx';
 import AppBannerwithRouter from './components/AppBanner.jsx';
 import BrowsePage from './components/BrowsePage.jsx';
 import MapViewingPage from './components/MapViewingPage.jsx';
+import React, { useState, useRef, useEffect } from 'react';
+
 
 const theme = createTheme({
   typography: {
@@ -34,13 +35,19 @@ const theme = createTheme({
 
 
 const App = () => {
+
+  const [guest, setGuest] = React.useState(true);
+
+  useEffect(() => {
+  }, [guest]);
+
   return (
     <BrowserRouter>
       <ThemeProvider theme={theme}>
-        <AppBanner />
+        <AppBanner guest={guest}/>
         <Routes>
-          <Route path="/" element={<LoginScreen />} />
-          <Route path="/login/" element={<LoginScreen />} />
+          <Route path="/" element={<LoginScreen handleGuest={setGuest}/>} />
+          <Route path="/login/" element={<LoginScreen handleGuest={setGuest}/>} />
           <Route path="/register/" element={<RegisterScreen />} />
           <Route path="/forget/" element={<ForgetPswdScreen />} />
           <Route path="/profile/" element={<ProfileScreen />} />

@@ -10,10 +10,12 @@ import Container from '@mui/material/Container';
 import LoginLogo from '../assets/cyannav_logo_wo_name.png'
 import { useNavigate } from 'react-router-dom';
 
-export default function LoginScreen() {
+export default function LoginScreen(props) {
+    const [signinButton, setsigninButton] = useState(null);
     const navigate = useNavigate();
 
     const handleSubmit = (event) => {
+
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         console.log({
@@ -62,6 +64,8 @@ export default function LoginScreen() {
                     />
 
                     <Button
+                        onClick={()=>{props.handleGuest(false)}}
+                        id="signInBtn"
                         type="submit"
                         fullWidth
                         variant="contained"
@@ -70,6 +74,7 @@ export default function LoginScreen() {
                         Sign In
                     </Button>
                     <Button
+                        onClick={()=>{props.handleGuest(true)}}
                         type="submit"
                         fullWidth
                         variant="contained"

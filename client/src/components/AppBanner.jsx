@@ -12,11 +12,12 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import logo from '../assets/cyannav_logo.png'
-import { ThumbUp, ThumbUpAltOff, ThumbDownAltOff, ThumbDown } from '@mui/icons-material';
+import { ThumbUp, ThumbUpAltOff, ThumbDownAltOff, ThumbDown, PartyMode } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 
-function AppBanner() {
+function AppBanner(props) {
+  
   const navigate = useNavigate();
 
   const settings = ['Account Settings', 'Logout'];
@@ -28,10 +29,10 @@ function AppBanner() {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const location = useLocation(); // Get access to the location object
   const { pathname } = location; // Destructure pathname from location object
-
   // Check if the current pathname is '/login' or '/register'
   // and return null (don't render anything) if it's a match
   if (pathname === '/login/' || pathname === '/login' || pathname === '/register/' || pathname === '/register' || pathname === '/forget/' || pathname === '/forget') {
+    
     return null;
   }
 
@@ -47,15 +48,100 @@ function AppBanner() {
   // };
 
   const handleCloseUserMenu = (setting) => {
-    if(setting == 'Account Settings'){
+    if (setting == 'Account Settings') {
       navigate('/profile')
     }
 
-    if(setting == 'Logout'){
+    if (setting == 'Logout') {
       navigate('/login')
     }
     setAnchorElUser(null);
   };
+
+
+  const guestAccount = () => {
+    return (
+      <>
+        <Button
+          onClick={() => { navigate('/login') }}
+          variant='outlined'
+          sx={{
+            margin: '2px',
+            border: '3px solid',
+            borderColor: 'black',
+            color: 'black',
+            backgroundColor: 'lightgrey',
+            '&:hover': {
+              backgroundColor: 'grey', // This will be the background color on hover
+              borderColor: 'black', // If you also want to change the border color on hover
+              border: '3px solid',
+
+            },
+          }}>
+          <Typography fontWeight={'bold'}>Login</Typography>
+        </Button>
+
+        <Button
+          onClick={() => { navigate('/register') }}
+          variant='outlined'
+          sx={{
+            margin: '2px',
+            border: '3px solid',
+            borderColor: 'black',
+            color: 'black',
+            backgroundColor: 'lightgrey',
+            '&:hover': {
+              backgroundColor: 'grey',
+              borderColor: 'black',
+              border: '3px solid',
+
+            },
+          }}>
+          <Typography fontWeight={'bold'}>Register</Typography>
+        </Button>
+      </>
+
+
+    );
+  }
+
+  const userAccount = () => {
+    return (
+      <>
+        <Typography variant='h5' sx={{ paddingRight: '10px', color: 'black', fontWeight: 'bold', display: { xs: 'none', md: 'block' } }}>Username</Typography>
+
+        <Box sx={{ flexGrow: 0 }}>
+          <IconButton id="settingsDropdown" onClick={handleOpenUserMenu} sx={{}}>
+            <Avatar alt="profile_picture" src="/static/images/avatar/2.jpg" />
+          </IconButton>
+          <Menu
+            sx={{ mt: '45px' }}
+            id="menu-appbar"
+            anchorEl={anchorElUser}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            open={Boolean(anchorElUser)}
+            onClose={handleCloseUserMenu}
+          >
+            {settings.map((setting) => (
+              <MenuItem id="settingsDropdownOption" key={setting} onClick={()=>{handleCloseUserMenu(setting)}}>
+              <Typography textAlign="center">{setting}</Typography>
+              </MenuItem>
+            ))}
+          </Menu>
+        </Box>
+      </>
+    );
+  }
+
+
 
   return (
     // <AppBar position="static" sx={{ backgroundColor: 'cyan' }}>
@@ -66,15 +152,15 @@ function AppBanner() {
       <Container maxWidth="false">
         <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Button onClick={()=>{navigate('/browsepage')}}>
-            <Box component="img"
-              sx={{
-                width: '200px',
-                borderRadius: 2,
-                flexGrow: 0
-              }}
-              src={logo}
-            />
+            <Button onClick={() => { navigate('/browsepage') }}>
+              <Box component="img"
+                sx={{
+                  width: '200px',
+                  borderRadius: 2,
+                  flexGrow: 0
+                }}
+                src={logo}
+              />
             </Button>
             <Typography
               variant="h5"
@@ -88,7 +174,7 @@ function AppBanner() {
                 textDecoration: 'none',
               }}
             >
-              {mapTitle} by {mapAuthor}
+              {pathname === '/mapview' ? (mapTitle + (props.guest ? " by " + mapAuthor : "")) : ""}
             </Typography>
           </Box>
 
@@ -128,72 +214,10 @@ function AppBanner() {
               <Typography variant="body1" sx={{ display: { xs: 'none', md: 'block' }, color: 'black' }}>{downvoteCount}</Typography>
 
             </Box>
-            <Typography variant='h5' sx={{ paddingRight: '10px', color: 'black', fontWeight: 'bold', display: { xs: 'none', md: 'block' } }}>Username</Typography>
 
-            <Box sx={{ flexGrow: 0 }}>
-              <IconButton onClick={handleOpenUserMenu} sx={{}}>
-                <Avatar alt="profile_picture" src="/static/images/avatar/2.jpg" />
-              </IconButton>
-              <Menu
-                sx={{ mt: '45px' }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-              >
-                {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={()=>{handleCloseUserMenu(setting)}}>
-                    <Typography textAlign="center">{setting}</Typography>
-                  </MenuItem>
-                ))}
-              </Menu>
-            </Box>
-
+            {!props.guest ? userAccount() : guestAccount()}
             {/* <------ Logging in and Registering ------> */}
-            {/* <Button
-              variant='outlined'
-              sx={{
-                margin: '2px',
-                border: '3px solid',
-                borderColor: 'black',
-                color: 'black',
-                backgroundColor: 'lightgrey',
-                '&:hover': {
-                  backgroundColor: 'grey', // This will be the background color on hover
-                  borderColor: 'black', // If you also want to change the border color on hover
-                  border: '3px solid',
 
-                },
-              }}>
-              <Typography fontWeight={'bold'}>Login</Typography>
-            </Button>
-
-            <Button
-              variant='outlined'
-              sx={{
-                margin: '2px',
-                border: '3px solid',
-                borderColor: 'black',
-                color: 'black',
-                backgroundColor: 'lightgrey',
-                '&:hover': {
-                  backgroundColor: 'grey',
-                  borderColor: 'black',
-                  border: '3px solid',
-
-                },
-              }}>
-              <Typography fontWeight={'bold'}>Register</Typography>
-            </Button> */}
 
 
           </Box>

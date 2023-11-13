@@ -85,7 +85,7 @@ function BrowsePage() {
         </Box>
 
         <Box gridArea={'sortoption'} sx={{ textAlign: 'left' }}>
-          <Button onClick={handleSortClick} variant="contained" sx={{ color: 'black', bgcolor: 'cyan' }}
+          <Button id="outerSortByMenuBtn" onClick={handleSortClick} variant="contained" sx={{ color: 'black', bgcolor: 'cyan' }}
           >
             {selectedSort}<KeyboardArrowDown />
           </Button>
@@ -102,12 +102,12 @@ function BrowsePage() {
               horizontal: 'left',
             }}
           >
-            <MenuItem onClick={() => handleSortSelect('recent')}>Recent</MenuItem>
-            <MenuItem onClick={() => handleSortSelect('name')}>Name</MenuItem>
+            <MenuItem id="recentSortSelect" onClick={() => handleSortSelect('recent')}>Recent</MenuItem>
+            <MenuItem id="nameSortSelect" onClick={() => handleSortSelect('name')}>Name</MenuItem>
           </Menu>
         </Box>
         <Box gridArea={'searchoption'} sx={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-          <Button onClick={handleOptionClick} variant="contained" sx={{ color: 'black', bgcolor: 'cyan' }}>
+          <Button id="outerMenuByName" onClick={handleOptionClick} variant="contained" sx={{ color: 'black', bgcolor: 'cyan' }}>
             {selectedOption}<KeyboardArrowDown />
           </Button>
           <Menu
@@ -123,8 +123,8 @@ function BrowsePage() {
               horizontal: 'left',
             }}
           >
-            <MenuItem onClick={() => handleOptionSelect('By Map Name')}>By Map Name</MenuItem>
-            <MenuItem onClick={() => handleOptionSelect('By Username')}>By Username</MenuItem>
+            <MenuItem id="byMapNameBtn" onClick={() => handleOptionSelect('By Map Name')}>By Map Name</MenuItem>
+            <MenuItem id="byUsernameBtn" onClick={() => handleOptionSelect('By Username')}>By Username</MenuItem>
           </Menu>
         </Box>
       </Box>
@@ -180,6 +180,7 @@ function BrowsePage() {
         </IconButton>
 
         <IconButton
+          id="marketplaceBtn"
           sx={{ color: activeItem === 'Marketplace' ? '#000000' : '#a5a5a5', fontSize: '45px', marginTop: '10vh' }}
           onClick={() => handleClick('Marketplace')}
         >
