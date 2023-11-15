@@ -3,7 +3,8 @@ const User = require('../schemas/userProfileSchema')
 
 
 loggedIn = async (req, res) => {
-    try {
+        try {
+            console.log('test')
         console.log("auth-controller::loggedIn")
         console.log("req: " + req)
 
