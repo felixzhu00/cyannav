@@ -158,17 +158,7 @@ register = async (req, res) => {
             })
         }
 
-        var hashed_password
-        bcrypt.hash(password, saltRounds, function (err, hash) {
-            if (err) {
-                return res.status(500).json({
-                    loggedIn: false,
-                    // errorMessage: "Internal server error.",
-                })
-            }
-
-            hashed_password = hash
-        })
+        const hashed_password = await bcrypt.hash(password, saltRounds)
 
         const newUser = new User({ email, hashed_password, username })
         const saved = await newUser.save()
