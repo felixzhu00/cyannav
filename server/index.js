@@ -2,7 +2,7 @@ const http = require("http")
 const express = require("express")
 const cors = require("cors")
 const dotenv = require("dotenv")
-// const cookieParser = require('cookieparser')
+const cookieParser = require("cookie-parser")
 
 dotenv.config() // Loads .env
 
@@ -20,7 +20,7 @@ app.use(
     })
 )
 app.use(express.json())
-// app.use(cookieParser())
+app.use(cookieParser())
 
 const authRouter = require("./routes/auth-router")
 app.use("/auth", authRouter)
