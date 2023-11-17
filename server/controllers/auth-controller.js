@@ -6,25 +6,22 @@ const saltRounds = 10
 
 loggedIn = async (req, res) => {
     try {
-        console.log("test")
-        console.log("auth-controller::loggedIn")
-        console.log("req: " + req)
-
-        let userId = auth.verifyUser(req)
+        var userId = auth.verifyUser(req)
         if (!userId) {
-            return res.status(200).json({
+            return res.status(401).json({
                 loggedIn: false,
                 user: null,
-                errorMessage: "Invalid username or password.",
+                // errorMessage: "Invalid username or password.",
             })
         }
 
         const loggedInUser = await User.findOne({ _id: userId })
         if (!loggedInUser) {
-            return res.status(401).json({
+            // TODO: decide what to do with this, loggedIn user is not found..
+            return res.status(404).json({
                 loggedIn: false,
                 user: null,
-                errorMessage: "Invalid username or password.",
+                // errorMessage: "User not found.",
             })
         }
 
@@ -54,7 +51,7 @@ login = async (req, res) => {
             return res.status(400).json({
                 loggedIn: false,
                 user: null,
-                errorMessage: "Required fields empty.",
+                // errorMessage: "Required fields empty.",
             })
         }
 
@@ -64,7 +61,7 @@ login = async (req, res) => {
             return res.status(401).json({
                 loggedIn: false,
                 user: null,
-                errorMessage: "Wrong email or password",
+                // errorMessage: "Wrong email or password",
             })
         }
 
@@ -74,7 +71,7 @@ login = async (req, res) => {
                 return res.status(500).json({
                     loggedIn: false,
                     user: null,
-                    errorMessage: "Internal server error.",
+                    // errorMessage: "Internal server error.",
                 })
             }
 
@@ -82,7 +79,7 @@ login = async (req, res) => {
                 return res.status(401).json({
                     loggedIn: false,
                     user: null,
-                    errorMessage: "Wrong email or password",
+                    // errorMessage: "Wrong email or password",
                 })
             }
         })
@@ -91,7 +88,7 @@ login = async (req, res) => {
 
         return res
             .cookie("access_token", token, {
-                httpOnly: true, // TODO: change this later when HTTPS is introduced.
+                httpOnly: true, // TODO: HTTPS: change this later when HTTPS is introduced.
                 secure: true,
                 sameSite: true,
             })
@@ -124,7 +121,7 @@ register = async (req, res) => {
             return res.status(401).json({
                 loggedIn: false,
                 user: null,
-                errorMessage: "Passwords does not match",
+                // errorMessage: "Passwords does not match",
             })
         }
 
@@ -137,7 +134,7 @@ register = async (req, res) => {
             return res.status(401).json({
                 loggedIn: false,
                 user: null,
-                errorMessage: "Password fails security requirement.",
+                // errorMessage: "Password fails security requirement.",
             })
         }
 
@@ -147,7 +144,7 @@ register = async (req, res) => {
             return res.status(401).json({
                 loggedIn: false,
                 user: null,
-                errorMessage: "Email is already in use",
+                // errorMessage: "Email is already in use.",
             })
         }
 
@@ -157,7 +154,7 @@ register = async (req, res) => {
             return res.status(401).json({
                 loggedIn: false,
                 user: null,
-                errorMessage: "Username is already taken",
+                // errorMessage: "Username is already taken.",
             })
         }
 
@@ -166,7 +163,7 @@ register = async (req, res) => {
             if (err) {
                 return res.status(500).json({
                     loggedIn: false,
-                    errorMessage: "Internal server error.",
+                    // errorMessage: "Internal server error.",
                 })
             }
 
@@ -179,19 +176,19 @@ register = async (req, res) => {
         if (!saved) {
             return res.status(500).json({
                 loggedIn: false,
-                errorMessage: "Internal server error.",
+                // errorMessage: "Internal server error.",
             })
         }
 
         const token = auth.signToken(newUser._id)
 
         return res
-            .status(200)
             .cookie("access_token", token, {
                 httpOnly: true, // TODO: change this later when HTTPS is introduced.
                 secure: true,
                 sameSite: true,
             })
+            .status(200)
             .json({
                 loggedIn: true,
                 user: {
@@ -238,6 +235,10 @@ updateUsername = async (req, res) => {
     try {
         const { newUsername } = req.body
 
+        if (!newUsername) {
+            return res.status(400)
+        }
+
         var existingUser = await User.findOne({ username: newUsername })
         if (existingUser) {
             return res.status(401).json({
@@ -264,6 +265,10 @@ updateUsername = async (req, res) => {
 updateEmail = async (req, res) => {
     try {
         const { newEmail } = req.body
+
+        if (!newEmail) {
+            return res.status(400)
+        }
 
         var existingUser = await User.findOne({ username: newEmail })
         if (existingUser) {
