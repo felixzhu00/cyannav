@@ -31,3 +31,20 @@ input: title, type, json
 400
 401
 500
+
+/api/duplicatemap
+createDuplicateMapById
+input: id
+200
+400
+401
+500
+
+/api/forkmap
+/api/duplicatemap
+createDuplicateMapById
+input: id
+200
+400
+401
+500

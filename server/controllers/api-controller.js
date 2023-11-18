@@ -149,6 +149,47 @@ createNewMap = async (req, res) => {
 
 createDuplicateMapById = async (req, res) => {
     try {
+        const { id } = req.body
+
+        if (!id) {
+            return res.status(400)
+        }
+
+        const srcMap = Map.findById(id)
+
+        if (srcMap.user !== res.locals.userId) {
+            return res.status(401)
+        }
+
+        // TODO: (collaborate) add collaborator permission
+        // Actually, figure out if a collaborate should fork or create
+
+        var newMapTitle
+        for (let i = 0; i < 9999; i++) {
+            // hard-cap... our app will probably break before this much attempts.
+            newMapTitle = `${srcMap.title} (${i})`
+            let mapExist = await Map.find({
+                title: newMapTitle,
+                user: res.locals.userId,
+            })
+            if (!mapExist) {
+                break
+            }
+        }
+
+        // TODO: (later) This probably doesn't work, as it stores our JSON as id, and they are now point
+        // to the same id. We'll fix this after we clarify the data model
+        delete srcMap._id
+        srcMap.title = newMapTitle
+
+        const newMap = new Map(srcMap)
+        const saved = await newMap.save()
+
+        if (!saved) {
+            return res.status(500)
+        }
+
+        return res.status(200).json({ id: saved._id })
     } catch (err) {
         console.error("api-controller::createDuplicateMapById")
         console.error(err)
