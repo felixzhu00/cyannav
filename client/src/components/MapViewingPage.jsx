@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Typography, Box, InputBase, Menu, MenuItem, Paper, InputAdornment, Button, IconButton, ListItemIcon, Select, TextField, Grid, Tabs, Tab } from '@mui/material';
+import { Typography, Box, InputBase, Menu, MenuItem, Paper, InputAdornment, Button, IconButton, ListItemIcon, Select, TextField, Grid, Tabs, Tab, useTheme } from '@mui/material';
 import { ZoomIn, ZoomOut, Undo, Redo, Delete, KeyboardArrowDown } from '@mui/icons-material';
 
 import MUIExportMapModal from './modals/MUIExportMapModal'
@@ -8,6 +8,8 @@ import MUIAddFieldModal from './modals/MUIAddFieldModal'
 import MUICommentModal from './modals/MUICommentModal'
 
 function MapViewingPage() {
+    const theme = useTheme(); // Use the theme
+
     const [value, setValue] = useState('1');
     const [fields, setFields] = useState([
         { id: 1, text: 'Temperature', value: '' },
@@ -36,12 +38,19 @@ function MapViewingPage() {
 
     // Comment bubble styling
     const commentBubbleStyle = {
-        margin: '10px',
-        padding: '10px',
-        backgroundColor: '#04ECF0', // Light grey background
-        borderRadius: '15px', // Rounded corners for bubble effect
-        boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.2)', // Slight shadow for depth
-        maxWidth: '90%', // Max width of the bubble
+        // margin: '10px',
+        // padding: '10px',
+        // backgroundColor: '#04ECF0', // Light grey background
+        // borderRadius: '15px', // Rounded corners for bubble effect
+        // boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.2)', // Slight shadow for depth
+        // maxWidth: '90%', // Max width of the bubble
+
+        margin: theme.spacing(1),
+        padding: theme.spacing(1),
+        backgroundColor: theme.palette.background.paper,
+        borderRadius: theme.shape.borderRadius,
+        boxShadow: theme.shadows[2],
+        maxWidth: '90%',
     };
 
     const handleInputChange = (id, value) => {
