@@ -23,3 +23,10 @@ getMapJsonById
 401
 404?
 500
+
+/api/newmap
+createNewMap
+input: title, type, json
+200
+401
+500

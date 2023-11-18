@@ -1,65 +1,65 @@
-const date = new Date(Date.now());
+const date = new Date(Date.now())
 
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const mongoose = require("mongoose")
+const Schema = mongoose.Schema
 
 const mapGraphicSchema = new Schema({
     comments: [
         {
             type: Schema.Types.ObjectID,
             ref: "commentSchema",
-            default: []
-        }
+            default: [],
+        },
     ],
     dateCreated: {
         type: Date,
-        default: date
+        default: date,
     },
     dislike: [
         {
             type: Schema.Types.ObjectID,
             ref: "userProfileSchema",
-            default: []
-        }
+            default: [],
+        },
     ],
     dislike: [
         {
             type: Schema.Types.ObjectID,
             ref: "userProfileSchema",
-            default: []
-        }
+            default: [],
+        },
     ],
     mapType: {
         type: String,
-        required: [true, "no mapType given"]
+        required: [true, "no mapType given"],
     },
     navjson: {
         type: Schema.Types.ObjectID,
         ref: "navJsonSchema",
-        required: [true, "no navJson map given"]
+        required: [true, "no navJson map given"],
     },
     published: {
         type: Boolean,
-        required: [true, "no publish bool given"]
+        default: false,
     },
     tags: [
         {
             type: Schema.Types.ObjectID,
             ref: "tagSchema",
-            default: []
-        }
+            default: [],
+        },
     ],
     title: {
         type: String,
         required: [true, "no title given"],
-        maxLength: 50
+        maxLength: 50,
     },
     user: {
         type: Schema.Types.ObjectID,
         ref: "userProfileSchema",
-        required: [true, "no user given"]
-    }
-});
+        required: [true, "no user given"],
+    },
+})
 
-const mapGraphicModel = mongoose.model("mapGraphicModel", mapGraphicSchema);
-module.exports = mapGraphicModel;
+const mapGraphicModel = mongoose.model("mapGraphicModel", mapGraphicSchema)
+module.exports = mapGraphicModel

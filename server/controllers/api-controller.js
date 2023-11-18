@@ -107,13 +107,36 @@ getMapJsonById = async (req, res) => {
 
 createNewMap = async (req, res) => {
     try {
-        // TODO: complete this method.
-        const {} = req.body
+        // TODO: (later) how do we handle guest? Do we create one without a user??.
 
-        return res.status(200).json({})
+        const { title, type, json } = req.body
+
+        // Seems kind of inefficient but oh well.
+        const userMapWithTitle = await Map.countDocuments({
+            title: title,
+            user: res.locals.userId,
+        })
+        if (userMapWithTitle > 0) {
+            res.status(401)
+        }
+
+        const newMap = new Map({
+            mapType: type,
+            navjson: json,
+            title: title,
+        })
+
+        const saved = await newMap.save()
+        if (!saved) {
+            return res.status(500)
+        }
+
+        return res.status(200).json({ id: saved._id })
     } catch (err) {
         console.error("api-controller::createNewMap")
         console.error(err)
+
+        return res.status(500)
     }
 }
 
