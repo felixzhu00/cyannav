@@ -5,3 +5,8 @@ getMapById
 401
 200
 500
+
+/api/mapbyuser/:id
+getUserMaps
+200
+500

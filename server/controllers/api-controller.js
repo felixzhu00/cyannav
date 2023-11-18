@@ -41,15 +41,22 @@ getUserMaps = async (req, res) => {
             })
         }
 
-        // TODO: test this.
-        const Maps = await Map.find({ user: userId })
+        var userMaps // TODO: (later) need testing
+        if (res.locals.userId === userId) {
+            userMaps = await Map.find({ user: userId })
+        } else {
+            // Only get the maps that are published TODO: (collaborate) gets maps user have permission for.
+            userMaps = await Map.find({ user: userId, published: true })
+        }
 
         return res.status(200).json({
-            // TODO: how to format data here..
+            maps: userMaps, // TODO: (later) for now I'm returning everything.
         })
     } catch (err) {
         console.error("api-controller::getUserMaps")
         console.error(err)
+
+        return res.status(500)
     }
 }
 
