@@ -200,16 +200,41 @@ createDuplicateMapById = async (req, res) => {
 
 createForkMapById = async (req, res) => {
     try {
+        // TODO: (later) basically the same as duplicate.
+        // will implment later when we have concrete data structure.
+        return res.status(404)
     } catch (err) {
         console.error("api-controller::createForkMapById")
         console.error(err)
+
+        return res.status(500)
     }
 }
+
 deleteMapById = async (req, res) => {
     try {
+        const { id } = req.body
+
+        if (!id) {
+            return res.status(400)
+        }
+
+        const toBeDeleted = await Map.findById(id)
+        if (toBeDeleted.user !== res.locals.userId) {
+            return res.status(401)
+        }
+
+        const deleted = await Map.findByIdAndDelete(id)
+        if (!deleted) {
+            return res.status(500)
+        }
+
+        return res.status(200)
     } catch (err) {
         console.error("api-controller::deleteMapById")
         console.error(err)
+
+        return res.status(500)
     }
 }
 updateMapNameById = async (req, res) => {

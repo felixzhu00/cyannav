@@ -41,10 +41,18 @@ input: id
 500
 
 /api/forkmap
-/api/duplicatemap
-createDuplicateMapById
+createForkMapById
 input: id
 200
 400
 401
 500
+
+/api/deletemap/:id
+deleteMapById
+input: id
+200
+400
+401
+500
+
