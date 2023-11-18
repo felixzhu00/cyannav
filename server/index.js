@@ -1,31 +1,35 @@
-const http = require('http')
-const express = require('express')
-const cors = require('cors')
-// const cookieParser = require('cookieparser')
+const http = require("http")
+const express = require("express")
+const cors = require("cors")
+const dotenv = require("dotenv")
+const cookieParser = require("cookie-parser")
 
+dotenv.config() // Loads .env
 
-const hostname = '127.0.0.1'
-const port = 8000
+const hostname = process.env.SERVER_HOSTNAME
+const port = process.env.SERVER_PORT
 
 const app = express()
 
 // MIDDLE WARE
-app.use(express.urlencoded({extend: true}))
-app.use(cors({
-  origin: ["http://129.213.145.105"],
-  credentials: true
-}))
+app.use(express.urlencoded({ extend: true }))
+app.use(
+    cors({
+        origin: [`http://${hostname}:${port}`], // TODO: change to https for production later
+        credentials: true,
+    })
+)
 app.use(express.json())
-// app.use(cookieParser())
+app.use(cookieParser())
 
-const authRouter = require('./routes/auth-router')
-app.use('/auth', authRouter)
-const apiRouter = require('./routes/api-router')
-app.use('/api', apiRouter)
+const authRouter = require("./routes/auth-router")
+app.use("/auth", authRouter)
+const apiRouter = require("./routes/api-router")
+app.use("/api", apiRouter)
 
 // Initialize database connection
-const db = require('./db')
-db.on('error', console.error.bind(console, 'MongoDB connection failed'))
+const db = require("./db")
+db.on("error", console.error.bind(console, "MongoDB connection failed"))
 
 // Run server
 app.listen(port, () => console.log(`Server running on port ${port}`))

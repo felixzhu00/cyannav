@@ -1,5 +1,4 @@
-const Map = require('../schemas/mapGraphicSchema')
-
+const Map = require("../schemas/mapGraphicSchema")
 
 getMapById = async (req, res) => {
     try {
@@ -7,25 +6,25 @@ getMapById = async (req, res) => {
 
         if (!id) {
             return res.status(400).json({
-                errorMessage: "Improper request"
+                errorMessage: "Improper request",
             })
         }
 
-        const targetMap = await Map.findOne({_id: id})
+        const targetMap = await Map.findOne({ _id: id })
 
         if (!targetMap) {
             // TODO: figure out if this is the correct status code.
             return res.status(404).json({
-                errorMessage: "No map by ID"
+                errorMessage: "No map by ID",
             })
         }
-        
+
         return res.status(200).json({
-            // TODO: how to format data here.. 
+            // TODO: how to format data here..
         })
     } catch (err) {
-        // TODO: error handling
-        console.log("getMapById:: " + err)
+        console.error("api-controller::getMapById")
+        console.error(err)
     }
 }
 
@@ -35,19 +34,19 @@ getUserMaps = async (req, res) => {
 
         if (!userId) {
             return res.status(400).json({
-                errorMessage: "Improper request"
+                errorMessage: "Improper request",
             })
         }
 
         // TODO: test this.
-        const Maps = await Map.find({user: userId})
+        const Maps = await Map.find({ user: userId })
 
         return res.status(200).json({
             // TODO: how to format data here..
         })
     } catch (err) {
-        // TODO: error handling
-        console.log("getUserMaps:: " + err)
+        console.error("api-controller::getUserMaps")
+        console.error(err)
     }
 }
 
@@ -55,15 +54,12 @@ getAllMaps = async (req, res) => {
     try {
         const Maps = await Map.find()
 
-        // Not including 400 bad request because there is 
-        // literally nothing to be formatted wrong
-
         return res.status(200).json({
             // TODO: how to format data here..
         })
     } catch (err) {
-        // TODO: error handling
-        console.log("getUserMaps:: " + err)
+        console.error("api-controller::getUserMaps")
+        console.error(err)
     }
 }
 
@@ -73,52 +69,91 @@ getMapJsonById = async (req, res) => {
 
         if (!id) {
             return res.status(400).json({
-                errorMessage: "Improper request"
+                errorMessage: "Improper request",
             })
         }
 
-        const targetMap = await Map.findOne({_id: id})
+        const targetMap = await Map.findOne({ _id: id })
 
         if (!targetMap) {
             // TODO: figure out if this is the correct status code.
             return res.status(404).json({
-                errorMessage: "No map by ID"
+                errorMessage: "No map by ID",
             })
         }
-        
+
         return res.status(200).json({
-            // TODO: how to format data here.. 
+            // TODO: how to format data here..
             // This should be targetMap.navJSON
         })
     } catch (err) {
-        // TODO: error handling
-        console.log("getMapById:: " + err)
+        console.error("api-controller::getMapJsonById")
+        console.error(err)
     }
 }
 
 createNewMap = async (req, res) => {
-    const { type } = req.body //used to be const { type, template, json } = req.body
-                                            //no clue what template is, replacing it for now so that
-                                            //we can do our backend tests with jest
+    try {
+        // TODO: complete this method.
+        const {} = req.body
 
-    if (!type) {
-        return res.status(400).json({
-            errorMessage: "Improper request"
-        })
+        return res.status(200).json({})
+    } catch (err) {
+        console.error("api-controller::createNewMap")
+        console.error(err)
     }
-
-    return res.status(201).json({
-        // TODO: deal with later, also, why 201?
-    })
 }
 
-createDuplicateMapById = async (req, res) => {}
-createForkMapById = async (req, res) => {}
-deleteMapById = async (req, res) => {}
-updateMapNameById = async (req, res) => {}
-updateMapTag = async (req, res) => {}
-updateMapPublishStatus = async (req, res) => {}
-updateMapJson = async (req, res) => {}
+createDuplicateMapById = async (req, res) => {
+    try {
+    } catch (err) {
+        console.error("api-controller::createDuplicateMapById")
+        console.error(err)
+    }
+}
+
+createForkMapById = async (req, res) => {
+    try {
+    } catch (err) {
+        console.error("api-controller::createForkMapById")
+        console.error(err)
+    }
+}
+deleteMapById = async (req, res) => {
+    try {
+    } catch (err) {
+        console.error("api-controller::deleteMapById")
+        console.error(err)
+    }
+}
+updateMapNameById = async (req, res) => {
+    try {
+    } catch (err) {
+        console.error("api-controller::updateMapNameById")
+        console.error(err)
+    }
+}
+updateMapTag = async (req, res) => {
+    try {
+    } catch (err) {
+        console.error("api-controller::updateMapTag")
+        console.error(err)
+    }
+}
+updateMapPublishStatus = async (req, res) => {
+    try {
+    } catch (err) {
+        console.error("api-controller::updateMapPublishStatus")
+        console.error(err)
+    }
+}
+updateMapJson = async (req, res) => {
+    try {
+    } catch (err) {
+        console.error("api-controller::updateMapJson")
+        console.error(err)
+    }
+}
 
 module.exports = {
     getMapById,
@@ -132,5 +167,5 @@ module.exports = {
     updateMapNameById,
     updateMapTag,
     updateMapPublishStatus,
-    updateMapJson
+    updateMapJson,
 }
