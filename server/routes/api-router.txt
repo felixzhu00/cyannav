@@ -1,0 +1,7 @@
+/api/map/:id
+getMapById
+400
+404?
+401
+200
+500

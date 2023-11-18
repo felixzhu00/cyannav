@@ -5,26 +5,29 @@ getMapById = async (req, res) => {
         const { id } = req.body
 
         if (!id) {
-            return res.status(400).json({
-                errorMessage: "Improper request",
-            })
+            return res.status(400)
         }
 
         const targetMap = await Map.findOne({ _id: id })
-
         if (!targetMap) {
-            // TODO: figure out if this is the correct status code.
-            return res.status(404).json({
-                errorMessage: "No map by ID",
-            })
+            // TODO: (later) figure out if this is the correct status code.
+            return res.status(404)
+        }
+
+        // The user have no access to this map.
+        // TODO: (collaborate) when we implement collabortors, we need the permission here
+        if (!targetMap.published && targetMap.user !== res.locals.userId) {
+            return res.status(401)
         }
 
         return res.status(200).json({
-            // TODO: how to format data here..
+            map: targetMap, // TODO: (later) for now I'm returning everything.
         })
     } catch (err) {
         console.error("api-controller::getMapById")
         console.error(err)
+
+        return res.status(500)
     }
 }
 
