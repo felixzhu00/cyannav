@@ -1,229 +1,148 @@
 import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
-import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
-import MenuItem from '@mui/material/MenuItem';
-import logo from '../assets/cyannav_logo.png'
-import { ThumbUp, ThumbUpAltOff, ThumbDownAltOff, ThumbDown, PartyMode } from '@mui/icons-material';
-import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  AppBar, Box, Toolbar, IconButton, Typography, Menu, Container,
+  Avatar, Button, Tooltip, MenuItem
+} from '@mui/material';
+import { Menu as MenuIcon, Home, Store } from '@mui/icons-material'; // Corrected the import for MenuIcon
+import { useTheme } from '@mui/material/styles';
+import logo from '../assets/cyannav_logo.svg';
 
+const settings = ['Account Settings', 'Logout'];
 
-function AppBanner(props) {
-  
-  const navigate = useNavigate();
+function AppBanner() {
+  const theme = useTheme(); // Access the theme
 
-  const settings = ['Account Settings', 'Logout'];
-  const mapTitle = ['MAP TITLE']
-  const mapAuthor = ['MAP AUTHOR']
-  const upvoteCount = 100
-  const downvoteCount = 50
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
-  const location = useLocation(); // Get access to the location object
-  const { pathname } = location; // Destructure pathname from location object
-  // Check if the current pathname is '/login' or '/register'
-  // and return null (don't render anything) if it's a match
-  if (pathname === '/' || pathname === '/login/' || pathname === '/login' || pathname === '/register/' || pathname === '/register' || pathname === '/forget/' || pathname === '/forget') {
-    
-    return null;
-  }
 
-  // const handleOpenNavMenu = (event) => {
-  //   setAnchorElNav(event.currentTarget);
-  // };
+  // Handle menu opening and closing
+  const handleOpenNavMenu = (event) => {
+    setAnchorElNav(event.currentTarget);
+  };
+  const handleCloseNavMenu = () => {
+    setAnchorElNav(null);
+  };
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
-
-  // const handleCloseNavMenu = () => {
-  //   setAnchorElNav(null);
-  // };
-
-  const handleCloseUserMenu = (setting) => {
-    if (setting == 'Account Settings') {
-      navigate('/profile')
-    }
-
-    if (setting == 'Logout') {
-      navigate('/login')
-    }
+  const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
 
-
-  const guestAccount = () => {
-    return (
-      <>
-        <Button
-          onClick={() => { navigate('/login') }}
-          variant='outlined'
-          sx={{
-            margin: '2px',
-            border: '3px solid',
-            borderColor: 'black',
-            color: 'black',
-            backgroundColor: 'lightgrey',
-            '&:hover': {
-              backgroundColor: 'grey', // This will be the background color on hover
-              borderColor: 'black', // If you also want to change the border color on hover
-              border: '3px solid',
-
-            },
-          }}>
-          <Typography fontWeight={'bold'}>Login</Typography>
-        </Button>
-
-        <Button
-          onClick={() => { navigate('/register') }}
-          variant='outlined'
-          sx={{
-            margin: '2px',
-            border: '3px solid',
-            borderColor: 'black',
-            color: 'black',
-            backgroundColor: 'lightgrey',
-            '&:hover': {
-              backgroundColor: 'grey',
-              borderColor: 'black',
-              border: '3px solid',
-
-            },
-          }}>
-          <Typography fontWeight={'bold'}>Register</Typography>
-        </Button>
-      </>
-
-
-    );
-  }
-
-  const userAccount = () => {
-    return (
-      <>
-        <Typography variant='h5' sx={{ paddingRight: '10px', color: 'black', fontWeight: 'bold', display: { xs: 'none', md: 'block' } }}>Username</Typography>
-
-        <Box sx={{ flexGrow: 0 }}>
-          <IconButton id="settingsDropdown" onClick={handleOpenUserMenu} sx={{}}>
-            <Avatar alt="profile_picture" src="/static/images/avatar/2.jpg" />
-          </IconButton>
-          <Menu
-            sx={{ mt: '45px' }}
-            id="menu-appbar"
-            anchorEl={anchorElUser}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            keepMounted
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            open={Boolean(anchorElUser)}
-            onClose={handleCloseUserMenu}
-          >
-            {settings.map((setting) => (
-              <MenuItem id="settingsDropdownOption" key={setting} onClick={()=>{handleCloseUserMenu(setting)}}>
-              <Typography textAlign="center">{setting}</Typography>
-              </MenuItem>
-            ))}
-          </Menu>
-        </Box>
-      </>
-    );
-  }
-
-
-
   return (
-    // <AppBar position="static" sx={{ backgroundColor: 'cyan' }}>
-    //   <Container maxWidth="xl">
-    //     <Toolbar disableGutters>
-    //       <Button onClick={()=>{navigate('/browsepage')}}>
-    <AppBar position="static" sx={{ backgroundColor: 'cyan', width: "100%" }}>
+    <AppBar position="static" sx={{ backgroundColor: theme.palette.background.default, width: "100%" }}>
       <Container maxWidth="false">
-        <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Button onClick={() => { navigate('/browsepage') }}>
-              <Box component="img"
-                sx={{
-                  width: '200px',
-                  borderRadius: 2,
-                  flexGrow: 0
-                }}
-                src={logo}
-              />
-            </Button>
-            <Typography
-              variant="h5"
-              noWrap
-              href="#app-bar-with-responsive-menu"
-              sx={{
-                mr: 2,
-                display: { xs: 'none', md: 'flex', paddingLeft: '25px' },
-                fontWeight: 'bold',
-                color: 'black',
-                textDecoration: 'none',
-              }}
+        <Toolbar disableGutters>
+          {/* Hamburger Menu for smaller screens */}
+          <Box sx={{ display: { xs: 'flex', md: 'none' }, mr: 2 }}>
+            <IconButton
+              size="large"
+              aria-label="open navigation menu"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleOpenNavMenu}
+              color="inherit"
             >
-              {pathname === '/mapview' ? (mapTitle + (props.guest ? " by " + mapAuthor : "")) : ""}
-            </Typography>
+              <MenuIcon />
+            </IconButton>
+
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorElNav}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              keepMounted
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+              open={Boolean(anchorElNav)}
+              onClose={handleCloseNavMenu}
+            >
+              <MenuItem onClick={() => {/* navigate('/mymaps') */ }}>
+                <IconButton sx={{ color: "black", mr: 1 }}>
+                  <Home />
+                </IconButton>
+                <Typography textAlign="center">My Maps</Typography>
+              </MenuItem>
+              <MenuItem onClick={() => {/* navigate('/marketplace') */ }}>
+                <IconButton sx={{ color: "black", mr: 1 }}>
+                  <Store />
+                </IconButton>
+                <Typography textAlign="center">Marketplace</Typography>
+              </MenuItem>
+            </Menu>
           </Box>
 
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
-            sx={{
-              mr: 2,
-              display: { xs: 'flex', md: 'none', paddingLeft: '12px' },
-              flexGrow: 1,
-              fontFamily: 'inter',
-              fontWeight: 700,
-              color: 'black',
-              textDecoration: 'none',
-            }}
-          >
-            {mapTitle}
+          {/* Logo */}
+          <Button onClick={() => { /* navigate('/browsepage') */ }} sx={{ mr: "16px" }}>
+            <Box component="img" sx={{ width: '175px', borderRadius: 1, ml: "-16px", mr: "-16px" }} src={logo} />
+          </Button>
+
+
+          {/* Home and Store Buttons for larger screens */}
+          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', mr: 2 }}>
+            <IconButton sx={{ color: "black" }} onClick={() => {/* navigate('/home') */ }}>
+              <Home sx={{ fontSize: "30px" }} />
+            </IconButton>
+            <IconButton sx={{ color: "black" }} onClick={() => {/* navigate('/store') */ }}>
+              <Store sx={{ fontSize: "30px" }} />
+            </IconButton>
+          </Box>
+
+          {/* Title and Author of map */}
+          <Typography variant='h6' sx={{
+            flexGrow: 1,
+            maxWidth: { xs: 100, sm: 500 }, // Adjust max width based on screen size
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: { xs: 'none', sm: 'block' } // Hide on very small screens
+          }}>
+            (Title) by (Name)asdfasdasdasd
           </Typography>
 
-          {/* Spacer Box to push everything else to the right
-          <Box sx={{ flexGrow: 1 }}>
-          </Box> */}
+          {/* Spacer to push the user avatar to the right */}
+          <Box sx={{ flexGrow: 1 }} />
 
-          {/* ThumbDown and ThumbUp icons */}
-          
+          {/* User Avatar and Menu */}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {pathname === '/mapview' && <Box sx={{ display: 'flex', alignItems: 'center', paddingRight: '20px' }}>
-              <IconButton aria-label="upvote">
-                <ThumbUp sx={{ color: 'black' }} />
+            <Tooltip title="Open settings">
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                <Avatar alt="User Avatar" src="/static/images/avatar/2.jpg" />
               </IconButton>
-              <Typography variant="body1" sx={{ display: { xs: 'none', md: 'block' }, color: 'black' }}>{upvoteCount}</Typography>
-
-              <IconButton aria-label="downvote">
-                <ThumbDown sx={{ color: 'black' }} />
-              </IconButton>
-              <Typography variant="body1" sx={{ display: { xs: 'none', md: 'block' }, color: 'black' }}>{downvoteCount}</Typography>
-            </Box>}
-            
-            {!props.guest ? userAccount() : guestAccount()}
-            {/* <------ Logging in and Registering ------> */}
-
-
-
+            </Tooltip>
+            <Menu
+              sx={{ mt: '45px' }}
+              id="menu-appbar"
+              anchorEl={anchorElUser}
+              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+              keepMounted
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+              open={Boolean(anchorElUser)}
+              onClose={handleCloseUserMenu}
+            >
+              <Box sx={{ maxWidth: 200, p: 1, display: 'flex', flexDirection: 'column', p: '15px' }}>
+                <Typography sx={{ fontWeight: 'bold' }}>
+                  Username:
+                </Typography>
+                <Typography
+                  sx={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  TESTINGTESTINGTESTING
+                </Typography>
+              </Box>
+              {settings.map((setting) => (
+                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                  <Typography textAlign="center">{setting}</Typography>
+                </MenuItem>
+              ))}
+            </Menu>
           </Box>
         </Toolbar>
       </Container>
     </AppBar>
   );
 }
+
 export default AppBanner;
