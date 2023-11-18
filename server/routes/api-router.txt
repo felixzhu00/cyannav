@@ -1,4 +1,4 @@
-/api/map/:id
+/api/mapbyid/:id
 getMapById
 400
 404?

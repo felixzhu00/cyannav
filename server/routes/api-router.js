@@ -4,7 +4,7 @@ const mapGraphicSchemaController = require("../controllers/api-controller")
 const auth = require("../auth") // auth_manager
 
 //Handles getting an existing map(by ID) request
-router.get("/map/:id", auth.verify, mapGraphicSchemaController.getMapById)
+router.get("/mapbyid/:id", auth.verify, mapGraphicSchemaController.getMapById)
 
 //Handles getting all maps made by a specific user request
 router.get(
