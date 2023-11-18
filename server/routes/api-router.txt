@@ -10,3 +10,8 @@ getMapById
 getUserMaps
 200
 500
+
+/api/allmap
+getAllMaps
+200
+500
