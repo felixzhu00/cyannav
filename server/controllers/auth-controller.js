@@ -34,12 +34,10 @@ loggedIn = async (req, res) => {
             },
         })
     } catch (err) {
-        console.log(err)
-        // TODO: revoke user token?
-        return res.status(200).json({
-            loggedIn: false,
-            user: null,
-        })
+        console.error("auth-controller::loggedIn")
+        console.error(err)
+
+        return res.status(500)
     }
 }
 
@@ -65,24 +63,15 @@ login = async (req, res) => {
             })
         }
 
-        bcrypt.compare(password, targetUser.password, function (result) {
-            if (err) {
-                // TODO: deal with this better.
-                return res.status(500).json({
-                    loggedIn: false,
-                    user: null,
-                    // errorMessage: "Internal server error.",
-                })
-            }
-
-            if (!result) {
-                return res.status(401).json({
-                    loggedIn: false,
-                    user: null,
-                    // errorMessage: "Wrong email or password",
-                })
-            }
-        })
+        // Match password
+        const match = await bcrypt.compare(password, targetUser.password)
+        if (!match) {
+            return res.status(401).json({
+                loggedIn: false,
+                user: null,
+                // errorMessage: "Wrong email or password",
+            })
+        }
 
         const token = auth.signToken(targetUser._id)
 
@@ -90,6 +79,7 @@ login = async (req, res) => {
             .cookie("access_token", token, {
                 httpOnly: true, // TODO: HTTPS: change this later when HTTPS is introduced.
                 secure: true,
+                // withCredentials: true,
                 sameSite: true,
             })
             .status(200)
@@ -102,14 +92,10 @@ login = async (req, res) => {
                 },
             })
     } catch (err) {
-        console.log(err)
+        console.error("auth-controllers::login")
+        console.error(err)
 
-        // TODO: figure out what should be returned here
-        return res.status(200).json({
-            loggedIn: false,
-            user: null,
-            errorMessage: "TODO-login",
-        })
+        return res.status(500)
     }
 }
 
@@ -160,14 +146,15 @@ register = async (req, res) => {
 
         const hashed_password = await bcrypt.hash(password, saltRounds)
 
-        const newUser = new User({ email, hashed_password, username })
+        const newUser = new User({
+            email: email,
+            password: hashed_password,
+            username: username,
+        })
         const saved = await newUser.save()
 
         if (!saved) {
-            return res.status(500).json({
-                loggedIn: false,
-                // errorMessage: "Internal server error.",
-            })
+            return res.status(500)
         }
 
         const token = auth.signToken(newUser._id)
@@ -188,14 +175,10 @@ register = async (req, res) => {
                 },
             })
     } catch (err) {
-        console.log(err)
+        console.error("auth-controller::register")
+        console.error(err)
 
-        // TODO: deal with error
-        return res.status(401).json({
-            loggedIn: false,
-            user: null,
-            errorMessage: "register backend",
-        })
+        return res.status(500)
     }
 }
 
