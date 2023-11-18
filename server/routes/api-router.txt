@@ -1,9 +1,9 @@
 /api/mapbyid/:id
 getMapById
-400
-404?
-401
 200
+400
+401
+404?
 500
 
 /api/mapbyuser/:id
@@ -14,4 +14,12 @@ getUserMaps
 /api/allmap
 getAllMaps
 200
+500
+
+/api/mapjson/:id
+getMapJsonById
+200
+400
+401
+404?
 500

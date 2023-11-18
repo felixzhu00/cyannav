@@ -81,27 +81,27 @@ getMapJsonById = async (req, res) => {
         const { id } = req.body
 
         if (!id) {
-            return res.status(400).json({
-                errorMessage: "Improper request",
-            })
+            return res.status(400)
         }
 
         const targetMap = await Map.findOne({ _id: id })
-
         if (!targetMap) {
             // TODO: figure out if this is the correct status code.
-            return res.status(404).json({
-                errorMessage: "No map by ID",
-            })
+            return res.status(404)
+        }
+
+        if (targetMap.user !== res.locals.userId && !targetMap.published) {
+            return res.status(401)
         }
 
         return res.status(200).json({
-            // TODO: how to format data here..
-            // This should be targetMap.navJSON
+            mapJSON: targetMap.navjson, // TODO: (later) save geojson as obj?
         })
     } catch (err) {
         console.error("api-controller::getMapJsonById")
         console.error(err)
+
+        return res.status(500)
     }
 }
 
