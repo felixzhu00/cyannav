@@ -28,5 +28,6 @@ getMapJsonById
 createNewMap
 input: title, type, json
 200
+400
 401
 500
