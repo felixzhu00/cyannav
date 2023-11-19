@@ -85,24 +85,26 @@ const App = () => {
   }, [guest]);
 
   return (
-    <AuthContextProvider>
-    <GlobalStoreContextProvider>
-    <BrowserRouter>
-      <ThemeProvider theme={theme}>
-        <AppBanner guest={guest} />
-        <Routes>
-          <Route path="/" element={<LoginScreen handleGuest={setGuest} />} />
-          <Route path="/login/" element={<LoginScreen handleGuest={setGuest} />} />
-          <Route path="/register/" element={<RegisterScreen />} />
-          <Route path="/forget/" element={<ForgetPswdScreen />} />
-          <Route path="/profile/" element={<ProfileScreen />} />
-          <Route path="/browsepage/" element={<BrowsePage />} />
-          <Route path="/mapview/" element={<MapViewingPage />} />
-        </Routes>
-      </ThemeProvider>
-    </BrowserRouter>
-    </GlobalStoreContextProvider>
-    </AuthContextProvider>
+    <ThemeProvider theme={theme}>
+      <AuthContextProvider>
+        <GlobalStoreContextProvider>
+          <BrowserRouter>
+
+            <AppBanner guest={guest} />
+            <Routes>
+              <Route path="/" element={<LoginScreen handleGuest={setGuest} />} />
+              <Route path="/login/" element={<LoginScreen handleGuest={setGuest} />} />
+              <Route path="/register/" element={<RegisterScreen />} />
+              <Route path="/forget/" element={<ForgetPswdScreen />} />
+              <Route path="/profile/" element={<ProfileScreen />} />
+              <Route path="/browsepage/" element={<BrowsePage />} />
+              <Route path="/mapview/" element={<MapViewingPage />} />
+            </Routes>
+
+          </BrowserRouter>
+        </GlobalStoreContextProvider>
+      </AuthContextProvider>
+    </ThemeProvider>
   );
 }
 
