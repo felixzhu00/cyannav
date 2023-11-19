@@ -24,8 +24,8 @@ jobs:
                   npm i --force
                   cd ../server
                   npm i --force
-                  cd ..
-                  npx cypress run
+                  npm --version
+                  node --version
 
     lint:
         needs: setup
@@ -43,6 +43,8 @@ jobs:
         steps:
             - name: Frontend Cypress test
               run: |
+                  npm --version
+                  node --version
                   npx cypress run
 
     backend-test:
