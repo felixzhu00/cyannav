@@ -13,10 +13,11 @@ jobs:
         steps:
             - name: Checkout main repo
               uses: actions/checkout@v4
-            - name: Install node dependencies
+            - name: Setup node environment
               uses: actions/setup-node@v4
               with:
                   node-version: "21.x"
+            - name: Install node dependencies
               run: |
                   npm i --force
                   cd client
