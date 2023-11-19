@@ -1,6 +1,5 @@
-import Map from './Map'
-import React, { useEffect, useState } from 'react';
-import { Typography, Grid, Box, InputBase, Menu, MenuItem, Paper, InputAdornment, Button, IconButton, ListItemIcon, FormControl, Select, Fab } from '@mui/material';
+import { useState, useContext } from "react";
+import { Typography, Grid, Box, InputBase, Menu, MenuItem, Paper, InputAdornment, Button, IconButton, ListItemIcon, FormControl, Select } from '@mui/material';
 import { Search, KeyboardArrowDown, Home, Store, Add } from '@mui/icons-material';
 import { Link, MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import Pagination from '@mui/material/Pagination';
@@ -11,18 +10,19 @@ import MUIAddTagModal from './modals/MUIAddTagModal';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import MapCard from './MapCard.jsx'
+import { GlobalStoreContext } from '../store'
 
 function BrowsePage() {
+  const { store } = useContext(GlobalStoreContext);
   const theme = useTheme();
   const isMediumOrSmaller = useMediaQuery(theme.breakpoints.down('md'));
   const [anchorElSort, setAnchorElSort] = useState(null);
   const [anchorElOption, setAnchorElOption] = useState(null);
-  const [selectedOption, setSelectedOption] = useState('By Map Name');
-  const [selectedSort, setSelectedSort] = useState('recent');
-  const [currentModal, setCurrentModal] = useState('');
-  const [activeItem, setActiveItem] = useState('My Maps');
-  const [searchTerm, setSearchTerm] = React.useState('');
+
+
+  //Search Sort options
   const [searchBy, setSearchBy] = useState('mapName'); // 'mapName' or 'username'
+  const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('recent');
 
 
@@ -36,7 +36,7 @@ function BrowsePage() {
   const lastMapIndex = firstMapIndex + mapsPerPage;
   const mapCardsToShow = Array.from({ length: mapsPerPage }, (_, index) => index + firstMapIndex).filter(index => index < totalMaps);
 
-
+  
   const handleChangePage = (event, value) => {
     setCurrentPage(value);
   };
@@ -57,6 +57,9 @@ function BrowsePage() {
   const handleSearchInputChange = (event) => {
     setSearchTerm(event.target.value);
   };
+
+
+
 
 
   const searchAndSort = () => (
@@ -81,7 +84,6 @@ function BrowsePage() {
             p: '2px 4px',
             display: 'flex',
             alignItems: 'center',
-            bgcolor: theme.palette.background.default
           }}
           onSubmit={(e) => e.preventDefault()}
         >
@@ -136,15 +138,11 @@ function BrowsePage() {
 
 
   return (
-    <Box sx={{ p: 3, overflow: 'hidden', height: 'auto', bgcolor: theme.palette.background.paper }}>
-      <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{activeItem}</Typography>
+    <Box sx={{ margin: 3, overflow: 'hidden', height: 'auto' }}>
+      <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{store.togglebrowseHome ? "My Maps" :  "Marketplace"}</Typography>
       <Box sx={{ mt: '10px' }}>
         {searchAndSort()}
       </Box>
-
-      <Fab color="primary" aria-label="add" sx={{ position: 'absolute', top: 150, right: 20 }}>
-        <Add fontSize="large" />
-      </Fab>
 
       <Grid container spacing={2} sx={{ mt: 2 }}>
         {mapCardsToShow.map((index) => (
