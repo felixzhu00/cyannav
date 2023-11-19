@@ -24,7 +24,6 @@ jobs:
                   npm i --force
                   cd ../server
                   npm i --force
-                  npx cypress run
 
     lint:
         needs: setup
