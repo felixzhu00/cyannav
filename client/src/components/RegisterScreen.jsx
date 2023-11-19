@@ -68,6 +68,16 @@ export default function RegisterScreen() {
                                 autoComplete="new-password"
                             />
                         </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                name="verify-password"
+                                label="Verify Password"
+                                type="password"
+                                id="verify-password"
+                                autoComplete="new-password"
+                            />
+                        </Grid>
                     </Grid>
                     <Button
                         type="submit"
@@ -79,7 +89,7 @@ export default function RegisterScreen() {
                     </Button>
                     <Grid container justifyContent="flex-end">
                         <Grid item>
-                            <Link onClick={()=>{navigate('/login')}} variant="body2">
+                            <Link onClick={() => { navigate('/login') }} variant="body2">
                                 Already have an account? Sign in
                             </Link>
                         </Grid>
