@@ -6,18 +6,12 @@ function authManager() {
         try {
             const token = req.cookies.access_token
             if (!token) {
-                return res.status(401).json({
-                    loggedIn: false,
-                    username: null,
-                    // errorMessage: "Unauthorized",
-                })
+                res.locals.userId = null
+            } else {
+                const verified = jwt.verify(token, process.env.JWT_SECRET)
+                req.userId = verified.userId
+                res.locals.userId = verified.userId
             }
-
-            const verified = jwt.verify(token, process.env.JWT_SECRET)
-
-            req.userId = verified.userId
-
-            res.locals.userId = verified.userId
 
             next()
         } catch (err) {
