@@ -41,6 +41,10 @@ jobs:
         runs-on: self-hosted
 
         steps:
+            - name: Setup node environment
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "21.x"
             - name: Frontend Cypress test
               run: |
                   npm --version
