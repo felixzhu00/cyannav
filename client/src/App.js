@@ -23,6 +23,9 @@ import AppBannerwithRouter from './components/AppBanner.jsx';
 import BrowsePage from './components/BrowsePage.jsx';
 import MapViewingPage from './components/MapViewingPage.jsx';
 import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { GlobalStoreContextProvider } from './store'
+import { AuthContextProvider } from './auth';
 
 // Define your color palette
 const colors = {
@@ -45,6 +48,7 @@ const colors = {
     300: '#aecccc',
   },
 };
+
 
 // Create a theme instance
 const theme = createTheme({
@@ -75,12 +79,14 @@ const theme = createTheme({
 
 const App = () => {
 
-  const [guest, setGuest] = React.useState(true);
+  const [guest, setGuest] = useState(true);
 
   useEffect(() => {
   }, [guest]);
 
   return (
+    <AuthContextProvider>
+    <GlobalStoreContextProvider>
     <BrowserRouter>
       <ThemeProvider theme={theme}>
         <AppBanner guest={guest} />
@@ -95,6 +101,8 @@ const App = () => {
         </Routes>
       </ThemeProvider>
     </BrowserRouter>
+    </GlobalStoreContextProvider>
+    </AuthContextProvider>
   );
 }
 

@@ -11,6 +11,7 @@ const settings = ['Account Settings', 'Logout'];
 
 function AppBanner() {
   const theme = useTheme(); // Access the theme
+  const navigate = useNavigate();
 
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
