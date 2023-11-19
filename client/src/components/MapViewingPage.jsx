@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Typography, Box, InputBase, Menu, MenuItem, Paper, InputAdornment, Button, IconButton, ListItemIcon, Select, TextField, Grid, Tabs, Tab, useTheme } from '@mui/material';
-import { ZoomIn, ZoomOut, Undo, Redo, Delete, KeyboardArrowDown } from '@mui/icons-material';
+import { ZoomIn, ZoomOut, Undo, Redo, Delete, KeyboardArrowDown, ThumbUp, ThumbDown } from '@mui/icons-material';
 
 import MUIExportMapModal from './modals/MUIExportMapModal'
 import MUIPublishMapModal from './modals/MUIPublishMapModal'
@@ -26,6 +26,9 @@ function MapViewingPage() {
     const [selectedChoropleth, setSelectedChoropleth] = useState('');
     const [anchorElChoropleth, setAnchorElChoropleth] = useState(null);
 
+    /**
+     * Commenting constants and states
+     */
     const [comments, setComments] = useState([]); // Used to store comments
     const addComment = (newCommentText) => {
         const newComment = {
@@ -34,17 +37,7 @@ function MapViewingPage() {
         };
         setComments([...comments, newComment]);
     };
-
-
-    // Comment bubble styling
-    const commentBubbleStyle = {
-        // margin: '10px',
-        // padding: '10px',
-        // backgroundColor: '#04ECF0', // Light grey background
-        // borderRadius: '15px', // Rounded corners for bubble effect
-        // boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.2)', // Slight shadow for depth
-        // maxWidth: '90%', // Max width of the bubble
-
+    const commentBubbleStyle = { // Comment bubble styling
         margin: theme.spacing(1),
         padding: theme.spacing(1),
         backgroundColor: theme.palette.background.paper,
@@ -53,14 +46,27 @@ function MapViewingPage() {
         maxWidth: '90%',
     };
 
-    const handleInputChange = (id, value) => {
+    /**
+     * Like/Dislikes constants and states
+     */
+    const [likes, setLikes] = useState(0);
+    const [dislikes, setDislikes] = useState(0);
+    const [hasLiked, setHasLiked] = useState(false);
+    const [hasDisliked, setHasDisliked] = useState(false);
+
+
+    /**
+     * Handler functions
+     */
+    const handleInputChange = (id, value) => { // field numerical values
         const updatedFields = fields.map((field) =>
             field.id === id ? { ...field, value } : field
         );
         setFields(updatedFields);
     };
 
-    const handleDeleteField = (id) => {
+
+    const handleDeleteField = (id) => { // when user deletes a field
         const updatedFields = fields.filter((field) => field.id !== id);
         setFields(updatedFields);
         setChoroplethOptions(updatedFields.map((field) => field.text));
@@ -107,32 +113,79 @@ function MapViewingPage() {
         setCurrentModel("addfield")
     }
 
+    const handleLike = () => { // handles likes
+        // TODO: Need to implement to save to DB as well as retrieve from it
+        if (hasLiked) {
+            // If already liked, unlike it
+            setLikes(likes - 1);
+            setHasLiked(false);
+        } else {
+            // Like and remove dislike if it was disliked before
+            setLikes(likes + 1);
+            setHasLiked(true);
+            if (hasDisliked) {
+                setDislikes(dislikes - 1);
+                setHasDisliked(false);
+            }
+        }
+    };
+
+    const handleDislike = () => { // handles dislikes
+        // TODO: Need to implement to save to DB as well as retrieve from it
+        if (hasDisliked) {
+            // If already disliked, undislike it
+            setDislikes(dislikes - 1);
+            setHasDisliked(false);
+        } else {
+            // Dislike and remove like if it was liked before
+            setDislikes(dislikes + 1);
+            setHasDisliked(true);
+            if (hasLiked) {
+                setLikes(likes - 1);
+                setHasLiked(false);
+            }
+        }
+    };
+
     const topLeft = () => {
         return (
             <Box
-                gridArea={'topbar'}
                 sx={{
                     boxSizing: 'border-box',
                     width: '100%',
                     display: 'flex',
-                    justifyContent: 'flex-end',
                     alignItems: 'center',
-                    bgcolor: '#15B5B0',
+                    bgcolor: theme.palette.primary.main, // Use theme color
                     padding: '10px',
-                    height: 'relative',
                 }}
             >
-                <Box>
-                    <Button variant="contained" onClick={handleExport} sx={{ width: '100px', marginRight: '10px', backgroundColor: 'cyan', color: 'black' }}>
+                {/* Left-aligned Buttons */}
+                <Box sx={{ marginRight: 'auto' }}>
+                    <Button variant="contained" onClick={handleExport} sx={{ width: '100px', marginRight: '10px', backgroundColor: theme.palette.secondary.main, color: 'black' }}>
                         Export
                     </Button>
-                    <Button variant="contained" onClick={handlePublish} sx={{ width: '100px', backgroundColor: 'cyan', color: 'black' }}>
+                    <Button variant="contained" onClick={handlePublish} sx={{ width: '100px', backgroundColor: theme.palette.secondary.main, color: 'black' }}>
                         Publish
                     </Button>
                 </Box>
+
+                {/* Right-aligned Icons with like/dislike counts */}
+                <Box display="flex" alignItems="center"> {/* Ensure flex layout for this Box */}
+                    <IconButton onClick={handleLike} color={hasLiked ? "primary" : "default"}>
+                        <ThumbUp />
+                    </IconButton>
+                    <Typography sx={{ mx: 1 }}>{likes}</Typography> {/* Added margin for spacing */}
+
+                    <IconButton onClick={handleDislike} color={hasDisliked ? "primary" : "default"}>
+                        <ThumbDown />
+                    </IconButton>
+                    <Typography sx={{ mx: 1 }}>{dislikes}</Typography> {/* Added margin for spacing */}
+                </Box>
             </Box>
-        )
+        );
     }
+
+
     const topRight = () => {
         return (
             <Box
@@ -141,7 +194,7 @@ function MapViewingPage() {
                     boxSizing: 'border-box',
                     display: 'flex',
                     justifyContent: 'flex-end',
-                    bgcolor: '#F9BDC0',
+                    bgcolor: theme.palette.primary.main, // Use theme color
                     padding: '4px',
                     boxShadow: 4
                 }}
@@ -257,7 +310,7 @@ function MapViewingPage() {
                     padding: '10px',
                     height: '100%',
                     width: '100%',
-                    // backgroundColor: '#FFFFFF', // Change color as needed
+                    bgcolor: theme.palette.background.paper,
                 }}
             >
                 <Box>
@@ -287,10 +340,10 @@ function MapViewingPage() {
             </Box>
         );
     };
-    const sideBar = () => {
+    const editBar = () => {
         return (
             <Box
-                gridArea={'sidebar'}
+                gridArea={'editBar'}
                 sx={{
                     boxSizing: 'border-box',
                     display: 'flex',
@@ -299,8 +352,8 @@ function MapViewingPage() {
                     height: `calc(100vh - 121px)`,
                     width: '100%',
                     padding: '10px',
-                    // backgroundColor: '#FFFFFF',
-                    boxShadow: 4
+                    boxShadow: 1,
+                    bgcolor: theme.palette.background.paper,
                 }}
             >
                 <Box>
@@ -355,7 +408,7 @@ function MapViewingPage() {
                         sx={{
                             marginBottom: '10px',
                             color: 'black',
-                            backgroundColor: 'cyan'
+                            bgcolor: theme.palette.secondary.main
                         }}
                     >
                         + Add Field
@@ -369,7 +422,14 @@ function MapViewingPage() {
                     >
                         <Typography sx={{ m: "10px" }}>{maptype} by:</Typography>
                         <Box sx={{ textAlign: 'right' }}>
-                            <Button onClick={handleChoroplethClick} variant="contained" sx={{ color: "black", backgroundColor: "cyan", width: '150px' }}>
+                            <Button
+                                onClick={handleChoroplethClick}
+                                variant="contained"
+                                sx={{
+                                    color: "black",
+                                    bgcolor: theme.palette.secondary.main,
+                                    width: '150px'
+                                }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                                     <span>{selectedChoropleth}</span>
                                     <KeyboardArrowDown />
@@ -414,7 +474,7 @@ function MapViewingPage() {
             <Box sx={{ gridColumn: '1', gridRow: '1', textAlign: 'left', paddingTop: '1px' }}>{topLeft()}</Box>
             <Box sx={{ gridColumn: '2', gridRow: '1', textAlign: 'right', paddingTop: '1px' }}>{topRight()}</Box>
             <Box sx={{ gridColumn: '1', gridRow: '2' }}>{mapView()}</Box>
-            <Box sx={{ gridColumn: '2', gridRow: '2' }}>{value === '1' ? sideBar() : commentSide()}</Box>
+            <Box sx={{ gridColumn: '2', gridRow: '2' }}>{value === '1' ? editBar() : commentSide()}</Box>
             {
                 currentModel === 'export' && <MUIExportMapModal
                     open={currentModel === 'export'}
