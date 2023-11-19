@@ -6,12 +6,17 @@ import {
 import { Menu as MenuIcon, Home, Store } from '@mui/icons-material'; // Corrected the import for MenuIcon
 import { useTheme } from '@mui/material/styles';
 import logo from '../assets/cyannav_logo.svg';
+import { GlobalStoreContext } from '../store'
+import AuthContext from '../auth'
 
 const settings = ['Account Settings', 'Logout'];
 
 function AppBanner() {
+
   const theme = useTheme(); // Access the theme
   const navigate = useNavigate();
+  const { store } = useContext(GlobalStoreContext);
+  const { auth } = useContext(AuthContext);
 
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -24,11 +29,44 @@ function AppBanner() {
     setAnchorElNav(null);
   };
   const handleOpenUserMenu = (event) => {
+    console.log(auth.user)
+
     setAnchorElUser(event.currentTarget);
   };
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  // Handle navigating to different on clicking on buttons
+  const handleIconClick = () => {
+    navigate("/browsepage");
+  };
+  const handleAccountSettingClick = () => {
+    navigate("/profile");
+    setAnchorElUser(null);
+  };
+  const handleLogoutClick = async () => {
+    auth.logoutUser()
+    navigate("/login");
+    setAnchorElUser(null);
+  };
+
+  // Change the current display subpage
+  const handleHome = () => {
+    store.toggleBrowsePage("home") //togglebrowseHome : true
+    navigate("/browsepage");
+    // Calls global store function
+  }
+  const handleStore = () => {
+    store.toggleBrowsePage("store") //togglebrowseHome : false
+    navigate("/browsepage");
+    // Calls global store function
+  }
+
+  useEffect(() => {
+  }, []);
+
+
 
   return (
     <AppBar position="relative" sx={{ backgroundColor: theme.palette.background.default, width: "100%" }}>
