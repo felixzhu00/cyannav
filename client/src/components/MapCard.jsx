@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import { useState, useContext } from "react";
 import { Box, Card, CardMedia, CardContent, Typography, IconButton, Menu, MenuItem, useMediaQuery, useTheme } from '@mui/material';
-import { MoreVert } from '@mui/icons-material';
+import { MoreVert, StoreTwoTone } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import mapSample from '../assets/map_sample.jpg';
+import { GlobalStoreContext } from '../store'
+import AuthContext from '../auth'
 
 export default function MapCard() {
+    const { store } = useContext(GlobalStoreContext);
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const theme = useTheme();
@@ -17,6 +20,29 @@ export default function MapCard() {
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    const handleKebab = (option) => {
+        switch (option) {
+            case "rename":
+                break;
+            case "addTag":
+                store.setCurrentModal("AddTagModal")
+                break;
+            case "publish":
+                store.setCurrentModal("PublishMapModal")
+                break;
+            case "duplicate":
+                //duplicates map                
+
+                break;
+            case "delete":
+                store.setCurrentModal("DeleteMapModal")
+                break;
+            default:
+                console.log(`${option} is incorrect`);
+        }
+        setAnchorEl(null);
+    }
 
     return (
         <Card sx={{ maxWidth: isSmallScreen ? 300 : 'relative' }}>
@@ -40,11 +66,11 @@ export default function MapCard() {
                         open={open}
                         onClose={handleClose}
                     >
-                        <MenuItem onClick={handleClose}>Rename</MenuItem>
-                        <MenuItem onClick={handleClose}>Add Tag</MenuItem>
-                        <MenuItem onClick={handleClose}>Publish</MenuItem>
-                        <MenuItem onClick={handleClose}>Duplicate</MenuItem>
-                        <MenuItem onClick={handleClose}>Delete</MenuItem>
+                        <MenuItem onClick={()=>{handleKebab("rename")}}>Rename</MenuItem>
+                        <MenuItem onClick={()=>{handleKebab("addTag")}}>Add Tag</MenuItem>
+                        <MenuItem onClick={()=>{handleKebab("publish")}}>Publish</MenuItem>
+                        <MenuItem onClick={()=>{handleKebab("duplicate")}}>Duplicate</MenuItem>
+                        <MenuItem onClick={()=>{handleKebab("delete")}}>Delete</MenuItem>
                     </Menu>
                 </Box>
                 <Typography variant="body2" color="text.secondary">
