@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { useState } from 'react';
+import { useContext } from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -10,27 +9,36 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import RegisterLogo from '../assets/cyannav_logo_wo_name.png'
 import { useNavigate } from 'react-router-dom';
+import AuthContext from '../auth'
 
 export default function RegisterScreen() {
+    const { auth } = useContext(AuthContext);
     const navigate = useNavigate();
+
+    const [errorMessage, setErrorMessage] = useState('');
+
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        if (data.get('password') !== data.get('verify-password')) { // checks if two fields match
-            setErrorMessage('The passwords do not match.');
-            return; // Prevent form submission
-        }
-
-        console.log({
+        const input = {
             email: data.get('email'),
             username: data.get('username'),
             password: data.get('password'),
-        });
+        }
+        if (data.get('password') !== data.get('verify-password')) { // checks if two fields match
+            setErrorMessage('The passwords do not match.');
+            return;
+        }
 
-        setErrorMessage(''); // erases error message
-        navigate('/login');
+        auth.registerUser(input.email, input.username, input.password, input.password)
+        if (auth.error != null) {
+            console.log(auth.error)
+        } else {
+            setErrorMessage(''); 
+            navigate('/login');
+        }
     };
-    const [errorMessage, setErrorMessage] = useState(''); // used to display message if username/password combination is wrong
+    
 
     return (
         <Container component="main" maxWidth="xs">
