@@ -17,26 +17,58 @@ export default function ForgetPswdScreen() {
     const [verificationCode, setVerificationCode] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+
+    // Used for displaying error messages
+    const [emailError, setEmailError] = useState('');
+    const [verificationCodeError, setVerificationCodeError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
     const navigate = useNavigate();
 
     const handleEmailSubmit = (event) => {
         event.preventDefault();
-        // const data = new FormData(event.currentTarget);
-        console.log("Email submitted: ", email);
-        setStep('verificationStep'); // Move to the next step
+
+        // TODO: Need backend to check if email exists (Example code below)
+        // if (!isEmailRegistered(email)) {
+        //     setEmailError("This email address was never registered.");
+        // } else {
+        //     setEmailError('Email error message test'); // Clear any existing error message
+        //     setStep('verificationStep');
+        // }
+
+
+        // setEmailError("Email error message test");
+        setStep('verificationStep');
+
     };
 
     const handleVerificationCodeSubmit = (event) => {
         event.preventDefault();
-        // const data = new FormData(event.currentTarget);
-        console.log("Verification code submitted: ", verificationCode);
+
+        // TODO: Need backend to do this. (Example code below)
+        // if (!isValidVerificationCode(verificationCode)) {
+        //     setVerificationCodeError("Wrong verification code.");
+        // } else {
+        //     setVerificationCodeError('Verification error message test'); // Clear any existing error message
+        //     setStep('resetPasswordStep');
+        // }
+        // setVerificationCodeError('Verification error message test'); // Clear any existing error message
         setStep('resetPasswordStep');
+
+
     };
 
     const handleResetPasswordSubmit = (event) => {
         event.preventDefault();
+        if (password !== confirmPassword) {
+            setPasswordError("Passwords do not match");
+            return;
+        } else {
+            setPasswordError('Password error message test');
+        }
+        // TODO: Reset password logic here
         navigate('/login/');
     };
+
 
     return (
         <Container component="main" maxWidth="xs">
@@ -53,30 +85,48 @@ export default function ForgetPswdScreen() {
                 <Typography component="h1" variant="h5">
                     {step === 'emailStep' ? 'Forgot Password' : 'Enter Verification Code'}
                 </Typography>
-                <Box component="form" noValidate onSubmit={step === 'emailStep' ? handleEmailSubmit : handleVerificationCodeSubmit} sx={{ mt: 3 }}>
+                <Box component="form" noValidate onSubmit={step === 'emailStep' ? handleEmailSubmit : handleVerificationCodeSubmit} sx={{ mt: 3, width: '350px' }}>
                     {step === 'emailStep' && (
-                        <TextField
-                            required
-                            fullWidth
-                            id="email"
-                            label="Email Address"
-                            name="email"
-                            autoComplete="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
+                        <>
+                            <TextField
+                                required
+                                fullWidth
+                                id="email"
+                                label="Email Address"
+                                name="email"
+                                autoComplete="email"
+                                value={email}
+                                onChange={(e) => {
+                                    setEmail(e.target.value);
+                                    setEmailError('');
+                                }} />
+                            {emailError && <Typography color="error" variant="subtitle2" sx={{ mt: 1 }}>{emailError}</Typography>}
+
+                            {/* <Typography
+                                color="error"
+                                variant="subtitle2"
+                                sx={{ mt: 1, height: emailError ? 'auto' : '24px' }}> 
+                                // {emailError}
+                            </Typography> */}
+                        </>
                     )}
                     {step === 'verificationStep' && (
-                        <TextField
-                            required
-                            fullWidth
-                            id="verificationCode"
-                            label="Verification Code"
-                            name="verificationCode"
-                            autoComplete="one-time-code"
-                            value={verificationCode}
-                            onChange={(e) => setVerificationCode(e.target.value)}
-                        />
+                        <>
+                            <TextField
+                                required
+                                fullWidth
+                                id="verificationCode"
+                                label="Verification Code"
+                                name="verificationCode"
+                                autoComplete="one-time-code"
+                                value={verificationCode}
+                                onChange={(e) => {
+                                    setVerificationCode(e.target.value);
+                                    setVerificationCodeError('');
+                                }}
+                            />
+                            {verificationCodeError && <Typography color="error" variant="subtitle2" sx={{ mt: 1 }}>{verificationCodeError}</Typography>}
+                        </>
                     )}
                     {step === 'resetPasswordStep' && (
                         <>
@@ -89,7 +139,10 @@ export default function ForgetPswdScreen() {
                                 id="password"
                                 autoComplete="new-password"
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                onChange={(e) => {
+                                    setPassword(e.target.value)
+                                    setPasswordError('');
+                                }}
                                 sx={{ mt: 2 }}
                             />
                             <TextField
@@ -100,9 +153,13 @@ export default function ForgetPswdScreen() {
                                 type="password"
                                 id="confirmPassword"
                                 value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                onChange={(e) => {
+                                    setConfirmPassword(e.target.value)
+                                    setPasswordError('');
+                                }}
                                 sx={{ mt: 2 }}
                             />
+                            {passwordError && <Typography color="error" variant="subtitle2" sx={{ mt: 1 }}>{passwordError}</Typography>}
                         </>
                     )}
                     <Button
@@ -127,14 +184,14 @@ export default function ForgetPswdScreen() {
                 </Box>
                 <Grid container justifyContent="center">
                     <Grid item>
-                        <Link onClick={()=>{navigate('/login')}} variant="body2">
+                        <Link onClick={() => { navigate('/login') }} variant="body2">
                             Remember your password? Sign in
                         </Link>
                     </Grid>
                 </Grid>
                 <Grid container justifyContent="center">
                     <Grid item>
-                        <Link onClick={()=>{navigate('/register')}} variant="body2">
+                        <Link onClick={() => { navigate('/register') }} variant="body2">
                             Don't have an account? Sign up
                         </Link>
                     </Grid>
