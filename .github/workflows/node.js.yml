@@ -39,7 +39,7 @@ jobs:
         runs-on: self-hosted
 
         steps:
-            - name: Front-end Cypress test
+            - name: Frontend Cypress test
               run: |
                   npx cypress run
 
@@ -48,7 +48,7 @@ jobs:
         runs-on: self-hosted
 
         steps:
-            - name: Back-end API test
+            - name: Backend API test
               run: |
                   echo "To be implemented"
 
@@ -57,7 +57,7 @@ jobs:
         runs-on: self-hosted
 
         steps:
-            - name: Build front-end
+            - name: Build frontend
               run: |
                   cd client
                   npm run build
@@ -74,7 +74,7 @@ jobs:
                   pm2 start 0
 
     deploy-frontend:
-        needs: build-front-end
+        needs: build-frontend
         runs-on: self-hosted
 
         steps:
