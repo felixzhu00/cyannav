@@ -22,10 +22,10 @@ import MUIAddTagModal from './components/modals/MUIAddTagModal.jsx';
 import AppBannerwithRouter from './components/AppBanner.jsx';
 import BrowsePage from './components/BrowsePage.jsx';
 import MapViewingPage from './components/MapViewingPage.jsx';
-import React, { useState, useRef, useEffect } from 'react';
 import { useState, useRef, useEffect } from 'react';
 import { GlobalStoreContextProvider } from './store'
 import { AuthContextProvider } from './auth';
+
 
 // Define your color palette
 const colors = {

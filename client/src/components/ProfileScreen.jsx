@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { Typography, TextField, InputAdornment, IconButton, Button } from '@mui/material';
 import { AccountCircle, Email, Lock, Edit, DeleteForever } from '@mui/icons-material';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -10,15 +10,20 @@ import MUIChangePasswordModal from './modals/MUIChangePasswordModal';
 import MUIChangeUsernameModal from './modals/MUIChangeUsernameModal';
 import MUIDeleteAccountModal from './modals/MUIDeleteAccountModal';
 import MUIChangeProfilePicModal from './modals/MUIChangeProfilePicModal';
+import AuthContext from '../auth'
+
+
 
 export default function ProfileScreen() {
+    const { auth } = useContext(AuthContext);
     const [currentModel, setCurrentModel] = useState('');
     // Example user data, replace with actual data as needed
     const userData = {
-        username: 'User123',
-        email: 'user123@example.com',
-        password: 'password123' // In a real scenario, you wouldn't display a password like this
+        username: auth.user.username ? auth.user.username : "",
+        email: auth.user.email ? auth.user.email : "",
+        password: '************' // In a real scenario, you wouldn't display a password like this
     };
+    
     const handleDeleteAccount = () => {
         // Implement account deletion logic
         console.log('Delete account');
