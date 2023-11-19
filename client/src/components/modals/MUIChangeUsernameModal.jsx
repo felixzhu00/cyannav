@@ -22,7 +22,7 @@ const style = {
 export default function MUIChangeUsernameModal(props) {
 
     const [open, setOpen] = React.useState(props.open);
-    const handleClose = () => { 
+    const handleClose = () => {
         setOpen(false)
         props.onClose()
     };
@@ -67,7 +67,7 @@ export default function MUIChangeUsernameModal(props) {
                             fullWidth
                         />
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
-                            <Button onClick={handleClose} variant="contained" sx={{ backgroundColor: "cyan", color: "black", mr: "10px", width: "90px" }}>Save</Button>
+                            <Button onClick={handleClose} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", mr: "10px", width: "90px" }}>Save</Button>
                             <Button onClick={handleClose} variant="outlined" sx={{ color: "black" }}>Cancel</Button>
                         </Box>
                     </Box>

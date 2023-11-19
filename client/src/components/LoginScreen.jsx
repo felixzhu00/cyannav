@@ -61,6 +61,7 @@ export default function LoginScreen(props) {
                         name="email"
                         autoComplete="email"
                         autoFocus
+                        required
                     />
                     <TextField
                         margin="normal"
@@ -70,6 +71,7 @@ export default function LoginScreen(props) {
                         type="password"
                         id="password"
                         autoComplete="current-password"
+                        required
                     />
                     {errorMessage && (
                         <Typography color='red' variant="subtitle2" sx={{ mt: 1 }}>

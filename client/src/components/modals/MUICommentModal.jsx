@@ -68,7 +68,7 @@ export default function MUICommentModal(props) {
                             onChange={(e) => setCommentText(e.target.value)}
                         />
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
-                            <Button onClick={handleSend} variant="contained" sx={{ backgroundColor: "cyan", color: "black", mr: "5px" }}>Send </Button>
+                            <Button onClick={handleSend} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", mr: "5px" }}>Send </Button>
                             <Button onClick={handleClose} variant="outlined" sx={{ color: "black", ml: "5px" }}>Cancel</Button>
                         </Box>
                     </Box>

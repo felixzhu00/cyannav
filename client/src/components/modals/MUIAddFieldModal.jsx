@@ -7,6 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import { Close } from '@mui/icons-material';
 import { TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useTheme } from '@mui/material';
 
 const style = {
     position: 'absolute',
@@ -21,8 +22,9 @@ const style = {
 };
 
 export default function MUIAddFieldModal(props) {
+    const theme = useTheme();
     const [open, setOpen] = useState(props.open);
-    const handleClose = () => { 
+    const handleClose = () => {
         setOpen(false)
         props.onClose()
     };
@@ -68,7 +70,7 @@ export default function MUIAddFieldModal(props) {
                                 onClick={handleClose}
                                 variant="contained"
                                 sx={{
-                                    backgroundColor: "cyan",
+                                    bgcolor: theme.palette.primary.main,
                                     color: "black",
                                     mr: "5px",
                                     width: '100px' // Set a fixed width

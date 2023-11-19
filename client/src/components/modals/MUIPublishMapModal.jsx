@@ -51,7 +51,7 @@ export default function MUIPublishMapModal(props) {
                             onClick={handleClose}
                             variant="contained"
                             sx={{
-                                backgroundColor: "cyan",
+                                bgcolor: theme.palette.primary.main,
                                 color: "black",
                                 mr: "10px"
                             }}

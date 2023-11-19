@@ -1,6 +1,6 @@
 import Map from './Map'
 import React, { useEffect, useState } from 'react';
-import { Typography, Grid, Box, InputBase, Menu, MenuItem, Paper, InputAdornment, Button, IconButton, ListItemIcon, FormControl, Select } from '@mui/material';
+import { Typography, Grid, Box, InputBase, Menu, MenuItem, Paper, InputAdornment, Button, IconButton, ListItemIcon, FormControl, Select, Fab } from '@mui/material';
 import { Search, KeyboardArrowDown, Home, Store, Add } from '@mui/icons-material';
 import { Link, MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import Pagination from '@mui/material/Pagination';
@@ -81,6 +81,7 @@ function BrowsePage() {
             p: '2px 4px',
             display: 'flex',
             alignItems: 'center',
+            bgcolor: theme.palette.background.default
           }}
           onSubmit={(e) => e.preventDefault()}
         >
@@ -135,11 +136,15 @@ function BrowsePage() {
 
 
   return (
-    <Box sx={{ margin: 3, overflow: 'hidden', height: 'auto' }}>
+    <Box sx={{ p: 3, overflow: 'hidden', height: 'auto', bgcolor: theme.palette.background.paper }}>
       <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{activeItem}</Typography>
       <Box sx={{ mt: '10px' }}>
         {searchAndSort()}
       </Box>
+
+      <Fab color="primary" aria-label="add" sx={{ position: 'absolute', top: 150, right: 20 }}>
+        <Add fontSize="large" />
+      </Fab>
 
       <Grid container spacing={2} sx={{ mt: 2 }}>
         {mapCardsToShow.map((index) => (

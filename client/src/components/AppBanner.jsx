@@ -30,7 +30,7 @@ function AppBanner() {
   };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: theme.palette.background.default, width: "100%" }}>
+    <AppBar position="relative" sx={{ backgroundColor: theme.palette.background.default, width: "100%" }}>
       <Container maxWidth="false">
         <Toolbar disableGutters>
           {/* Hamburger Menu for smaller screens */}
