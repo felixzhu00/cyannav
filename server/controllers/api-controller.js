@@ -157,6 +157,10 @@ createDuplicateMapById = async (req, res) => {
 
         const srcMap = Map.findById(id)
 
+        if(!srcMap){
+            return res.status(400)
+        }
+
         if (srcMap.user !== res.locals.userId) {
             return res.status(401)
         }
