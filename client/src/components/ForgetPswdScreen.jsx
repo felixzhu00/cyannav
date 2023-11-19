@@ -10,6 +10,7 @@ import Container from '@mui/material/Container';
 import Logo from '../assets/cyannav_logo_wo_name.png'
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom'
+import AuthContext from '../auth'
 
 export default function ForgetPswdScreen() {
     const [step, setStep] = useState('emailStep');
@@ -26,35 +27,16 @@ export default function ForgetPswdScreen() {
 
     const handleEmailSubmit = (event) => {
         event.preventDefault();
-
-        // TODO: Need backend to check if email exists (Example code below)
-        // if (!isEmailRegistered(email)) {
-        //     setEmailError("This email address was never registered.");
-        // } else {
-        //     setEmailError('Email error message test'); // Clear any existing error message
-        //     setStep('verificationStep');
-        // }
-
-
-        // setEmailError("Email error message test");
-        setStep('verificationStep');
-
+        // const data = new FormData(event.currentTarget);
+        console.log("Email submitted: ", email);
+        setStep('verificationStep'); // Move to the next step
     };
 
     const handleVerificationCodeSubmit = (event) => {
         event.preventDefault();
-
-        // TODO: Need backend to do this. (Example code below)
-        // if (!isValidVerificationCode(verificationCode)) {
-        //     setVerificationCodeError("Wrong verification code.");
-        // } else {
-        //     setVerificationCodeError('Verification error message test'); // Clear any existing error message
-        //     setStep('resetPasswordStep');
-        // }
-        // setVerificationCodeError('Verification error message test'); // Clear any existing error message
+        // const data = new FormData(event.currentTarget);
+        console.log("Verification code submitted: ", verificationCode);
         setStep('resetPasswordStep');
-
-
     };
 
     const handleResetPasswordSubmit = (event) => {
@@ -68,7 +50,6 @@ export default function ForgetPswdScreen() {
         // TODO: Reset password logic here
         navigate('/login/');
     };
-
 
     return (
         <Container component="main" maxWidth="xs">
@@ -99,17 +80,10 @@ export default function ForgetPswdScreen() {
                                 onChange={(e) => {
                                     setEmail(e.target.value);
                                     setEmailError('');
-                                }} />
+                                }}
+                            />
                             {emailError && <Typography color="error" variant="subtitle2" sx={{ mt: 1 }}>{emailError}</Typography>}
-
-                            {/* <Typography
-                                color="error"
-                                variant="subtitle2"
-                                sx={{ mt: 1, height: emailError ? 'auto' : '24px' }}> 
-                                // {emailError}
-                            </Typography> */}
-                        </>
-                    )}
+                        </>)}
                     {step === 'verificationStep' && (
                         <>
                             <TextField
@@ -197,6 +171,6 @@ export default function ForgetPswdScreen() {
                     </Grid>
                 </Grid>
             </Box>
-        </Container>
+        </Container >
     );
 }
