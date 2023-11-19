@@ -13,6 +13,17 @@ import { useNavigate } from 'react-router-dom';
 export default function LoginScreen(props) {
     const [signinButton, setsigninButton] = useState(null);
     const navigate = useNavigate();
+    const [errorMessage, setErrorMessage] = useState('The username and password combination is incorrect.'); // used to display message if username/password combination is wrong
+
+
+    // EXAMPLE FOR BOOL CHECK FOR AUTH:
+    // const isValid = await validateCredentials(data.get('email'), data.get('password'));
+    // if (!isValid) {
+    //     setErrorMessage('Incorrect username or password.');
+    // } else {
+    //     navigate('/browsepage');
+    // }
+
 
     const handleSubmit = (event) => {
 
@@ -60,6 +71,11 @@ export default function LoginScreen(props) {
                         id="password"
                         autoComplete="current-password"
                     />
+                    {errorMessage && (
+                        <Typography color='red' variant="subtitle2" sx={{ mt: 1 }}>
+                            {errorMessage}
+                        </Typography>
+                    )}
 
                     <Button
                         onClick={() => { props.handleGuest(false) }}
@@ -82,12 +98,12 @@ export default function LoginScreen(props) {
                     </Button>
                     <Grid container>
                         <Grid item xs>
-                            <Link onClick={()=>{navigate('/forget')}} variant="body2">
+                            <Link onClick={() => { navigate('/forget') }} variant="body2">
                                 Forgot password?
                             </Link>
                         </Grid>
                         <Grid item>
-                            <Link id="registerLink" onClick={()=>{navigate('/register')}} variant="body2">
+                            <Link id="registerLink" onClick={() => { navigate('/register') }} variant="body2">
                                 {"Don't have an account? Sign Up"}
                             </Link>
                         </Grid>

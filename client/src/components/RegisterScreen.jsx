@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -15,13 +16,21 @@ export default function RegisterScreen() {
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
+        if (data.get('password') !== data.get('verify-password')) { // checks if two fields match
+            setErrorMessage('The passwords do not match.');
+            return; // Prevent form submission
+        }
+
         console.log({
             email: data.get('email'),
             username: data.get('username'),
             password: data.get('password'),
         });
+
+        setErrorMessage(''); // erases error message
         navigate('/login');
     };
+    const [errorMessage, setErrorMessage] = useState(''); // used to display message if username/password combination is wrong
 
     return (
         <Container component="main" maxWidth="xs">
@@ -61,12 +70,29 @@ export default function RegisterScreen() {
                         <Grid item xs={12}>
                             <TextField
                                 fullWidth
+                                onChange={() => setErrorMessage('')}
                                 name="password"
                                 label="Password"
                                 type="password"
                                 id="password"
                                 autoComplete="new-password"
                             />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                onChange={() => setErrorMessage('')}
+                                name="verify-password"
+                                label="Verify Password"
+                                type="password"
+                                id="verify-password"
+                                autoComplete="new-password"
+                            />
+                            {errorMessage && (
+                                <Typography color="error" variant='subtitle2' sx={{ mt: 1 }}>
+                                    {errorMessage}
+                                </Typography>
+                            )}
                         </Grid>
                     </Grid>
                     <Button
@@ -79,7 +105,7 @@ export default function RegisterScreen() {
                     </Button>
                     <Grid container justifyContent="flex-end">
                         <Grid item>
-                            <Link onClick={()=>{navigate('/login')}} variant="body2">
+                            <Link onClick={() => { navigate('/login') }} variant="body2">
                                 Already have an account? Sign in
                             </Link>
                         </Grid>
