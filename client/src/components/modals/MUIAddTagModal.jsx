@@ -9,6 +9,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import { useTheme } from '@emotion/react';
 
 const style = {
     position: 'absolute',
@@ -23,6 +24,7 @@ const style = {
 };
 
 export default function TagModal(props) {
+    const theme = useTheme();
     const [open, setOpen] = React.useState(props.open);
     const [tags, setTags] = React.useState([]);
     const [inputValue, setInputValue] = React.useState('');
@@ -72,7 +74,7 @@ export default function TagModal(props) {
                             autoFocus // Automatically focus when the modal opens
                         />
                         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
-                            <Button onClick={handleAddTag} sx={{ backgroundColor: "cyan", color: "black" }} variant="contained">
+                            <Button onClick={handleAddTag} sx={{ bgcolor: theme.palette.primary.main, color: "black" }} variant="contained">
                                 Add Tag
                             </Button>
                             <Button onClick={handleClose} sx={{ color: "black" }} variant="outlined">
@@ -100,6 +102,6 @@ export default function TagModal(props) {
                     </Box>
                 </Box>
             </Box>
-        </Modal>
+        </Modal >
     );
 }
