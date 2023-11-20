@@ -333,19 +333,27 @@ updateEmail = async (req, res) => {
 
         return res.status(200)
     } catch (err) {
+        console.err("auth-controller::updateEmail")
+        console.err(err)
         return res.status(500).end()
     }
 }
 
 deleteAccount = async (req, res) => {
     try {
-        var deleteUser = await User.findOne({ _id: res.locals.userId })
-        if (deleteUser.ok === 1) {
+        if (res.locals.userId === null) {
+            return res.status(401).end()
+        }
+
+        var deleteUser = await User.findByIdAndDelete(res.locals.userId)
+        if (deleteUser) {
             return res.status(200).end()
         } else {
-            return res.status(401).end() // TODO: maybe change to 500?
+            return res.status(500).end()
         }
     } catch (err) {
+        console.err("auth-controller::deleteAccount")
+        console.err(err)
         return res.status(500).end()
     }
 }
