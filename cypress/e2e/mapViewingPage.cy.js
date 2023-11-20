@@ -1,8 +1,8 @@
-describe('my maps specs', () => {
+describe('map viewing specs', () => {
     beforeEach(() => {
       cy.visit('129.213.145.105')
       cy.get("#signInBtn").click()
-      cy.contains('[title="mapImage"]')
+      cy.get('img[title="mapImage"]')
       .first()
       .click();
     })
