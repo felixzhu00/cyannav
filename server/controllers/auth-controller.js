@@ -187,8 +187,8 @@ logout = async (req, res) => {
         httpOnly: true,
         expires: new Date(0),
         secure: true,
-        sameSite: "none"
-    }).send();
+        sameSite: "none",
+    }).send()
 }
 
 // TODO: To be implemented once email service is setup.
@@ -298,7 +298,7 @@ updateUsername = async (req, res) => {
             return res.status(500).end()
         }
 
-        return res.status(200)
+        return res.status(200).end()
     } catch (err) {
         console.err("auth-controller::updateUsername")
         console.err(err)
