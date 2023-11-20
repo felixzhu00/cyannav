@@ -58,7 +58,9 @@ jobs:
                   node-version: "21.x"
             - name: Backend API test
               run: |
+                  pm2 stop 0
                   npm test
+                  pm2 start 0
 
     build-frontend:
         needs: setup
@@ -82,7 +84,6 @@ jobs:
             - name: Deploy backend server
               run: |
                   cd server
-                  pm2 stop 0
                   pm2 start 0
 
     deploy-frontend:

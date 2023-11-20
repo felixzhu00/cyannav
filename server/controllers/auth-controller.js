@@ -183,8 +183,12 @@ register = async (req, res) => {
 }
 
 logout = async (req, res) => {
-    // This should be enough... front end needs to redirect to homepage.
-    return res.clearCookie("access_token").status(200).end()
+    res.cookie("access_token", "", {
+        httpOnly: true,
+        expires: new Date(0),
+        secure: true,
+        sameSite: "none"
+    }).send();
 }
 
 // TODO: To be implemented once email service is setup.

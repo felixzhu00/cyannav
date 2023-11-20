@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
+import { useTheme } from '@emotion/react';
 
 function MUIChangeProfilePicModal({ open, onClose, onSave }) {
+    const theme = useTheme();
+
     const [selectedFile, setSelectedFile] = useState(null);
 
     const handleFileChange = (event) => {
