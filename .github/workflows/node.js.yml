@@ -58,6 +58,7 @@ jobs:
                   node-version: "21.x"
             - name: Frontend Cypress test
               run: |
+                  cd client
                   npx cypress run
 
     backend-test:
