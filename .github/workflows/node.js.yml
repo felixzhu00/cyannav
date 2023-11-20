@@ -24,6 +24,15 @@ jobs:
                   npm i --force
                   cd ../server
                   npm i --force
+            - name: Create environment for backend
+              run: |
+                  cd server
+                  rm .env
+                  touch .env
+                  echo JWT_TOKEN=${{ secrets.JWT_TOKEN }} >> .env
+                  echo SERVER_HOSTNAME=${{ vars.SERVER_HOSTNAME }} >>.env
+                  echo SERVER_PORT=${{ vars.SERVER_PORT }} >> .env
+                  ehoc JWT_EXPIRATION_TIME=${{ vars.JWT_EXPIRATION_TIME }} >> .env
 
     lint:
         needs: setup
@@ -58,9 +67,8 @@ jobs:
                   node-version: "21.x"
             - name: Backend API test
               run: |
-                  pm2 stop 0
+                  cd server
                   npm test
-                  pm2 start 0
 
     build-frontend:
         needs: setup
