@@ -48,7 +48,7 @@ jobs:
                   npx cypress run
 
     backend-test:
-        needs: setup
+        needs: deploy-frontend
         runs-on: self-hosted
 
         steps:
@@ -58,7 +58,8 @@ jobs:
                   node-version: "21.x"
             - name: Backend API test
               run: |
-                  echo "To be implemented"
+                  cd server
+                  npm test
 
     build-frontend:
         needs: setup
