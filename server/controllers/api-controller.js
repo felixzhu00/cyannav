@@ -5,19 +5,19 @@ getMapById = async (req, res) => {
         const { id } = req.body
 
         if (!id) {
-            return res.status(400)
+            return res.status(400).end()
         }
 
         const targetMap = await Map.findOne({ _id: id })
         if (!targetMap) {
             // TODO: (later) figure out if this is the correct status code.
-            return res.status(404)
+            return res.status(404).end()
         }
 
         // The user have no access to this map.
         // TODO: (collaborate) when we implement collabortors, we need the permission here
         if (!targetMap.published && targetMap.user !== res.locals.userId) {
-            return res.status(401)
+            return res.status(401).end()
         }
 
         return res.status(200).json({
@@ -27,7 +27,7 @@ getMapById = async (req, res) => {
         console.error("api-controller::getMapById")
         console.error(err)
 
-        return res.status(500)
+        return res.status(500).end()
     }
 }
 
@@ -56,7 +56,7 @@ getUserMaps = async (req, res) => {
         console.error("api-controller::getUserMaps")
         console.error(err)
 
-        return res.status(500)
+        return res.status(500).end()
     }
 }
 
@@ -72,7 +72,7 @@ getAllMaps = async (req, res) => {
         console.error("api-controller::getAllMaps")
         console.error(err)
 
-        return res.status(500)
+        return res.status(500).end()
     }
 }
 
@@ -81,17 +81,17 @@ getMapJsonById = async (req, res) => {
         const { id } = req.body
 
         if (!id) {
-            return res.status(400)
+            return res.status(400).end()
         }
 
         const targetMap = await Map.findOne({ _id: id })
         if (!targetMap) {
             // TODO: figure out if this is the correct status code.
-            return res.status(404)
+            return res.status(404).end()
         }
 
         if (targetMap.user !== res.locals.userId && !targetMap.published) {
-            return res.status(401)
+            return res.status(401).end()
         }
 
         return res.status(200).json({
@@ -101,7 +101,7 @@ getMapJsonById = async (req, res) => {
         console.error("api-controller::getMapJsonById")
         console.error(err)
 
-        return res.status(500)
+        return res.status(500).end()
     }
 }
 
@@ -112,11 +112,11 @@ createNewMap = async (req, res) => {
         const { title, type, json } = req.body
 
         if (!title || !type || !json) {
-            return res.status(400)
+            return res.status(400).end()
         }
         if (type !== "heatmap") {
             // TODO: (later) AND MORE, add all possible values here.
-            return res.status(400)
+            return res.status(400).end()
         }
         // Seems kind of inefficient but oh well.
         const userMapWithTitle = await Map.countDocuments({
@@ -124,7 +124,7 @@ createNewMap = async (req, res) => {
             user: res.locals.userId,
         })
         if (userMapWithTitle > 0) {
-            return res.status(401)
+            return res.status(401).end()
         }
 
         const newMap = new Map({
@@ -135,7 +135,7 @@ createNewMap = async (req, res) => {
 
         const saved = await newMap.save()
         if (!saved) {
-            return res.status(500)
+            return res.status(500).end()
         }
 
         return res.status(200).json({ id: saved._id })
@@ -143,7 +143,7 @@ createNewMap = async (req, res) => {
         console.error("api-controller::createNewMap")
         console.error(err)
 
-        return res.status(500)
+        return res.status(500).end()
     }
 }
 
@@ -152,17 +152,17 @@ createDuplicateMapById = async (req, res) => {
         const { id } = req.body
 
         if (!id) {
-            return res.status(400)
+            return res.status(400).end()
         }
 
         const srcMap = Map.findById(id)
 
-        if(!srcMap){
-            return res.status(400)
+        if (!srcMap) {
+            return res.status(400).end()
         }
 
         if (srcMap.user !== res.locals.userId) {
-            return res.status(401)
+            return res.status(401).end()
         }
 
         // TODO: (collaborate) add collaborator permission
@@ -190,7 +190,7 @@ createDuplicateMapById = async (req, res) => {
         const saved = await newMap.save()
 
         if (!saved) {
-            return res.status(500)
+            return res.status(500).end()
         }
 
         return res.status(200).json({ id: saved._id })
@@ -198,7 +198,7 @@ createDuplicateMapById = async (req, res) => {
         console.error("api-controller::createDuplicateMapById")
         console.error(err)
 
-        return res.status(500)
+        return res.status(500).end()
     }
 }
 
@@ -206,12 +206,12 @@ createForkMapById = async (req, res) => {
     try {
         // TODO: (later) basically the same as duplicate.
         // will implment later when we have concrete data structure.
-        return res.status(404)
+        return res.status(404).end()
     } catch (err) {
         console.error("api-controller::createForkMapById")
         console.error(err)
 
-        return res.status(500)
+        return res.status(500).end()
     }
 }
 
@@ -220,25 +220,25 @@ deleteMapById = async (req, res) => {
         const { id } = req.body
 
         if (!id) {
-            return res.status(400)
+            return res.status(400).end()
         }
 
         const toBeDeleted = await Map.findById(id)
         if (toBeDeleted.user !== res.locals.userId) {
-            return res.status(401)
+            return res.status(401).end()
         }
 
         const deleted = await Map.findByIdAndDelete(id)
         if (!deleted) {
-            return res.status(500)
+            return res.status(500).end()
         }
 
-        return res.status(200)
+        return res.status(200).end()
     } catch (err) {
         console.error("api-controller::deleteMapById")
         console.error(err)
 
-        return res.status(500)
+        return res.status(500).end()
     }
 }
 updateMapNameById = async (req, res) => {
