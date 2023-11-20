@@ -8,7 +8,7 @@ dotenv.config() // Loads .env
 
 const hostname = process.env.SERVER_HOSTNAME
 const port = process.env.SERVER_PORT
-const clientPort = process.env.CLIENT_PORT
+const clientPort = process.env.CLIENT_PORT ? process.env.CLIENT_PORT : ""
 
 const app = express()
 
