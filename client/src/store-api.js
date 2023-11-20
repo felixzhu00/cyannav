@@ -2,7 +2,7 @@ import axios from 'axios';
 
 axios.defaults.withCredentials = true;
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: 'http://129.213.145.105:8000',
 });
 
 const handleResponse = (response) => {
