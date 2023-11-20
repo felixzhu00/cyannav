@@ -5,8 +5,10 @@ import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import { Close } from '@mui/icons-material';
 import { TextField } from '@mui/material';
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useContext} from 'react';
 import { useTheme } from '@emotion/react';
+import AuthContext from '../../auth.js';
+
 
 
 const style = {
@@ -23,11 +25,26 @@ const style = {
 
 export default function MUIChangeEmailModal(props) {
     const theme = useTheme();
-    const [open, setOpen] = React.useState(props.open);
+    const { auth } = useContext(AuthContext);
+    const [open, setOpen] = useState(props.open);
+    const [newEmail, setNewEmail] = useState('');
+
+
     const handleClose = () => {
         setOpen(false)
         props.onClose()
     };
+    
+    const handleSave = ()=> {
+        auth.updateEmail(newEmail, newEmail);
+        handleClose()
+    }
+
+    const handleEmailChange = (event) => {
+        setNewEmail(event.target.value);
+    };
+
+    
 
     return (
         <div>
@@ -69,9 +86,10 @@ export default function MUIChangeEmailModal(props) {
                             label="New Email"
                             defaultValue=""
                             fullWidth
+                            onChange={handleEmailChange}
                         />
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
-                            <Button onClick={handleClose} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", mr: "10px", width: "90px" }}>Save</Button>
+                            <Button onClick={handleSave} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", mr: "10px", width: "90px" }}>Save</Button>
                             <Button onClick={handleClose} variant="outlined" sx={{ color: "black" }}>Cancel</Button>
                         </Box>
                     </Box>
