@@ -17,7 +17,7 @@ function authManager() {
         } catch (err) {
             console.error("authManager::verify")
             console.error(err)
-            return res.status(401).json({
+            return res.status(500).json({
                 loggedIn: false,
                 username: null,
                 // errorMessage: "Unauthorized",
