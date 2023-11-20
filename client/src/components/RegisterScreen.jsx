@@ -34,11 +34,11 @@ export default function RegisterScreen() {
         if (auth.error != null) {
             console.log(auth.error)
         } else {
-            setErrorMessage(''); 
+            setErrorMessage('');
             navigate('/login');
         }
     };
-    
+
 
     return (
         <Container component="main" maxWidth="xs">
