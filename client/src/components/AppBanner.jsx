@@ -108,7 +108,7 @@ function AppBanner() {
               <MenuItem
                 onClick={handleStore
                   // () => {navigate('/marketplace')}
-                }
+                } id="marketplaceBtn"
               >
                 <IconButton sx={{ color: "black", mr: 1 }}>
                   <Store />
@@ -181,7 +181,7 @@ function AppBanner() {
           {/* User Avatar and Menu */}
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+              <IconButton id="settingsDropdown" onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="User Avatar" src="/static/images/avatar/2.jpg" />
               </IconButton>
             </Tooltip>
@@ -215,7 +215,7 @@ function AppBanner() {
                   {auth.user != null ? auth.user.username : ""}
                 </Typography>
               </Box>
-              <MenuItem key={"Account Settings"} onClick={handleAccountSettingClick}>
+              <MenuItem id="settingsDropdownOption" key={"Account Settings"} onClick={handleAccountSettingClick}>
                 <Typography textAlign="center">Account Settings</Typography>
               </MenuItem>
               <MenuItem key={"Logout"} onClick={handleLogoutClick}>

@@ -50,6 +50,7 @@ export default function MUIPublishMapModal(props) {
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
 
                         <Button
+                            id="publishBtnOnModal"
                             onClick={handleClose}
                             variant="contained"
                             sx={{
