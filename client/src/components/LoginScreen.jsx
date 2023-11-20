@@ -14,27 +14,36 @@ import AuthContext from '../auth'
 
 
 export default function LoginScreen(props) {
-    const [signinButton, setsigninButton] = useState(null);
     const navigate = useNavigate();
     const { auth } = useContext(AuthContext);
 
     const [errorMessage, setErrorMessage] = useState('');
-    const handleSubmit = (event) => {
 
+    const handleLogin = async (event) => {
         event.preventDefault();
+
         const data = new FormData(event.currentTarget);
         let input = {
             email: data.get('email'),
             password: data.get('password'),
-        }
-        auth.loginUser(input.email, input.password)
-        if (auth.error != null) {
-            console.log(auth.error)
-        } else {
-            console.log(auth.user, auth.loggedIn)
-            navigate('/browsepage');
+        };
+
+        try {
+            await auth.loginUser(input.email, input.password);
+            if (auth.loggedIn) {
+                navigate('/browsepage');
+            } else {
+                setErrorMessage(auth.error || 'Invalid login credentials');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            setErrorMessage('An error occurred during login');
         }
     };
+
+    const handleGuest = (event) => {
+        navigate('/browsepage');
+    }
 
     return (
         <Container component="main" maxWidth="xs">
@@ -52,7 +61,7 @@ export default function LoginScreen(props) {
                 <Typography component="h1" variant="h5">
                     Sign in
                 </Typography>
-                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                <Box component="form" noValidate sx={{ mt: 1 }}>
                     <TextField
                         margin="normal"
                         fullWidth
@@ -80,7 +89,7 @@ export default function LoginScreen(props) {
                     )}
 
                     <Button
-                        onClick={() => { props.handleGuest(false) }}
+                        onClick={(e) => { handleLogin(e) }}
                         id="signInBtn"
                         type="submit"
                         fullWidth
@@ -90,7 +99,7 @@ export default function LoginScreen(props) {
                         Sign In
                     </Button>
                     <Button
-                        onClick={() => { props.handleGuest(true) }}
+                        onClick={() => { handleGuest() }}
                         type="submit"
                         fullWidth
                         variant="contained"
