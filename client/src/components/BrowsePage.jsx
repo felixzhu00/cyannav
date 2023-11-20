@@ -64,17 +64,15 @@ function BrowsePage() {
     <Box sx={{
       display: 'flex',
       flexDirection: isMediumOrSmaller ? 'column' : 'row',
-      alignItems: 'center',
       justifyContent: 'space-between',
-      width: '800px',
+      alignItems: 'center',
+      width: '100%',
     }}>
       {/* Search Functionality */}
       <Box sx={{
         display: 'flex',
         alignItems: 'center',
-        flexGrow: 1,
         marginBottom: isMediumOrSmaller ? 2 : 0,
-        width: isMediumOrSmaller ? '100%' : 'auto',
       }}>
         <Paper
           component="form"
@@ -145,9 +143,7 @@ function BrowsePage() {
         {searchAndSort()}
       </Box>
 
-      <Fab onClick={handleCreateMapModal} color="primary" aria-label="add" sx={{ position: 'absolute', top: 100, right: 20 }}>
-        <Add fontSize="large" />
-      </Fab>
+      <Button onClick={handleCreateMapModal} variant="contained" aria-label="add" sx={{ position: 'absolute', top: 85, right: 20 }}>Import Map</Button>
 
       <Grid container spacing={2} sx={{ mt: 2 }}>
         {mapCardsToShow.map((index) => (
