@@ -18,7 +18,7 @@ export default function LoginScreen(props) {
     const navigate = useNavigate();
     const { auth } = useContext(AuthContext);
 
-    const [errorMessage, setErrorMessage] = useState('The username and password combination is incorrect.');
+    const [errorMessage, setErrorMessage] = useState('');
     const handleSubmit = (event) => {
 
         event.preventDefault();
