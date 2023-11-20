@@ -11,7 +11,7 @@ getMapById = async (req, res) => {
         const targetMap = await Map.findOne({ _id: id })
         if (!targetMap) {
             // TODO: (later) figure out if this is the correct status code.
-            return res.status(404).end()
+            return res.status(400).end()
         }
 
         // The user have no access to this map.
@@ -63,7 +63,7 @@ getUserMaps = async (req, res) => {
 getAllMaps = async (req, res) => {
     try {
         // const allmaps = await Map.find({ published: true })
-        const allMaps = await Map.find()
+        // const allMaps = await Map.find()
 
         return res.status(200).json({
             maps: allMaps, // TODO: (later) for now I'm returning everything.

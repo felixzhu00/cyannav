@@ -4,12 +4,11 @@ describe('login page specs', () => {
     })
   
     it('checks that email is displayed', () => {
-        cy.get('label[for="email"]')
-        .should('have.text', 'Email Address');
-
+        cy.get('#email')
+        .should('have.attr', 'name', 'email');
     })
     it('checks that password is displayed', () => {
-        cy.get('label[for="password"]')
-        .should('have.text', 'Password');
-    })
+      cy.get('#password')
+      .should('have.attr', 'name', 'password');
   })
+})
