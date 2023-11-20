@@ -16,7 +16,7 @@ const app = express()
 app.use(express.urlencoded({ extend: true }))
 app.use(
     cors({
-        origin: [`http://${hostname}:${clientPort}`], // TODO: change to https for production later
+        origin: [`http://${hostname}${clientPort}`], // TODO: change to https for production later
         credentials: true,
     })
 )
