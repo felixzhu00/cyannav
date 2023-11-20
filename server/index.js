@@ -6,11 +6,8 @@ const cookieParser = require("cookie-parser")
 
 dotenv.config() // Loads .env
 
-// const hostname = process.env.SERVER_HOSTNAME
-// const port = process.env.SERVER_PORT
-
-const hostname = "129.213.145.105"
-const port = "8000"
+const hostname = process.env.SERVER_HOSTNAME
+const port = process.env.SERVER_PORT
 
 const app = express()
 
