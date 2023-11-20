@@ -1,11 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Typography, Box, InputBase, Menu, MenuItem, Paper, InputAdornment, Button, IconButton, ListItemIcon, Select, TextField, Grid, Tabs, Tab, useTheme } from '@mui/material';
-import { ZoomIn, ZoomOut, Undo, Redo, Delete, KeyboardArrowDown, ThumbUp, ThumbDown } from '@mui/icons-material';
+import { MapContainer, GeoJSON } from "react-leaflet";
+import 'leaflet/dist/leaflet.css';
+import sha256 from 'crypto-js/sha256';
+import { Typography, Box, Menu, MenuItem, Paper, Button, IconButton, TextField, Tabs, Tab, useTheme } from '@mui/material';
+import { Undo, Redo, Delete, KeyboardArrowDown, ThumbUp, ThumbDown } from '@mui/icons-material';
 
 import MUIExportMapModal from './modals/MUIExportMapModal'
 import MUIPublishMapModal from './modals/MUIPublishMapModal'
 import MUIAddFieldModal from './modals/MUIAddFieldModal'
 import MUICommentModal from './modals/MUICommentModal'
+
+import hardcodegeojson from '../assets/South Korea.geo.json'
 
 function MapViewingPage() {
     const theme = useTheme(); // Use the theme
@@ -101,12 +106,6 @@ function MapViewingPage() {
         // Handle edit logic
     };
     const handleRedo = () => {
-        // Handle edit logic
-    };
-    const handleZoomIn = () => {
-        // Handle edit logic
-    };
-    const handleZoomOut = () => {
         // Handle edit logic
     };
     const handleAddField = () => {
@@ -213,83 +212,73 @@ function MapViewingPage() {
         )
     };
 
+    const leaflet = () => {
+        const popupLabel = (country, layer) => {
+            const name = country.properties.admin;
+            layer.bindPopup(name);
+
+            // This adds a tooltip directly on screen
+            // Probably needs CSS to make it look batter.
+            // layer.bindTooltip(name, {permanent: true, direction: "center", className: "my-labels"});
+        }
+
+        return (
+            <MapContainer center={[50, 50]} zoom={2} style={{ height: '100%', width: '100%' }}>
+                <GeoJSON key={sha256(hardcodegeojson)} data={hardcodegeojson} onEachFeature={popupLabel} />
+            </MapContainer>
+
+        )
+    }
+
     const mapView = () => {
         return (
             <Box
                 gridArea={'mapview'}
                 sx={{
+                    position: 'relative', // Position the container relatively
                     flex: '1',
                     width: '100%',
                     height: `calc(100vh - 121px)`,
-                    backgroundColor: '#87CEEB',
                     display: 'flex',
                     flexDirection: 'column',
-                    justifyContent: 'space-between', // Add space between children
+                    justifyContent: 'space-between',
                 }}
             >
-                <Box sx={{ display: 'flex', justifyContent: 'left', marginTop: '20px', marginLeft: '20px' }}>
+                {leaflet()}
+                <Box sx={{
+                    position: 'absolute', // Absolutely position the button container
+                    bottom: 20, // Adjust as needed
+                    left: 20, // Adjust as needed
+                    zIndex: 1000, // Ensure it's above the map
+                }}>
                     <IconButton
                         sx={{
-                            backgroundColor: '#28282B',
+                            backgroundColor: '#fff',
                             padding: '10px',
                             borderRadius: '5px',
-                            color: 'white',
-                            margin: '0 5px 0 0', // Add margin to the right for spacing
-                            border: '2px solid white', // Solid border
+                            color: 'black',
+                            margin: '0 5px 0 0',
+                            border: '2px solid #ccc',
                             '&:hover': {
-                                backgroundColor: '#28282B', // Set the background to transparent on hover
+                                backgroundColor: '#CCCCCC',
                             },
                         }}
-                        onClick={() => console.log(handleZoomIn)}
-                    >
-                        <ZoomIn />
-                    </IconButton>
-                    <IconButton
-                        sx={{
-                            backgroundColor: '#28282B',
-                            padding: '10px',
-                            borderRadius: '5px',
-                            color: 'white',
-                            border: '2px solid white', // Solid border
-                            '&:hover': {
-                                backgroundColor: '#28282B', // Set the background to transparent on hover
-                            },
-                        }}
-                        onClick={() => console.log(handleZoomOut)}
-                    >
-                        <ZoomOut />
-                    </IconButton>
-                </Box>
-
-                <Box sx={{ display: 'flex', justifyContent: 'left', marginBottom: '20px', marginLeft: '20px' }}>
-                    <IconButton
-                        sx={{
-                            backgroundColor: '#28282B',
-                            padding: '10px',
-                            borderRadius: '5px',
-                            color: 'white',
-                            margin: '0 5px 0 0', // Add margin to the right for spacing
-                            border: '2px solid white', // Solid border
-                            '&:hover': {
-                                backgroundColor: '#28282B', // Set the background to transparent on hover
-                            },
-                        }}
-                        onClick={() => console.log(handleUndo)}
+                        onClick={() => handleUndo()}
                     >
                         <Undo />
                     </IconButton>
                     <IconButton
                         sx={{
-                            backgroundColor: '#28282B',
+                            backgroundColor: '#fff',
                             padding: '10px',
                             borderRadius: '5px',
-                            color: 'white',
-                            border: '2px solid white', // Solid border
+                            color: 'black',
+                            border: '2px solid #ccc',
                             '&:hover': {
-                                backgroundColor: '#28282B', // Set the background to transparent on hover
+                                backgroundColor: '#CCCCCC',
                             },
                         }}
-                        onClick={() => console.log(handleRedo)}
+                        onClick={() => handleRedo()}
                     >
                         <Redo />
                     </IconButton>
@@ -330,7 +319,7 @@ function MapViewingPage() {
                         mt: 'auto', // This ensures the margin is applied to the top, pushing the button to the bottom
                         width: '100%', // Button takes full width of the sidebar
                         color: "black",
-                        bgcolor: "cyan"
+                        bgcolor: theme.palette.secondary.main
                     }}
                     onClick={handleComments} // Replace with your own event handler
                 >
@@ -427,8 +416,8 @@ function MapViewingPage() {
                                 variant="contained"
                                 sx={{
                                     color: "black",
-                                    bgcolor: theme.palette.secondary.main,
-                                    width: '150px'
+                                    width: '150px',
+                                    bgcolor: theme.palette.secondary.main
                                 }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                                     <span>{selectedChoropleth}</span>
