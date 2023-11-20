@@ -24,7 +24,6 @@ jobs:
                       server/package-lock.json
             - name: Install node dependencies
               run: |
-                  npm i --force
                   cd client
                   npm i --force
                   cd ../server
