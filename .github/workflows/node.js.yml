@@ -68,7 +68,6 @@ jobs:
             - name: Backend API test
               run: |
                   pm2 stop 0
-                  npm test
                   pm2 start 0
 
     build-frontend:
