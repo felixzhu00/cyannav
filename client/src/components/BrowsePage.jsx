@@ -6,6 +6,8 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import MapCard from './MapCard.jsx'
 import { GlobalStoreContext } from '../store'
+import CssBaseline from '@mui/material/CssBaseline';
+
 
 function BrowsePage() {
   const { store } = useContext(GlobalStoreContext);
@@ -53,9 +55,10 @@ function BrowsePage() {
     setSearchTerm(event.target.value);
   };
 
+  const handleCreateMapModal = () => {
+    store.setCurrentModal("CreateMapModal")
 
-
-
+  }
 
   const searchAndSort = () => (
     <Box sx={{
@@ -79,7 +82,7 @@ function BrowsePage() {
             p: '2px 4px',
             display: 'flex',
             alignItems: 'center',
-            bgcolor: theme.palette.background.default
+            bgcolor: theme.palette.background.paper
           }}
           onSubmit={(e) => e.preventDefault()}
         >
@@ -134,13 +137,15 @@ function BrowsePage() {
 
 
   return (
-    <Box sx={{ p: 3, overflow: 'hidden', height: 'auto', bgcolor: theme.palette.background.paper }}>
+    <Box sx={{ p: 3, overflow: 'hidden', bgcolor: theme.palette.background.default }}>
+      <CssBaseline />
+
       <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{store.togglebrowseHome ? "My Maps" : "Marketplace"}</Typography>
       <Box sx={{ mt: '10px' }}>
         {searchAndSort()}
       </Box>
 
-      <Fab color="primary" aria-label="add" sx={{ position: 'absolute', top: 150, right: 20 }}>
+      <Fab onClick={handleCreateMapModal} color="primary" aria-label="add" sx={{ position: 'absolute', top: 100, right: 20 }}>
         <Add fontSize="large" />
       </Fab>
 

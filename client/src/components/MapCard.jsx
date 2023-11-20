@@ -53,7 +53,7 @@ export default function MapCard() {
                     title="mapImage"
                 />
             </Link>
-            <CardContent>
+            <CardContent sx={{ bgcolor: theme.palette.background.paper }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Typography gutterBottom variant="h5" component="div">
                         NAME OF MAP
@@ -66,11 +66,11 @@ export default function MapCard() {
                         open={open}
                         onClose={handleClose}
                     >
-                        <MenuItem onClick={()=>{handleKebab("rename")}}>Rename</MenuItem>
-                        <MenuItem onClick={()=>{handleKebab("addTag")}}>Add Tag</MenuItem>
-                        <MenuItem onClick={()=>{handleKebab("publish")}}>Publish</MenuItem>
-                        <MenuItem onClick={()=>{handleKebab("duplicate")}}>Duplicate</MenuItem>
-                        <MenuItem onClick={()=>{handleKebab("delete")}}>Delete</MenuItem>
+                        <MenuItem onClick={() => { handleKebab("rename") }}>Rename</MenuItem>
+                        <MenuItem onClick={() => { handleKebab("addTag") }}>Add Tag</MenuItem>
+                        <MenuItem onClick={() => { handleKebab("publish") }}>Publish</MenuItem>
+                        <MenuItem onClick={() => { handleKebab("duplicate") }}>Duplicate</MenuItem>
+                        <MenuItem onClick={() => { handleKebab("delete") }}>Delete</MenuItem>
                     </Menu>
                 </Box>
                 <Typography variant="body2" color="text.secondary">
