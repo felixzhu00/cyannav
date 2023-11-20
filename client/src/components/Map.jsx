@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { IconButton, MenuList, ListItemText, Typography, Box, TextField, Menu, MenuItem, Card, CardMedia, CardContent, CardActions, Button } from '@mui/material';
 import { Co2Sharp, MoreVert, Publish } from '@mui/icons-material';
 import logo from "../assets/map_sample.jpg"
@@ -43,11 +43,10 @@ function Map(props) {
         console.log(anchorEl)
         console.log(mapName)
         console.log(isEditing)
-      }, [isEditing]);
-    
+    }, [isEditing]);
+
     return (
         <Card
-
             sx={{
                 width: '100%', border: '1px solid', '&:hover': {
                     boxShadow: 8,
@@ -112,7 +111,7 @@ function Map(props) {
                 <Typography id="createdByUser" gridArea={'user'} variant="body2" color="text.secondary">
                     CREATED BY USER
                 </Typography>
-                <IconButton 
+                <IconButton
                     id="moreInfoMapIcon"
                     sx={{
                         display: 'flex',

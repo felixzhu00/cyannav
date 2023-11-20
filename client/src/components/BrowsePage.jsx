@@ -64,9 +64,9 @@ function BrowsePage() {
     <Box sx={{
       display: 'flex',
       flexDirection: isMediumOrSmaller ? 'column' : 'row',
-      justifyContent: 'space-between',
+      justifyContent: 'space-between', // space out children
       alignItems: 'center',
-      width: '100%',
+      width: '100%', // take full width
     }}>
       {/* Search Functionality */}
       <Box sx={{

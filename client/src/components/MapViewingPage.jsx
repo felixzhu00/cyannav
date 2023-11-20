@@ -156,6 +156,9 @@ function MapViewingPage() {
                     alignItems: 'center',
                     bgcolor: theme.palette.primary.main, // Use theme color
                     padding: '10px',
+                    boxShadow: 4,
+                    zIndex: 1,
+                    position: 'relative', // Ensure this element is positioned
                 }}
             >
                 {/* Left-aligned Buttons */}
@@ -194,7 +197,10 @@ function MapViewingPage() {
                     justifyContent: 'flex-end',
                     bgcolor: theme.palette.primary.main, // Use theme color
                     padding: '4px',
-                    boxShadow: 4
+                    boxShadow: 4,
+                    height: '60px',
+                    zIndex: 1, // Increased z-index
+                    position: 'relative', // Ensure this element is positioned
                 }}
             >
                 <Box sx={{ width: '100%', height: "relative" }}>
