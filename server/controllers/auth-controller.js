@@ -78,7 +78,7 @@ login = async (req, res) => {
         return res
             .cookie("access_token", token, {
                 httpOnly: true, // TODO: HTTPS: change this later when HTTPS is introduced.
-                secure: true,
+                secure: false,
                 // withCredentials: true,
                 sameSite: true,
             })
@@ -162,7 +162,7 @@ register = async (req, res) => {
         return res
             .cookie("access_token", token, {
                 httpOnly: true, // TODO: change this later when HTTPS is introduced.
-                secure: true,
+                secure: false,
                 sameSite: true,
             })
             .status(200)
