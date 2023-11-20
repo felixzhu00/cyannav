@@ -6,8 +6,11 @@ const cookieParser = require("cookie-parser")
 
 dotenv.config() // Loads .env
 
-const hostname = process.env.SERVER_HOSTNAME
-const port = process.env.SERVER_PORT
+// const hostname = process.env.SERVER_HOSTNAME
+// const port = process.env.SERVER_PORT
+
+const hostname = "129.213.145.105"
+const port = "8000"
 
 const app = express()
 
@@ -15,7 +18,7 @@ const app = express()
 app.use(express.urlencoded({ extend: true }))
 app.use(
     cors({
-        origin: [`http://${hostname}:${port}`], // TODO: change to https for production later
+        origin: [`http://${hostname}`], // TODO: change to https for production later
         credentials: true,
     })
 )

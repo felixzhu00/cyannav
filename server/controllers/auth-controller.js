@@ -183,8 +183,13 @@ register = async (req, res) => {
 }
 
 logout = async (req, res) => {
-    // This should be enough... front end needs to redirect to homepage.
-    return res.clearCookie("access_token").status(200)
+    console.log("logout")
+    res.cookie("access_token", "", {
+        httpOnly: true,
+        expires: new Date(0),
+        secure: true,
+        sameSite: "none"
+    }).send();
 }
 
 // TODO: To be implemented once email service is setup.
@@ -201,7 +206,64 @@ verifyCode = async (req, res) => {
     // Return status
 }
 
-updatePasscode = async (req, res) => {}
+updatePasscode = async (req, res) => {
+    try {
+        const { verificationCode, originalPassword, password, passwordVerify } =
+            req.body
+
+        if (!verificationCode && !originalPassword) {
+            return res.status(400)
+        }
+
+        if (password !== passwordVerify) {
+            return res
+                .status(401)
+                .json({ errorMessage: "Passwords do not match." })
+        }
+
+        var userId
+        if (originalPassword) {
+            if (!res.locals.userId) {
+                return res
+                    .status(401)
+                    .json({ errorMessage: "User is not logged in." })
+            }
+            userId = res.locals.userId
+
+            const targetUser = User.findById(userId)
+            const match = await bcrypt.compare(password, targetUser.password)
+            if (!match) {
+                return res
+                    .status(401)
+                    .json({ errorMessage: "Incorrect original password." })
+            }
+        }
+
+        if (verificationCode) {
+            // TODO: (later)
+            // match verification code
+            // get userId from verification code.
+        }
+
+        const hashed_password = await bcrypt.hash(password, saltRounds)
+        if (!hashed_password) {
+            return res.status(500)
+        }
+
+        const success = User.findByIdAndUpdate(userId, {
+            password: hashed_password,
+        })
+        if (!success) {
+            return res.status(500)
+        }
+        return res.status(200)
+    } catch (err) {
+        console.err("auth-controller::updatePassword")
+        console.err(err)
+
+        return res.status(500)
+    }
+}
 
 // TODO: update documentation to remove login token from the following functions.
 updateUsername = async (req, res) => {
@@ -231,6 +293,8 @@ updateUsername = async (req, res) => {
 
         return res.status(200)
     } catch (err) {
+        console.err("auth-controller::updateUsername")
+        console.err(err)
         return res.status(500)
     }
 }
