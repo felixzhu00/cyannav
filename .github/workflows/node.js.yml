@@ -58,7 +58,6 @@ jobs:
                   node-version: "21.x"
             - name: Backend API test
               run: |
-                  cd server
                   npm test
 
     build-frontend:
