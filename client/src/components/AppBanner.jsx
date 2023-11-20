@@ -6,6 +6,12 @@ import { useTheme } from "@mui/material/styles";
 import logo from "../assets/cyannav_logo.svg";
 import { GlobalStoreContext } from '../store'
 import AuthContext from '../auth'
+const location = useLocation();
+const { pathname } = location;
+if (pathname === '/' || pathname === '/login/' || pathname === '/login' || pathname === '/register/' || pathname === '/register' || pathname === '/forget/' || pathname === '/forget') {
+
+  return null;
+}
 
 function AppBanner() {
   const { store } = useContext(GlobalStoreContext);
