@@ -9,6 +9,7 @@ on:
 jobs:
     setup:
         runs-on: self-hosted
+        environment: cyannav
 
         steps:
             - name: Checkout main repo
