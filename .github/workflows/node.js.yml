@@ -35,7 +35,7 @@ jobs:
                   echo "Linting to be implemented"
 
     frontend-test:
-        needs: setup
+        needs: build-frontend
         runs-on: self-hosted
 
         steps:
@@ -61,7 +61,7 @@ jobs:
                   echo "To be implemented"
 
     build-frontend:
-        needs: frontend-test
+        needs: setup
         runs-on: self-hosted
 
         steps:
