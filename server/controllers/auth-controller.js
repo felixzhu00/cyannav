@@ -331,7 +331,7 @@ updateEmail = async (req, res) => {
             return res.status(500).end()
         }
 
-        return res.status(200)
+        return res.status(200).end()
     } catch (err) {
         console.err("auth-controller::updateEmail")
         console.err(err)
