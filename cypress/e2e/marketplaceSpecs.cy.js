@@ -1,7 +1,14 @@
 describe('marketplace specs', () => {
+  Cypress.Commands.add('login', (username, password) => {
+    cy.session([username, password], () => {
+      cy.visit('129.213.145.105')
+      cy.get('[data-test=username]').type(username)
+      cy.get('[data-test=password]').type(password)
+      cy.get("#signInBtn").click()
+      cy.url().should('contain', '/login-successful')
+    })
+  })
   beforeEach(() => {
-    cy.visit('129.213.145.105')
-    cy.get("#signInBtn").click()
     cy.get("#marketplaceBtn").click()
   })
 
