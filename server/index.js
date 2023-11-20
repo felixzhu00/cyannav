@@ -8,6 +8,7 @@ dotenv.config() // Loads .env
 
 const hostname = process.env.SERVER_HOSTNAME
 const port = process.env.SERVER_PORT
+const clientPort = process.env.CLIENT_PORT
 
 const app = express()
 
@@ -15,7 +16,7 @@ const app = express()
 app.use(express.urlencoded({ extend: true }))
 app.use(
     cors({
-        origin: [`http://${hostname}:${port}`], // TODO: change to https for production later
+        origin: [`http://${hostname}:${clientPort}`], // TODO: change to https for production later
         credentials: true,
     })
 )
