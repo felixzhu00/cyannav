@@ -9,7 +9,7 @@ describe('marketplace specs', () => {
     cy.get("#outerSortByMenuBtn")
     .click()
     cy.get("#recentSortSelect")
-    .should("have.text", "Recent")
+    .should("have.text", "recent")
     .click();
   })
 
@@ -17,7 +17,7 @@ describe('marketplace specs', () => {
     cy.get("#outerSortByMenuBtn")
     .click()
     cy.get("#nameSortSelect")
-    .should("have.text", "Name")
+    .should("have.text", "Alphabetical Order")
     .click();
   })
 
@@ -31,7 +31,7 @@ describe('marketplace specs', () => {
     cy.get("#outerMenuByName")
     .click()
     cy.get("#byUsernameBtn")
-    .should("have.text", "By Username")
+    .should("have.text", "Username")
     .click()
   })
 
@@ -39,7 +39,7 @@ describe('marketplace specs', () => {
     cy.get("#outerMenuByName")
     .click()
     cy.get("#byMapNameBtn")
-    .should("have.text", "By Map Name")
+    .should("have.text", "Map Name")
     .click()
   })
 })
