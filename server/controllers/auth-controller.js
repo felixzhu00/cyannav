@@ -37,7 +37,7 @@ loggedIn = async (req, res) => {
         console.error("auth-controller::loggedIn")
         console.error(err)
 
-        return res.status(500)
+        return res.status(500).end()
     }
 }
 
@@ -95,7 +95,7 @@ login = async (req, res) => {
         console.error("auth-controllers::login")
         console.error(err)
 
-        return res.status(500)
+        return res.status(500).end()
     }
 }
 
@@ -154,7 +154,7 @@ register = async (req, res) => {
         const saved = await newUser.save()
 
         if (!saved) {
-            return res.status(500)
+            return res.status(500).end()
         }
 
         const token = auth.signToken(newUser._id)
@@ -178,13 +178,13 @@ register = async (req, res) => {
         console.error("auth-controller::register")
         console.error(err)
 
-        return res.status(500)
+        return res.status(500).end()
     }
 }
 
 logout = async (req, res) => {
     // This should be enough... front end needs to redirect to homepage.
-    return res.clearCookie("access_token").status(200)
+    return res.clearCookie("access_token").status(200).end()
 }
 
 // TODO: To be implemented once email service is setup.
@@ -211,11 +211,11 @@ updatePasscode = async (req, res) => {
             req.body
 
         if (!verificationCode && !originalPassword) {
-            return res.status(400)
+            return res.status(400).end()
         }
 
         if (verificationCode && originalPassword) {
-            return res.status(400)
+            return res.status(400).end()
         }
 
         if (password !== passwordVerify) {
@@ -250,21 +250,21 @@ updatePasscode = async (req, res) => {
 
         const hashed_password = await bcrypt.hash(password, saltRounds)
         if (!hashed_password) {
-            return res.status(500)
+            return res.status(500).end()
         }
 
         const success = User.findByIdAndUpdate(userId, {
             password: hashed_password,
         })
         if (!success) {
-            return res.status(500)
+            return res.status(500).end()
         }
         return res.status(200)
     } catch (err) {
         console.err("auth-controller::updatePassword")
         console.err(err)
 
-        return res.status(500)
+        return res.status(500).end()
     }
 }
 
@@ -274,7 +274,7 @@ updateUsername = async (req, res) => {
         const { newUsername } = req.body
 
         if (!newUsername) {
-            return res.status(400)
+            return res.status(400).end()
         }
 
         var existingUser = await User.findOne({ username: newUsername })
@@ -291,14 +291,14 @@ updateUsername = async (req, res) => {
 
         if (!targetUser) {
             // This happens if the database went down during the request.
-            return res.status(500)
+            return res.status(500).end()
         }
 
         return res.status(200)
     } catch (err) {
         console.err("auth-controller::updateUsername")
         console.err(err)
-        return res.status(500)
+        return res.status(500).end()
     }
 }
 
@@ -307,7 +307,7 @@ updateEmail = async (req, res) => {
         const { newEmail } = req.body
 
         if (!newEmail) {
-            return res.status(400)
+            return res.status(400).end()
         }
 
         var existingUser = await User.findOne({ username: newEmail })
@@ -324,12 +324,12 @@ updateEmail = async (req, res) => {
 
         if (!targetUser) {
             // This happens if the database went down during the request.
-            return res.status(500)
+            return res.status(500).end()
         }
 
         return res.status(200)
     } catch (err) {
-        return res.status(500)
+        return res.status(500).end()
     }
 }
 
@@ -337,12 +337,12 @@ deleteAccount = async (req, res) => {
     try {
         var deleteUser = await User.findOne({ _id: res.locals.userId })
         if (deleteUser.ok === 1) {
-            return res.status(200)
+            return res.status(200).end()
         } else {
-            return res.status(401) // TODO: maybe change to 500?
+            return res.status(401).end() // TODO: maybe change to 500?
         }
     } catch (err) {
-        return res.status(500)
+        return res.status(500).end()
     }
 }
 
