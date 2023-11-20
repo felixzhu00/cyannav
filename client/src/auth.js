@@ -2,6 +2,7 @@ import React, { createContext, useEffect, useState } from "react";
 // import { useHistory } from 'react-router-dom'
 import api from './store-api'
 
+
 const AuthContext = createContext();
 console.log("create AuthContext: " + AuthContext);
 
@@ -10,7 +11,8 @@ export const AuthActionType = {
     GET_LOGGED_IN: "GET_LOGGED_IN",
     LOGIN_USER: "LOGIN_USER",
     LOGOUT_USER: "LOGOUT_USER",
-    REGISTER_USER: "REGISTER_USER"
+    REGISTER_USER: "REGISTER_USER",
+    UPDATE_USERNAME: "UPDATE_USERNAME",
 }
 
 function AuthContextProvider(props) {
@@ -19,6 +21,8 @@ function AuthContextProvider(props) {
         loggedIn: false,
         error: null,
     });
+
+    
 
 
     useEffect(() => {
@@ -57,11 +61,18 @@ function AuthContextProvider(props) {
                     error: payload.error,
                 })
             }
+            case AuthActionType.UPDATE_USERNAME: {
+                return setAuth({
+                    user: payload.user,
+                    loggedIn: true,
+                    error: payload.error,
+                })
+            }
             default:
                 return auth;
         }
     }
-
+    
     auth.getLoggedIn = async function () {
         const response = await api.getLoggedIn();
         if (response.status === 200) {
@@ -134,6 +145,23 @@ function AuthContextProvider(props) {
                 type: AuthActionType.LOGOUT_USER,
                 payload: null
             })
+        }
+    }
+
+
+    auth.updateUsername = async function(loginToken, newUsername) {
+        const response = await api.updateUsername(newUsername , newUsername);
+        console.log(response)
+        if (response.status === 200) {
+            auth.getLoggedIn()
+        }
+    }
+
+    auth.updateEmail = async function(loginToken, newEmail) {
+        const response = await api.updateEmail(newEmail , newEmail);
+        console.log(response)
+        if (response.status === 200) {
+            auth.getLoggedIn()
         }
     }
 
