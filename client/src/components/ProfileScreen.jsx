@@ -24,10 +24,8 @@ export default function ProfileScreen() {
         console.log('Delete account');
     };
     
-    useEffect(() => {
-        console.log(auth.user)
-        //Runs only on the first render
-      }, [auth.authReducer]);
+      useEffect(() => {
+      });
 
     const [showProfilePicModal, setShowProfilePicModal] = useState(false);
     const [profilePicUrl, setProfilePicUrl] = useState(LoginLogo);
