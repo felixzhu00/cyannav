@@ -18,16 +18,16 @@ export default function ProfileScreen() {
     const { auth } = useContext(AuthContext);
     const [currentModel, setCurrentModel] = useState('');
     // Example user data, replace with actual data as needed
-    const userData = {
-        username: auth.user.username ? auth.user.username : "",
-        email: auth.user.email ? auth.user.email : "",
-        password: '************' // In a real scenario, you wouldn't display a password like this
-    };
     
     const handleDeleteAccount = () => {
         // Implement account deletion logic
         console.log('Delete account');
     };
+    
+    useEffect(() => {
+        console.log(auth.user)
+        //Runs only on the first render
+      }, [auth.authReducer]);
 
     const [showProfilePicModal, setShowProfilePicModal] = useState(false);
     const [profilePicUrl, setProfilePicUrl] = useState(LoginLogo);
@@ -97,7 +97,7 @@ export default function ProfileScreen() {
                     <TextField
                         id="username"
                         label="Username"
-                        defaultValue={userData.username}
+                        value={auth.user.username ? auth.user.username : ""}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
@@ -120,7 +120,7 @@ export default function ProfileScreen() {
                     <TextField
                         id="email"
                         label="Email Address"
-                        defaultValue={userData.email}
+                        value={auth.user.email ? auth.user.email : ""}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
@@ -143,7 +143,7 @@ export default function ProfileScreen() {
                     <TextField
                         id="password"
                         label="Password"
-                        defaultValue={userData.password}
+                        value={ '************'}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
