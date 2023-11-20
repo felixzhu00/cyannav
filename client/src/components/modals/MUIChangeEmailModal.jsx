@@ -35,8 +35,8 @@ export default function MUIChangeEmailModal(props) {
         props.onClose()
     };
     
-    const handleSave = ()=> {
-        auth.updateEmail(newEmail, newEmail);
+    const handleSave = async ()=> {
+        await auth.updateEmail(newEmail, newEmail);
         handleClose()
     }
 
