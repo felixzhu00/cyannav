@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { Box, Card, CardMedia, CardContent, Typography, IconButton, Menu, MenuItem, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Card, CardMedia, CardContent, Typography, IconButton, Menu, MenuItem, useMediaQuery, useTheme, TextField } from '@mui/material';
 import { MoreVert, StoreTwoTone } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import mapSample from '../assets/map_sample.jpg';
@@ -12,7 +12,8 @@ export default function MapCard() {
     const open = Boolean(anchorEl);
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-
+    const [isEditing, setIsEditing] = useState(false);
+    const [newName, setNewName] = useState("NAME OF MAP");
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -21,10 +22,24 @@ export default function MapCard() {
         setAnchorEl(null);
     };
 
+    const handleDoubleClick = () => {
+        setIsEditing(true);
+    };
+
+    const handleChangeName = (event) => {
+        setNewName(event.target.value);
+    };
+
+    const handleSubmitName = () => {
+        setIsEditing(false);
+        // TODO: Save name to backend!
+    };
+
     const handleKebab = (option) => {
         switch (option) {
-            case "rename":
-                break;
+            // case "rename":
+            //     setIsEditing(true);
+            //     break;
             case "addTag":
                 store.setCurrentModal("AddTagModal")
                 break;
@@ -55,9 +70,28 @@ export default function MapCard() {
             </Link>
             <CardContent sx={{ bgcolor: theme.palette.background.paper }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography gutterBottom variant="h5" component="div">
-                        NAME OF MAP
-                    </Typography>
+                    {isEditing ? (
+                        <TextField
+                            autoFocus
+                            value={newName}
+                            onChange={handleChangeName}
+                            onBlur={handleSubmitName}
+                            onKeyPress={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleSubmitName();
+                                }
+                            }}
+                        />
+                    ) : (
+                        <Typography
+                            gutterBottom
+                            variant="h5"
+                            component="div"
+                            onDoubleClick={handleDoubleClick}
+                        >
+                            {newName}
+                        </Typography>
+                    )}
                     <IconButton onClick={handleClick}>
                         <MoreVert />
                     </IconButton>
@@ -66,7 +100,7 @@ export default function MapCard() {
                         open={open}
                         onClose={handleClose}
                     >
-                        <MenuItem onClick={() => { handleKebab("rename") }}>Rename</MenuItem>
+                        {/* <MenuItem onClick={() => { handleKebab("rename") }}>Rename</MenuItem> */}
                         <MenuItem onClick={() => { handleKebab("addTag") }}>Add Tag</MenuItem>
                         <MenuItem onClick={() => { handleKebab("publish") }}>Publish</MenuItem>
                         <MenuItem onClick={() => { handleKebab("duplicate") }}>Duplicate</MenuItem>
