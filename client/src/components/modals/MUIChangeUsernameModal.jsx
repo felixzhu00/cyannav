@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {useState , useContext, useEffect} from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -7,6 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import { Close } from '@mui/icons-material';
 import { TextField } from '@mui/material';
 import { useTheme } from '@emotion/react';
+import AuthContext from '../../auth.js';
 
 const style = {
     position: 'absolute',
@@ -21,13 +22,31 @@ const style = {
 };
 
 export default function MUIChangeUsernameModal(props) {
-    const theme = useTheme();
+    // const [token, setToken] = useCookies(["user"]);
 
-    const [open, setOpen] = React.useState(props.open);
+    const theme = useTheme();
+    const { auth } = useContext(AuthContext);
+    const [open, setOpen] = useState(props.open);
+    const [newUsername, setNewUsername] = useState('');
+
+
+
     const handleClose = () => {
         setOpen(false)
         props.onClose()
     };
+
+    
+    const handleSave = ()=> {
+        auth.updateUsername(newUsername, newUsername);
+        handleClose()
+    }
+
+    const handleUsernameChange = (event) => {
+        setNewUsername(event.target.value);
+    };
+
+    // 
 
     return (
         <div>
@@ -67,9 +86,10 @@ export default function MUIChangeUsernameModal(props) {
                             label="New Username"
                             defaultValue=""
                             fullWidth
+                            onChange={handleUsernameChange}
                         />
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
-                            <Button onClick={handleClose} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", mr: "10px", width: "90px" }}>Save</Button>
+                            <Button onClick={handleSave} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", mr: "10px", width: "90px" }}>Save</Button>
                             <Button onClick={handleClose} variant="outlined" sx={{ color: "black" }}>Cancel</Button>
                         </Box>
                     </Box>
