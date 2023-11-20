@@ -66,7 +66,7 @@ getAllMaps = async (req, res) => {
         // const allMaps = await Map.find()
 
         return res.status(200).json({
-            maps: allMaps, // TODO: (later) for now I'm returning everything.
+            // maps: allMaps, // TODO: (later) for now I'm returning everything.
         })
     } catch (err) {
         console.error("api-controller::getAllMaps")

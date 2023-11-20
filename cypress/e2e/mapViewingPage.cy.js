@@ -2,7 +2,7 @@ describe('map viewing specs', () => {
     beforeEach(() => {
       cy.visit('129.213.145.105')
       cy.get("#signInBtn").click()
-      cy.get('img[title="mapImage"]')
+      cy.get('#mapImage')
       .first()
       .click();
     })
