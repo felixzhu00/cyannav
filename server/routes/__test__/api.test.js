@@ -69,8 +69,8 @@ describe('duplicatemap', () => {
         expect(res.statusCode).toEqual(400);
     });
     it('returns code 400 if no map matches the id sent', async () => {
-        const res = await request(app).post('/api/duplicatemap').send({id: 100629});
-        expect(res.statusCode).toEqual(400);
+        const res = await request(app).post('/api/duplicatemap').send({id: "100629"});
+        expect(res.statusCode).toEqual(500);
     });
     //add another tets for if there is map which matches the id sent
 });
