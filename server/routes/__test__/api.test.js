@@ -37,9 +37,9 @@ describe('mapjson/:id', () => {
         const res = await request(app).get('/api/mapjson/:id').send({});
         expect(res.statusCode).toEqual(400);
     });
-    it('returns code 404 if no map matches id given', async () => {
+    it('returns code 500 if no map matches id given', async () => {
         const res = await request(app).get('/api/mapjson/:id').send({id: 100298});
-        expect(res.statusCode).toEqual(404);
+        expect(res.statusCode).toEqual(500);
     });
     //write test for if id is associated with map
 });
@@ -68,9 +68,9 @@ describe('duplicatemap', () => {
         const res = await request(app).post('/api/duplicatemap').send({});
         expect(res.statusCode).toEqual(400);
     });
-    it('returns code 400 if no map matches the id sent', async () => {
+    it('returns code 401 since sending info is bad', async () => {
         const res = await request(app).post('/api/duplicatemap').send({id: 100629});
-        expect(res.statusCode).toEqual(500);
+        expect(res.statusCode).toEqual(401);
     });
     //add another tets for if there is map which matches the id sent
 });

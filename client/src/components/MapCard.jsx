@@ -61,7 +61,7 @@ export default function MapCard() {
 
     return (
         <Card sx={{ maxWidth: isSmallScreen ? 300 : 'relative' }}>
-            <Link to="/mapview" style={{ textDecoration: 'none' }}>
+            <Link id="mapImage" to="/mapview" style={{ textDecoration: 'none' }}>
                 <CardMedia
                     sx={{ height: 300, cursor: 'pointer' }}
                     image={mapSample}

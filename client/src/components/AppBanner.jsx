@@ -150,6 +150,7 @@ function AppBanner() {
               <Home sx={{ fontSize: "30px" }} />
             </IconButton>
             <IconButton
+              id="marketplaceBtn"
               sx={{ color: "black" }}
               onClick={handleStore
                 // () => {navigate('/store')}
