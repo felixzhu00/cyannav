@@ -22,7 +22,7 @@ export default function LoginScreen(props) {
     const handleLogin = async (event) => {
         event.preventDefault();
 
-        const data = new FormData(event.currentTarget);
+        const data = new FormData(event.target);
         let input = {
             email: data.get('email'),
             password: data.get('password'),
@@ -33,7 +33,7 @@ export default function LoginScreen(props) {
             if (auth.loggedIn) {
                 navigate('/browsepage');
             } else {
-                setErrorMessage(auth.error || 'Invalid login credentials');
+                setErrorMessage('Invalid login credentials');
             }
         } catch (error) {
             console.error('Login error:', error);
