@@ -19,24 +19,20 @@ export default function LoginScreen(props) {
     const { auth } = useContext(AuthContext);
 
     const [errorMessage, setErrorMessage] = useState('');
-    const handleSubmit = async (event) => {
+    const handleSubmit = (event) => {
+
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         let input = {
             email: data.get('email'),
             password: data.get('password'),
         }
-
-        try {
-            await auth.loginUser(input.email, input.password);
-            if (auth.error || !auth.loggedIn) {
-                setErrorMessage(auth.error); // Update error message
-            } else {
-                navigate('/browsepage');
-            }
-        } catch (error) {
-            console.error('Login failed:', error);
-            setErrorMessage('Login failed. Please try again.');
+        auth.loginUser(input.email, input.password)
+        if (auth.error != null) {
+            console.log(auth.error)
+        } else {
+            console.log(auth.user, auth.loggedIn)
+            navigate('/browsepage');
         }
     };
 
@@ -84,7 +80,7 @@ export default function LoginScreen(props) {
                     )}
 
                     <Button
-                        // onClick={() => { props.handleGuest(false) }}
+                        onClick={() => { props.handleGuest(false) }}
                         id="signInBtn"
                         type="submit"
                         fullWidth
@@ -94,7 +90,7 @@ export default function LoginScreen(props) {
                         Sign In
                     </Button>
                     <Button
-                        onClick={() => navigate('/browsepage')}
+                        onClick={() => { props.handleGuest(true) }}
                         type="submit"
                         fullWidth
                         variant="contained"
