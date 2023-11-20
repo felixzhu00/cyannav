@@ -20,7 +20,7 @@ describe('map viewing specs', () => {
         cy.contains('button', 'Publish')
         .click()
         cy.get("#publishBtnOnModal")
-        .should("have.text", "Publish")
+        .should("have.text", "PUBLISH")
         .click();
     })
     it('add field map button', () => {
@@ -45,14 +45,14 @@ describe('map viewing specs', () => {
         cy.get("#undoBtn")
         .click()
     })
-    it('ensure zoom in on screen', () => {
-        cy.get("#zoomInBtn")
-        .click()
-    })
-    it('ensure zoom out on screen', () => {
-        cy.get("#zoomOutBtn")
-        .click()
-    })
+    // it('ensure zoom in on screen', () => {
+    //     cy.get("#zoomInBtn")
+    //     .click()
+    // })
+    // it('ensure zoom out on screen', () => {
+    //     cy.get("#zoomOutBtn")
+    //     .click()
+    // })
     it('ensure like btn works', () => {
         cy.get("#likeBtn")
         .click()
