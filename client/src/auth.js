@@ -153,7 +153,7 @@ function AuthContextProvider(props) {
         const response = await api.updateUsername(newUsername , newUsername);
         console.log(response)
         if (response.status === 200) {
-            auth.getLoggedIn()
+            await auth.getLoggedIn()
         }
     }
 
@@ -161,7 +161,7 @@ function AuthContextProvider(props) {
         const response = await api.updateEmail(newEmail , newEmail);
         console.log(response)
         if (response.status === 200) {
-            auth.getLoggedIn()
+            await auth.getLoggedIn()
         }
     }
 
