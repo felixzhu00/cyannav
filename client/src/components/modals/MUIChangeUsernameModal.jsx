@@ -58,7 +58,7 @@ export default function MUIChangeUsernameModal(props) {
                             disabled
                             id="outlined-disabled"
                             label="Old Username"
-                            defaultValue="Hello World"
+                            defaultValue=""
                             fullWidth
                         />
                         <TextField
