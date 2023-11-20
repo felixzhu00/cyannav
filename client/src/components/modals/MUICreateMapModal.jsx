@@ -8,6 +8,8 @@ import { Close, PropaneSharp } from '@mui/icons-material';
 import { FormControl, RadioGroup, Radio, FormControlLabel, FormGroup, Select, MenuItem, InputLabel } from '@mui/material';
 import { DropzoneArea } from 'react-mui-dropzone'
 import { useEffect, useState } from 'react';
+import { useTheme } from '@emotion/react';
+
 
 const style = {
     position: 'absolute',
@@ -22,6 +24,8 @@ const style = {
 };
 
 export default function MUICreateMapModal(props) {
+    const theme = useTheme();
+
     const [open, setOpen] = React.useState(props.open);
     const [template, setTemplate] = React.useState('');
     const [files, setFiles] = React.useState([]);

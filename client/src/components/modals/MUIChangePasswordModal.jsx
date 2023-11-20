@@ -6,6 +6,7 @@ import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import { Close } from '@mui/icons-material';
 import { TextField } from '@mui/material';
+import { useTheme } from '@emotion/react';
 
 const style = {
     position: 'absolute',
@@ -20,6 +21,7 @@ const style = {
 };
 
 export default function MUIChangePasswordModal(props) {
+    const theme = useTheme();
     const [open, setOpen] = React.useState(props.open);
     const handleClose = () => {
         setOpen(false)

@@ -171,20 +171,19 @@ function MapViewingPage() {
 
                 {/* Right-aligned Icons with like/dislike counts */}
                 <Box display="flex" alignItems="center"> {/* Ensure flex layout for this Box */}
-                    <IconButton onClick={handleLike} color={hasLiked ? "primary" : "default"}>
+                    <IconButton onClick={handleLike} sx={{ color: hasLiked ? 'black' : 'default' }}>
                         <ThumbUp />
                     </IconButton>
                     <Typography sx={{ mx: 1 }}>{likes}</Typography> {/* Added margin for spacing */}
 
-                    <IconButton onClick={handleDislike} color={hasDisliked ? "primary" : "default"}>
+                    <IconButton onClick={handleDislike} sx={{ color: hasDisliked ? 'black' : 'default' }}>
                         <ThumbDown />
                     </IconButton>
                     <Typography sx={{ mx: 1 }}>{dislikes}</Typography> {/* Added margin for spacing */}
                 </Box>
             </Box>
         );
-    }
-
+    };
 
     const topRight = () => {
         return (
@@ -212,8 +211,7 @@ function MapViewingPage() {
                 </Box>
             </Box>
         )
-    }
-
+    };
 
     const mapView = () => {
         return (
@@ -298,7 +296,8 @@ function MapViewingPage() {
                 </Box>
             </Box>
         );
-    }
+    };
+
     const commentSide = () => {
         return (
             <Box
@@ -340,6 +339,7 @@ function MapViewingPage() {
             </Box>
         );
     };
+
     const editBar = () => {
         return (
             <Box
@@ -459,7 +459,7 @@ function MapViewingPage() {
                 </Box>
             </Box>
         );
-    }
+    };
 
     return (
         <Box
