@@ -56,7 +56,7 @@ export default function MUIExportMapModal(props) {
                         autoComplete="off"
                     >
                         <FormGroup>
-                            <Typography sx={{ mb: 1 }}>Select the format you would like to export as:</Typography>
+                            <Typography id="exportMapModalText" sx={{ mb: 1 }}>Select the format you would like to export as:</Typography>
                             <FormControl component="fieldset">
                                 <RadioGroup
                                     name="map-file-type"
@@ -71,7 +71,7 @@ export default function MUIExportMapModal(props) {
                         </FormGroup>
 
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                            <Button onClick={handleClose} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", mr: '5px' }}>Export</Button>
+                            <Button id="exportBtnOnModal" onClick={handleClose} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", mr: '5px' }}>Export</Button>
                             <Button onClick={handleClose} variant="outlined" sx={{ color: "black", ml: '5px' }}>Cancel</Button> {/* CHANGE THE ONCLICK! */}
                         </Box>
                     </Box>
