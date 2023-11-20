@@ -84,7 +84,7 @@ export default function LoginScreen(props) {
                     )}
 
                     <Button
-                        onClick={() => { props.handleGuest(false) }}
+                        // onClick={() => { props.handleGuest(false) }}
                         id="signInBtn"
                         type="submit"
                         fullWidth
@@ -94,7 +94,7 @@ export default function LoginScreen(props) {
                         Sign In
                     </Button>
                     <Button
-                        onClick={() => { props.handleGuest(true) }}
+                        onClick={() => navigate('/browsepage')}
                         type="submit"
                         fullWidth
                         variant="contained"
