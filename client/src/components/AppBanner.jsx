@@ -108,9 +108,9 @@ function AppBanner() {
               <MenuItem
                 onClick={handleStore
                   // () => {navigate('/marketplace')}
-                } id="marketplaceBtn"
+                }
               >
-                <IconButton sx={{ color: "black", mr: 1 }}>
+                <IconButton id="marketplaceBtn" sx={{ color: "black", mr: 1 }}>
                   <Store />
                 </IconButton>
                 <Typography textAlign="center">Marketplace</Typography>
