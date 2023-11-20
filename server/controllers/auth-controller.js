@@ -193,12 +193,16 @@ resetRequest = async (req, res) => {
     // Get info from req
     // Send to auth manager
     // Return status
+    // send email
+    // add verification code to database
 }
 
 verifyCode = async (req, res) => {
     // Get code from req
     // Send to auth manager
     // Return status
+    // check code against databse
+    // if yes, then ask
 }
 
 updatePasscode = async (req, res) => {
@@ -207,6 +211,10 @@ updatePasscode = async (req, res) => {
             req.body
 
         if (!verificationCode && !originalPassword) {
+            return res.status(400)
+        }
+
+        if (verificationCode && originalPassword) {
             return res.status(400)
         }
 
