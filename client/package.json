@@ -33,6 +33,7 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
+    "cypress": "^13.5.1",
     "typescript": "3.8.3"
   },
   "scripts": {
