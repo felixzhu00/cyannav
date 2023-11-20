@@ -1,6 +1,10 @@
 const app = require('../../index.js');
 const request = require('supertest')
 
+beforeAll(async () => {
+    server = await app.listen(8000);
+});
+
 describe('loggedIn', () => {
     it('returns 401 if user id not in db', async () => {
         const res = await request(app).get('/auth/loggedIn').send({});
@@ -111,3 +115,7 @@ describe('deleteAccount', () => {
         expect(res.statusCode).toEqual(401);
     });
 });
+
+afterAll(async () => {
+    await new Promise((resolve) => server.close(resolve));
+  });
