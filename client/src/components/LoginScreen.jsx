@@ -33,7 +33,7 @@ export default function LoginScreen(props) {
             if (auth.loggedIn) {
                 navigate('/browsepage');
             } else {
-                setErrorMessage(auth.error || 'Invalid login credentials');
+                setErrorMessage('Invalid login credentials');
             }
         } catch (error) {
             console.error('Login error:', error);
