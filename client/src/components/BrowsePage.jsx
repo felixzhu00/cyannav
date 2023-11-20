@@ -97,14 +97,15 @@ function BrowsePage() {
         </Paper>
         <FormControl variant="outlined" sx={{ ml: 2 }}>
           <Select
+            id="outerMenuByName"
             value={searchBy}
             onChange={handleSearchByChange}
             displayEmpty
             inputProps={{ 'aria-label': 'Search By' }}
             sx={{ height: '50px' }}
           >
-            <MenuItem value="mapName">Map Name</MenuItem>
-            <MenuItem value="username">Username</MenuItem>
+            <MenuItem id="byMapNameBtn" value="mapName">Map Name</MenuItem>
+            <MenuItem id="byUsernameBtn" value="username">Username</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -118,14 +119,15 @@ function BrowsePage() {
         <Typography variant="h6" sx={{ mr: 2 }}>Sort By:</Typography>
         <FormControl variant="outlined" sx={{ width: 200 }}>
           <Select
+            id="outerSortByMenuBtn"
             value={sortBy}
             onChange={handleSortByChange}
             displayEmpty
             inputProps={{ 'aria-label': 'Sort By' }}
             sx={{ height: '50px' }}
           >
-            <MenuItem value="recent">Recent</MenuItem>
-            <MenuItem value="alphabetical-order">Alphabetical Order</MenuItem>
+            <MenuItem id="recentSortSelect" value="recent">Recent</MenuItem>
+            <MenuItem id="nameSortSelect" value="alphabetical-order">Alphabetical Order</MenuItem>
           </Select>
         </FormControl>
       </Box>
