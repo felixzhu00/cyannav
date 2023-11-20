@@ -6,14 +6,17 @@ import { useTheme } from "@mui/material/styles";
 import logo from "../assets/cyannav_logo.svg";
 import { GlobalStoreContext } from '../store'
 import AuthContext from '../auth'
-const location = useLocation();
-const { pathname } = location;
-if (pathname === '/' || pathname === '/login/' || pathname === '/login' || pathname === '/register/' || pathname === '/register' || pathname === '/forget/' || pathname === '/forget') {
 
-  return null;
-}
 
 function AppBanner() {
+  const location = useLocation();
+  const { pathname } = location;
+  if (pathname === '/' || pathname === '/login/' || pathname === '/login' || pathname === '/register/' || pathname === '/register' || pathname === '/forget/' || pathname === '/forget') {
+
+    return null;
+  }
+
+
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
   // Route to different pages
@@ -66,7 +69,7 @@ function AppBanner() {
   }
 
   useEffect(() => {
-  },[]);
+  }, []);
 
 
 
