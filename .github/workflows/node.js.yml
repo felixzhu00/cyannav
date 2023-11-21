@@ -48,7 +48,7 @@ jobs:
                   echo "Linting to be implemented"
 
     frontend-test:
-        needs: setup
+        needs: deploy-backend
         runs-on: self-hosted
 
         steps:
@@ -59,7 +59,7 @@ jobs:
             - name: Frontend Cypress test
               run: |
                   cd client
-                  npx cypress run
+                  npm test
 
     backend-test:
         needs: setup
@@ -100,6 +100,7 @@ jobs:
                   pm2 restart 0
 
     deploy-frontend:
+        if: always()
         needs: build-frontend
         runs-on: self-hosted
 
