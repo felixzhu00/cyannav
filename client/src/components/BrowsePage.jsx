@@ -145,7 +145,7 @@ function BrowsePage() {
         {searchAndSort()}
       </Box>
 
-      <Button onClick={handleCreateMapModal} variant="contained" aria-label="add" sx={{ position: 'absolute', top: 85, right: 20 }}>Import Map</Button>
+      <Button id="createMapOuterBtn" onClick={handleCreateMapModal} variant="contained" aria-label="add" sx={{ position: 'absolute', top: 85, right: 20 }}>Import Map</Button>
 
       <Grid container spacing={2} sx={{ mt: 2 }}>
         {mapCardsToShow.map((index) => (

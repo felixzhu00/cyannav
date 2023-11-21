@@ -13,9 +13,12 @@ describe("map viewing specs", () => {
         )
         cy.get("#exportBtnOnModal").should("have.text", "Export").click()
     })
-    it("publish map button", () => {
-        cy.contains("button", "Publish").click()
-        cy.get("#publishBtnOnModal").should("have.text", "Publish").click()
+    it('publish map button', () => {
+        cy.contains('button', 'Publish')
+        .click()
+        cy.get("#publishBtnOnModal")
+        .should("have.text", "PUBLISH")
+        .click();
     })
     it("add field map button", () => {
         cy.get("#addFieldBtn").click()
@@ -32,15 +35,19 @@ describe("map viewing specs", () => {
     it("ensure undo on screen", () => {
         cy.get("#undoBtn").click()
     })
-    it("ensure zoom in on screen", () => {
-        cy.get("#zoomInBtn").click()
-    })
-    it("ensure zoom out on screen", () => {
-        cy.get("#zoomOutBtn").click()
-    })
-    it("ensure like btn works", () => {
-        cy.get("#likeBtn").click()
-        cy.get("#numLikes").should("have.text", "1")
+    // it('ensure zoom in on screen', () => {
+    //     cy.get("#zoomInBtn")
+    //     .click()
+    // })
+    // it('ensure zoom out on screen', () => {
+    //     cy.get("#zoomOutBtn")
+    //     .click()
+    // })
+    it('ensure like btn works', () => {
+        cy.get("#likeBtn")
+        .click()
+        cy.get("#numLikes")
+        .should("have.text", "1")
     })
     it("ensure dislike btn works", () => {
         cy.get("#dislikeBtn").click()

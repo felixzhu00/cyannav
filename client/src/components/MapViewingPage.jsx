@@ -173,12 +173,12 @@ function MapViewingPage() {
 
                 {/* Right-aligned Icons with like/dislike counts */}
                 <Box display="flex" alignItems="center"> {/* Ensure flex layout for this Box */}
-                    <IconButton onClick={handleLike} sx={{ color: hasLiked ? 'black' : 'default' }}>
+                    <IconButton id="likeBtn" onClick={handleLike} sx={{ color: hasLiked ? 'black' : 'default' }}>
                         <ThumbUp />
                     </IconButton>
                     <Typography sx={{ mx: 1 }}>{likes}</Typography> {/* Added margin for spacing */}
 
-                    <IconButton onClick={handleDislike} sx={{ color: hasDisliked ? 'black' : 'default' }}>
+                    <IconButton id="dislikeBtn" onClick={handleDislike} sx={{ color: hasDisliked ? 'black' : 'default' }}>
                         <ThumbDown />
                     </IconButton>
                     <Typography sx={{ mx: 1 }}>{dislikes}</Typography> {/* Added margin for spacing */}
@@ -210,8 +210,8 @@ function MapViewingPage() {
                         variant="fullWidth"
                         aria-label="edit-comment-tab-bar"
                     >
-                        <Tab sx={{ '&.Mui-selected': { color: 'black' } }} onClick={handleEdit} value="1" label="Edit" />
-                        <Tab sx={{ '&.Mui-selected': { color: 'black' } }} onClick={handleEdit} value="2" label="Comment" />
+                        <Tab id="editTab" sx={{ '&.Mui-selected': { color: 'black' } }} onClick={handleEdit} value="1" label="Edit" />
+                        <Tab id="commentTab" sx={{ '&.Mui-selected': { color: 'black' } }} onClick={handleEdit} value="2" label="Comment" />
                     </Tabs>
                 </Box>
             </Box>
@@ -258,6 +258,7 @@ function MapViewingPage() {
                     zIndex: 1000, // Ensure it's above the map
                 }}>
                     <IconButton
+                        id="undoBtn"
                         sx={{
                             backgroundColor: '#fff',
                             padding: '10px',
@@ -274,6 +275,7 @@ function MapViewingPage() {
                         <Undo />
                     </IconButton>
                     <IconButton
+                        id="redoBtn"
                         sx={{
                             backgroundColor: '#fff',
                             padding: '10px',
@@ -397,6 +399,7 @@ function MapViewingPage() {
                     }}
                 >
                     <Button
+                        id="addFieldBtn"
                         variant="contained"
                         color="primary"
                         onClick={handleAddField}
