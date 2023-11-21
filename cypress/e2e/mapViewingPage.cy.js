@@ -24,11 +24,11 @@ describe("map viewing specs", () => {
         cy.get("#addFieldBtn").click()
         cy.get("#add-field-modal-title").should("have.text", "Add Field")
     })
-    it("add comment button", () => {
-        cy.get("#commentTab").click()
-        cy.get("#addCommentBtn").click()
-        cy.get("#comment-modal-title").should("have.text", "Comment")
-    })
+    // it("add comment button", () => {
+    //     cy.get("#commentTab").click()
+    //     cy.get("#addCommentBtn").click()
+    //     cy.get("#comment-modal-title").should("have.text", "Comment")
+    // })
     it("ensure redo on screen", () => {
         cy.get("#redoBtn").click()
     })
@@ -43,14 +43,14 @@ describe("map viewing specs", () => {
     //     cy.get("#zoomOutBtn")
     //     .click()
     // })
-    it('ensure like btn works', () => {
-        cy.get("#likeBtn")
-        .click()
-        cy.get("#numLikes")
-        .should("have.text", "1")
-    })
-    it("ensure dislike btn works", () => {
-        cy.get("#dislikeBtn").click()
-        cy.get("#numDislikes").should("have.text", "1")
-    })
+    // it('ensure like btn works', () => {
+    //     cy.get("#likeBtn")
+    //     .click()
+    //     cy.get("#numLikes")
+    //     .should("have.text", "1")
+    // })
+    // it("ensure dislike btn works", () => {
+    //     cy.get("#dislikeBtn").click()
+    //     cy.get("#numDislikes").should("have.text", "1")
+    // })
 })

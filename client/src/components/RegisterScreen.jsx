@@ -104,6 +104,7 @@ export default function RegisterScreen() {
                         </Grid>
                     </Grid>
                     <Button
+                        id="registerBtn"
                         type="submit"
                         fullWidth
                         variant="contained"

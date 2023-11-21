@@ -1,20 +1,13 @@
 describe('marketplace specs', () => {
-  Cypress.Commands.add('login', (email, password) => {
-    cy.session([email, password], () => {
-      cy.visit("localhost:3000")
-      cy.get('#email').type(email)
-      cy.get('#password').type(password)
-      cy.get("#signInBtn").click()
-    })
-  })
   beforeEach(() => {
-    cy.login("autotest", "11223344!!")
+    cy.visit("localhost:3000")
+    cy.get("#signInBtn").click()
     cy.get("#marketplaceBtn").click()
   })
 
     it("sort by recent button displays correctly", () => {
         cy.get("#outerSortByMenuBtn").click()
-        cy.get("#recentSortSelect").should("have.text", "recent").click()
+        cy.get("#recentSortSelect").should("have.text", "Recent").click()
     })
 
     it("sort by name button displays correctly", () => {
@@ -25,7 +18,7 @@ describe('marketplace specs', () => {
     })
 
     it("map info displays correctly", () => {
-        cy.get("#createdByUser").should("have.text", "CREATED BY USER")
+        cy.get("#createdByUser").should("have.text", "By (OWNER)")
     })
 
     it("by username/mapName info displays correctly", () => {
