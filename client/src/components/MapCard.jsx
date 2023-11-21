@@ -107,7 +107,7 @@ export default function MapCard() {
                         <MenuItem onClick={() => { handleKebab("delete") }}>Delete</MenuItem>
                     </Menu>
                 </Box>
-                <Typography variant="body2" color="text.secondary">
+                <Typography id="createdByUser" variant="body2" color="text.secondary">
                     By (OWNER)
                 </Typography>
             </CardContent>
