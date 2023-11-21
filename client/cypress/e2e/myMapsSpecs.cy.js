@@ -1,7 +1,7 @@
-describe('my maps specs', () => {
+describe("my maps specs", () => {
     beforeEach(() => {
-      cy.visit('129.213.145.105')
-      cy.get("#signInBtn").click()
+        cy.visit("localhost:3000")
+        cy.get("#signInBtn").click()
     })
 
     // it('import map button ', () => {
@@ -64,4 +64,3 @@ describe('my maps specs', () => {
   //     .click()
   //   })
 })
-  
