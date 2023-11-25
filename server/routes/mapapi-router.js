@@ -1,79 +1,90 @@
 const express = require("express")
 const router = express.Router()
-const mapGraphicSchemaController = require("../controllers/api-controller")
+const mapMetadataSchemaController = require("../controllers/mapapi-controller")
 const auth = require("../auth") // auth_manager
 
 // Handles getting map metadata by id
 router.get(
     "/mapmetadata/:id",
     auth.verify,
-    mapGraphicSchemaController.getMapById
+    mapMetadataSchemaController.getMapById
 )
 
 //Handles getting all map metadata by user
 router.get(
     "/mapbyuser/:id",
     auth.verify,
-    mapGraphicSchemaController.getUserMaps
+    mapMetadataSchemaController.getUserMaps
 )
 
 //Handles getting all map metadata (that are published)
 router.get(
     "/allpublishedmap",
     auth.verify,
-    mapGraphicSchemaController.getAllMaps
+    mapMetadataSchemaController.getAllMaps
 )
 
 //Handles getting the geojson of the map by id
 router.get(
     "/mapgeojson/:id",
     auth.verify,
-    mapGraphicSchemaController.getMapJsonById
+    mapMetadataSchemaController.getMapJsonById
+)
+
+//Handles gettings the field datas of a map.
+router.get(
+    "/mapfields/:id",
+    auth.verify,
+    mapMetadataSchemaController.getMapFieldsById
 )
 
 //Handles creating a new map request
-router.post("/newmap", auth.verify, mapGraphicSchemaController.createNewMap)
+router.post("/newmap", auth.verify, mapMetadataSchemaController.createNewMap)
 
 //Handles duplicating a map (by ID) request
 router.post(
     "/duplicatemap",
     auth.verify,
-    mapGraphicSchemaController.createDuplicateMapById
+    mapMetadataSchemaController.createDuplicateMapById
 )
 
 //Handles forking a map (by ID) request
 router.post(
     "/forkmap",
     auth.verify,
-    mapGraphicSchemaController.createForkMapById
+    mapMetadataSchemaController.createForkMapById
 )
 
 //Handles deleting map (by ID) request
 router.delete(
     "/deletemap/:id",
     auth.verify,
-    mapGraphicSchemaController.deleteMapById
+    mapMetadataSchemaController.deleteMapById
 )
 
 //Handles updating the name of a map (by ID) request
 router.post(
     "/updatemapname",
     auth.verify,
-    mapGraphicSchemaController.updateMapNameById
+    mapMetadataSchemaController.updateMapNameById
 )
 
 //Handles updating a map's tags request
 router.post(
     "/updatemaptag",
     auth.verify,
-    mapGraphicSchemaController.updateMapTag
+    mapMetadataSchemaController.updateMapTag
 )
 
 //Handles updating a map's publish status request(published/unpublished)
 router.post(
-    "/mapstatus",
+    "/publishmap",
     auth.verify,
-    mapGraphicSchemaController.updateMapPublishStatus
+    mapMetadataSchemaController.updateMapPublishStatus
 )
+
+router.post("/likemap", auth.verify, mapMetadataSchemaController.likeMap)
+
+router.post("/dislikemap", auth.verify, mapMetadataSchemaController.dislikeMap)
 
 module.exports = router
