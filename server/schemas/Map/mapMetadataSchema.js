@@ -73,6 +73,11 @@ const mapMetadataSchema = new Schema({
             required: [true, "No fieldData have been specified."],
         },
     ],
+    parentMapId: {
+        type: Schema.Types.ObjectID,
+        ref: mapMetadata,
+        required: false,
+    },
 })
 
 const mapGraphicModel = mongoose.model("mapMetadata", mapMetadataSchema)

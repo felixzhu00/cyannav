@@ -225,9 +225,54 @@ createDuplicateMapById = async (req, res) => {
 }
 
 createForkMapById = async (req, res) => {
-    // TODO: (later)basically duplicated, but with different user
-    // Need to add parent in database as well.
-    return
+    try {
+        const { id } = req.body
+
+        if (!id) {
+            return res.status(400).end()
+        }
+
+        const srcMap = Map.findById(id)
+        if (!srcMap) {
+            return res.status(404).end()
+        }
+        if (!srcMap.published) {
+            return res.status(401).end()
+        }
+
+        var newMapTitle
+        for (let i = 1; i < 9999; i++) {
+            // hard-cap... our app will probably break before this much attempts.
+            newMapTitle = `${srcMap.title} (${i})`
+            let mapExist = await Map.find({
+                title: newMapTitle,
+                user: res.locals.userId,
+            })
+            if (!mapExist) {
+                break
+            }
+        }
+
+        // TODO: (later) Current both maps point towards the same geojson and fielddata, to be implemented after fielddata is implemented.
+        srcMap.parentMapId = srcMap._id
+        delete srcMap._id
+        srcMap.title = newMapTitle
+        srcMap.user = res.locals.userId
+        srcMap.commentsId = []
+        srcMap.like = []
+        srcMap.dislike = []
+
+        const newMap = new Map(srcMap)
+        const saved = await newMap.save()
+
+        if (!saved) {
+            return res.status(500).end()
+        }
+    } catch (err) {
+        console.error("mapapi-controller::createForkMapById")
+        console.error(err)
+        return res.status(500).end()
+    }
 }
 
 deleteMapById = async (req, res) => {
