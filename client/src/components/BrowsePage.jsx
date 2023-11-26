@@ -27,20 +27,29 @@ function BrowsePage() {
 
   // PAGE STUFF
   const [currentPage, setCurrentPage] = useState(1);
-  const totalMaps = 10; // Total number of MapCards to display
+  // console.log(store.currentMyMapCollection)
+  const [totalMaps, setTotalMaps] = useState('');
   const mapsPerPage = 8; // Display 8 MapCards per page
   const numberOfPages = Math.ceil(totalMaps / mapsPerPage);
   // Calculate the range of MapCards for the current page
   const firstMapIndex = (currentPage - 1) * mapsPerPage;
   const lastMapIndex = firstMapIndex + mapsPerPage;
-  const mapCardsToShow = Array.from({ length: mapsPerPage }, (_, index) => index + firstMapIndex).filter(index => index < totalMaps);
+  // const mapCardsToShow = Array.from({ length: mapsPerPage }, (_, index) => index + firstMapIndex).filter(index => index < totalMaps);
 
+  // Runs only when there is an user
   useEffect(() => {
     if (auth.user != null) {
       store.getMyMapCollection(auth.user.userId);
     }
-
   }, [auth.user]);
+
+  // Runs when there is a change in currentMyMapCollection
+  useEffect(() => {
+    if (store.currentMyMapCollection != null) {
+      setTotalMaps(store.currentMyMapCollection.length)
+    }
+  }, [store.currentMyMapCollection]);
+
 
   const handleChangePage = (event, value) => {
     setCurrentPage(value);
@@ -155,11 +164,15 @@ function BrowsePage() {
       <Button id="createMapOuterBtn" onClick={handleCreateMapModal} variant="contained" aria-label="add" sx={{ position: 'absolute', top: 85, right: 20 }}>Import Map</Button>
 
       <Grid container spacing={2} sx={{ mt: 2 }}>
-        {store.currentMyMapCollection && store.currentMyMapCollection.map((map, index) => (
-          <Grid item xs={12} sm={6} md={3} key={map._id}>
-            <MapCard map={map} />
-          </Grid>
-        ))}
+        {store.currentMyMapCollection &&
+          store.currentMyMapCollection
+            .slice(firstMapIndex, lastMapIndex) // Only take the maps for the current page
+            .map((map, index) => (
+              <Grid item xs={12} sm={6} md={3} key={map._id}>
+                <MapCard map={map} />
+              </Grid>
+            ))
+        }
       </Grid>
 
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>

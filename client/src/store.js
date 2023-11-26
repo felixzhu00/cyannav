@@ -40,8 +40,10 @@ function GlobalStoreContextProvider(props) {
         currentMyMapCollection: null, // What to display on mymap and browsepage
         currentMarketplaceCollection: null,
         currentModal: null,
+        currentModalMapId: null
     });
 
+    console.log(store.currentModal);
 
 
     //Nav Global Handlers
@@ -66,29 +68,94 @@ function GlobalStoreContextProvider(props) {
             ...store,
             currentMyMapCollection: response.data.userMaps
         });
-        console.log(response);
     }
-    //Browse Global Handlers
 
+    store.renameMap = async (mapId, newName) => {
+        // Call to backend API to update the map name
+        console.log(mapId, newName);
+        const response = await api.updateMapNameById(mapId, newName);
+        console.log(response);
+
+        if (response.success) {
+            // Update the map name in the currentMyMapCollection state
+            // Assuming each map object has an id and a name
+            const updatedCollection = store.currentMyMapCollection.map(map => {
+                if (map.id === mapId) {
+                    return { ...map, name: newName };
+                }
+                return map;
+            });
+            setStore({
+                ...store,
+                currentMyMapCollection: updatedCollection,
+            });
+        }
+    }    //Browse Global Handlers
+
+    store.deleteMap = async (mapId) => {
+        const response = await api.deleteMapById(mapId);
+        console.log(response)
+        if (response.success) {
+            // Update the map name in the currentMyMapCollection state
+            // Assuming each map object has an id and a name
+            const updatedCollection = store.currentMyMapCollection.map(map => {
+                if (map.id === mapId) {
+                    return { ...map, name: newName };
+                }
+                return map;
+            });
+            setStore({
+                ...store,
+                currentMyMapCollection: updatedCollection,
+            });
+        }
+    }
+
+    store.duplicateMap = async (mapId) => {
+        console.log(mapId);
+        const response = await api.createDuplicateMapById(mapId);
+        console.log(response)
+        if (response.success) {
+            // Update the map name in the currentMyMapCollection state
+            // Assuming each map object has an id and a name
+            const updatedCollection = store.currentMyMapCollection.map(map => {
+                if (map.id === mapId) {
+                    return { ...map, name: newName };
+                }
+                return map;
+            });
+            setStore({
+                ...store,
+                currentMyMapCollection: updatedCollection,
+            });
+        }
+    }
 
     //Map Card Global Handlers
 
 
 
-    // Moda Global Handlers
+    // Modal Global Handlers
     const modalProps = {
         open: store.currentModal !== null, // Set open based on whether there is a modal to display
         onClose: () => store.setCurrentModal(null), // Set onClose to close the modal
     };
 
 
-    store.setCurrentModal = function (option) {
+    store.setCurrentModal = (option, id) => {
         return setStore({
             ...store,
-            currentModal: option
+            currentModal: option,
+            currentModalMapId: id
         });
     }
 
+    // store.setCurrentModalMapId = (id) => {
+    //     return setStore({
+    //         ...store,
+    //         currentModalMapId: id
+    //     });
+    // }
     return (
         <GlobalStoreContext.Provider value={{ store }}>
             {store.currentModal === "AddFieldModal" && (

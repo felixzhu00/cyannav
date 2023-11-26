@@ -2,6 +2,8 @@ const MapMetadata = require("../schemas/Map/mapMetadataSchema")
 const GeoJsonSchema = require("../schemas/Map/geoJsonSchema")
 const MapFields = require("../schemas/Map/fieldDataSchema")
 
+const mongoose = require('mongoose');
+
 getMapById = async (req, res) => {
     try {
         const { id } = req.body
@@ -281,7 +283,7 @@ createForkMapById = async (req, res) => {
 
 deleteMapById = async (req, res) => {
     try {
-        const { id } = req.body
+        const id = req.params.id
 
         if (!id) {
             return res.status(400).end()
@@ -291,7 +293,7 @@ deleteMapById = async (req, res) => {
         if (!toBeDeleted) {
             return res.status(404).end()
         }
-        if (toBeDeleted.user !== res.locals.userId) {
+        if (toBeDeleted.user.toString() !== res.locals.userId) {
             return res.status(401).end()
         }
 
@@ -310,8 +312,12 @@ deleteMapById = async (req, res) => {
 }
 
 updateMapNameById = async (req, res) => {
+    console.log("bydasdas")
     try {
-        const { id, title } = req.body
+        const id = req.params.id
+        const title = req.body.name
+        console.log(id);
+        console.log(title);
 
         if (!id || !title) {
             return res.status(400).end()
@@ -321,7 +327,7 @@ updateMapNameById = async (req, res) => {
         if (!toBeUpdated) {
             return res.status(404).end()
         }
-        if (toBeUpdated.user !== res.locals.userId) {
+        if (toBeUpdated.user.toString() !== res.locals.userId) {
             return res.status(401).end()
         }
 
