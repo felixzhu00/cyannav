@@ -195,7 +195,7 @@ createDuplicateMapById = async (req, res) => {
         // TODO: (collaborate) deal with collabotor permissions later
 
         var newMapTitle
-        for (let i = 0; i < 9999; i++) {
+        for (let i = 1; i < 9999; i++) {
             // hard-cap... our app will probably break before this much attempts.
             newMapTitle = `${srcMap.title} (${i})`
             let mapExist = await Map.find({
@@ -210,6 +210,9 @@ createDuplicateMapById = async (req, res) => {
         // TODO: (later) Current both maps point towards the same geojson and fielddata, to be implemented after fielddata is implemented.
         delete srcMap._id
         srcMap.title = newMapTitle
+        srcMap.commentsId = []
+        srcMap.like = []
+        srcMap.dislike = []
 
         const newMap = new Map(srcMap)
         const saved = await newMap.save()
