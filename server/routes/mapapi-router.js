@@ -62,41 +62,41 @@ router.delete(
     mapMetadataSchemaController.deleteMapById
 )
 
-//Handles updating the name of a map (by ID) request
-router.post(
-    "/updatemapname",
-    auth.verify,
-    mapMetadataSchemaController.updateMapNameById
-)
+// //Handles updating the name of a map (by ID) request
+// router.post(
+//     "/updatemapname",
+//     auth.verify,
+//     mapMetadataSchemaController.updateMapNameById
+// )
 
-//Handles updating a map's tags request
-router.post(
-    "/updatemaptag",
-    auth.verify,
-    mapMetadataSchemaController.updateMapTag
-)
+// //Handles updating a map's tags request
+// router.post(
+//     "/updatemaptag",
+//     auth.verify,
+//     mapMetadataSchemaController.updateMapTag
+// )
 
-//Handles updating a map's publish status request(published/unpublished)
-router.post(
-    "/publishmap",
-    auth.verify,
-    mapMetadataSchemaController.updateMapPublishStatus
-)
+// //Handles updating a map's publish status request(published/unpublished)
+// router.post(
+//     "/publishmap",
+//     auth.verify,
+//     mapMetadataSchemaController.updateMapPublishStatus
+// )
 
-router.post("/likemap", auth.verify, mapMetadataSchemaController.likeMap)
+// router.post("/likemap", auth.verify, mapMetadataSchemaController.likeMap)
 
-router.post("/dislikemap", auth.verify, mapMetadataSchemaController.dislikeMap)
+// router.post("/dislikemap", auth.verify, mapMetadataSchemaController.dislikeMap)
 
-router.post(
-    "/postcomment",
-    auth.verify,
-    mapMetadataSchemaController.postComment
-)
+// router.post(
+//     "/postcomment",
+//     auth.verify,
+//     mapMetadataSchemaController.postComment
+// )
 
-router.post(
-    "/likecomment",
-    auth.verify,
-    mapMetadataSchemaController.likeComment
-)
+// router.post(
+//     "/likecomment",
+//     auth.verify,
+//     mapMetadataSchemaController.likeComment
+// )
 
 module.exports = router
