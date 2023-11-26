@@ -113,8 +113,10 @@ getMapFieldsById = async (req, res) => {
 createNewMap = async (req, res) => {
     try {
         const { title, type, GeoJsonSchemabuf } = req.body
-
-        if (!title || !type || !GeoJsonSchema) {
+        let bufferArray = Object.values(GeoJsonSchemabuf);
+        let buffer = Buffer.from(bufferArray);
+        console.log(title, type, GeoJsonSchemabuf)
+        if (!title || !type || !GeoJsonSchemabuf) {
             return res.status(400).json({
                 errorMessage: "Invalid request.",
             })
@@ -132,18 +134,18 @@ createNewMap = async (req, res) => {
             })
         }
 
-        const userMapWithTitle = await MapMetadata.countDocuments({
-            title: title,
-            user: res.locals.userId,
-        })
-        if (userMapWithTitle > 0) {
-            return res.status(400).json({
-                errorMessage: "Map with title already exists.",
-            })
-        }
+        // const userMapWithTitle = await MapMetadata.countDocuments({
+        //     title: title,
+        //     user: res.locals.userId,
+        // })
+        // if (userMapWithTitle > 0) {
+        //     return res.status(400).json({
+        //         errorMessage: "Map with title already exists.",
+        //     })
+        // }
 
         const newGeoJsonSchema = new GeoJsonSchema({
-            geoBuf: GeoJsonSchemabuf,
+            geoBuf: buffer,
         })
         const savedGeoJsonSchema = await newGeoJsonSchema.save()
         if (!savedGeoJsonSchema) {
@@ -158,7 +160,7 @@ createNewMap = async (req, res) => {
             mapType: type,
             // TODO: (later)
             // Generate thumbnail here?
-            GeoJsonSchemaId: savedGeoJsonSchema._id,
+            geojsonId: savedGeoJsonSchema._id,
             fieldDataId: savedGeoJsonSchema._id,
             // Create fieldData object
         })

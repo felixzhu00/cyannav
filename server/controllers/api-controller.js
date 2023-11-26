@@ -110,27 +110,31 @@ createNewMap = async (req, res) => {
         // TODO: (later) how do we handle guest? Do we create one without a user??.
 
         const { title, type, json } = req.body
-
+        console.log(title, type, json)
         if (!title || !type || !json) {
+            console.log('sdasda')
             return res.status(400).end()
         }
         if (type !== "heatmap") {
+            console.log('21312')
+
             // TODO: (later) AND MORE, add all possible values here.
             return res.status(400).end()
         }
         // Seems kind of inefficient but oh well.
-        const userMapWithTitle = await Map.countDocuments({
-            title: title,
-            user: res.locals.userId,
-        })
-        if (userMapWithTitle > 0) {
-            return res.status(401).end()
-        }
+        // const userMapWithTitle = await Map.countDocuments({
+        //     title: title,
+        //     user: res.locals.userId,
+        // })
+        // if (userMapWithTitle > 0) {
+        //     return res.status(401).end()
+        // }
 
         const newMap = new Map({
             mapType: type,
             navjson: json,
             title: title,
+            user: res.locals.userId
         })
 
         const saved = await newMap.save()
