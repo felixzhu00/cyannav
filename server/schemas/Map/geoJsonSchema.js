@@ -9,5 +9,5 @@ const geoJsonSchema = new Schema({
     },
 })
 
-const geoJsonModel = mongoose.model("fieldData", geoJsonSchema)
+const geoJsonModel = mongoose.model("geojson", geoJsonSchema)
 module.exports = geoJsonModel
