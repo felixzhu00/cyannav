@@ -39,7 +39,7 @@ getUserMaps = async (req, res) => {
 
         var userMaps
         if (res.locals.userId === userId) {
-            userMaps = await MapMetadata.find({ user: userId })
+            userMaps = await MapMetadata.find({ user: id })
         } else {
             userMaps = await MapMetadata.find({
                 user: userId,
