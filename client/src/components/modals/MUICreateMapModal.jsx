@@ -5,10 +5,12 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import { Close, PropaneSharp } from '@mui/icons-material';
-import { FormControl, RadioGroup, Radio, FormControlLabel, FormGroup, Select, MenuItem, InputLabel } from '@mui/material';
+import { FormControl, RadioGroup, Radio, FormControlLabel, FormGroup, Select, MenuItem, InputLabel, TextField } from '@mui/material';
 import { DropzoneArea } from 'react-mui-dropzone'
 import { useEffect, useState } from 'react';
 import { useTheme } from '@emotion/react';
+import { GlobalStoreContext } from '../../store'
+import { useContext } from 'react';
 
 
 const style = {
@@ -24,9 +26,12 @@ const style = {
 };
 
 export default function MUICreateMapModal(props) {
+    const { store } = useContext(GlobalStoreContext);
     const theme = useTheme();
 
     const [open, setOpen] = React.useState(props.open);
+    const [title, setTitle] = React.useState('Untitled');
+    const [fileType, setFileType] = React.useState('');
     const [template, setTemplate] = React.useState('');
     const [files, setFiles] = React.useState([]);
 
@@ -34,10 +39,27 @@ export default function MUICreateMapModal(props) {
         setOpen(false)
         props.onClose()
     };
-    const handleTemplateChange = (event) => setTemplate(event.target.value);
-    const handleFileChange = (files) => {
+
+    const handleFileTypeChange = (event) => { // radio buttons 
+        setFileType(event.target.value);
+    }
+
+    const handleTemplateChange = (event) => { // drop down menu
+        setTemplate(event.target.value);
+    };
+
+    const handleFileChange = (files) => { // uploaded files
         setFiles(files);
     };
+
+    const handleCreateMap = () => { // calls store function
+        console.log(title, fileType, template, files)
+        store.createMap(title, fileType, template, files);
+
+        // closes modal
+        setOpen(false)
+        props.onClose()
+    }
 
     return (
         <div>
@@ -65,6 +87,16 @@ export default function MUICreateMapModal(props) {
                         noValidate
                         autoComplete="off"
                     >
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>Map Title:
+                            <TextField
+                                required
+                                placeholder="Untitled"
+                                onChange={(e) => setTitle(e.target.value)}
+                                sx={{ ml: 2 }}
+                            />
+                        </Box>
+
+
                         <FormGroup sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                 <Typography sx={{ mr: 2 }}>Select map file type:</Typography>
@@ -72,6 +104,8 @@ export default function MUICreateMapModal(props) {
                                     <RadioGroup
                                         row
                                         name="map-file-type"
+                                        defaultValue={'shapefiles'}
+                                        onChange={handleFileTypeChange}
                                     >
                                         <FormControlLabel value="shapefiles" control={<Radio />} label="Shapefiles" />
                                         <FormControlLabel value="geojson" control={<Radio />} label="GeoJSON" />
@@ -94,11 +128,11 @@ export default function MUICreateMapModal(props) {
                                         label="Template"
                                         onChange={handleTemplateChange}
                                     >
-                                        <MenuItem value={'heat map'}>Heat Map</MenuItem>
-                                        <MenuItem value={'distributive flow map'}>Distributive Flow Map</MenuItem>
-                                        <MenuItem value={'point map'}>Point Map</MenuItem>
-                                        <MenuItem value={'choropleth map'}>Choropleth Map</MenuItem>
-                                        <MenuItem value={'3d rectangle map'}>3D Rectangle Map</MenuItem>
+                                        <MenuItem value={'heatmap'}>Heat Map</MenuItem>
+                                        <MenuItem value={'distributiveflowmap'}>Distributive Flow Map</MenuItem>
+                                        <MenuItem value={'pointmap'}>Point Map</MenuItem>
+                                        <MenuItem value={'choroplethmap'}>Choropleth Map</MenuItem>
+                                        <MenuItem value={'3drectangle'}>3D Rectangle Map</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Box>
@@ -115,7 +149,7 @@ export default function MUICreateMapModal(props) {
 
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
                             <Button onClick={handleClose} variant="outlined" sx={{ color: "black", mr: '5px' }}>Cancel</Button>
-                            <Button id="createMapBtnFromMyMaps" onClick={handleClose} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", ml: '5px' }}>Create</Button> {/* CHANGE THE ONCLICK! */}
+                            <Button id="createMapBtnFromMyMaps" onClick={handleCreateMap} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", ml: '5px' }}>Create</Button> {/* CHANGE THE ONCLICK! */}
                         </Box>
                     </Box>
                 </Box>

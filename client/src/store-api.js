@@ -47,9 +47,9 @@ export const getAllMaps = () =>
     api.get("/api/allmap").then(handleResponse).catch(handleError)
 export const getMapJsonbyId = (id) =>
     api.get(`/api/mapjson${id}`).then(handleResponse).catch(handleError)
-export const createNewMap = (type, template, json) =>
+export const createNewMap = (title, type, GeoJsonSchemabuf) =>
     api
-        .post("/api/newmap", { type, template, json })
+        .post("/api/newmap", { title, type, GeoJsonSchemabuf })
         .then(handleResponse)
         .catch(handleError)
 export const createDuplicateMapById = (id) =>

@@ -14,7 +14,8 @@ import MUIExportMapModal from './components/modals/MUIExportMapModal';
 import MUIPublishMapModal from './components/modals/MUIPublishMapModal';
 import api from './store-api'
 
-
+const geobuf = require('geobuf')
+const Pbf = require('pbf')
 
 export const GlobalStoreContext = createContext({});
 
@@ -37,7 +38,7 @@ function GlobalStoreContextProvider(props) {
         currentModal: null,
     });
 
-    
+
 
     //Nav Global Handlers
     store.toggleBrowsePage = function (option) {
@@ -45,6 +46,14 @@ function GlobalStoreContextProvider(props) {
             ...store,
             togglebrowseHome: option == "home" ? true : false
         });
+    }
+
+    store.createMap = async function (title, fileType, mapTemplate, files) {
+        console.log(files);
+        var buffer = geobuf.encode(files, new Pbf());
+        console.log(buffer);
+
+        const response = await api.createNewMap(title, mapTemplate, buffer);
     }
 
     //Browse Global Handlers
