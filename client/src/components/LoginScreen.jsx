@@ -19,7 +19,18 @@ export default function LoginScreen(props) {
     const { auth } = useContext(AuthContext);
 
     const [errorMessage, setErrorMessage] = useState('');
-    const handleSubmit = (event) => {
+
+    useEffect(() => {
+        if (auth.user == null) {
+            console.log(auth.error)
+            setErrorMessage(auth.error)
+        } else {
+            console.log(auth.user, auth.loggedIn)
+            navigate('/browsepage');
+        }
+    }, [auth]);
+
+    const handleSubmit = async (event) => {
 
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -27,14 +38,13 @@ export default function LoginScreen(props) {
             email: data.get('email'),
             password: data.get('password'),
         }
-        auth.loginUser(input.email, input.password)
-        if (auth.error != null) {
-            console.log(auth.error)
-        } else {
-            console.log(auth.user, auth.loggedIn)
-            navigate('/browsepage');
-        }
+        await auth.loginUser(input.email, input.password)
     };
+
+    const handleContAsGuest = () => {
+        props.handleGuest(true)
+        navigate('/browsepage');
+    }
 
     return (
         <Container component="main" maxWidth="xs">
@@ -59,6 +69,7 @@ export default function LoginScreen(props) {
                         id="email"
                         label="Email Address"
                         name="email"
+                        type="email"
                         autoComplete="email"
                         autoFocus
                         required
@@ -90,8 +101,8 @@ export default function LoginScreen(props) {
                         Sign In
                     </Button>
                     <Button
-                        onClick={() => { props.handleGuest(true) }}
-                        type="submit"
+                        onClick={() => { handleContAsGuest() }}
+                        type="button"
                         fullWidth
                         variant="contained"
                         sx={{ mt: 1, mb: 2 }}
