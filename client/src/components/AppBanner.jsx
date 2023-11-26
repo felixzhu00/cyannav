@@ -51,7 +51,7 @@ function AppBanner() {
     setAnchorElUser(null);
   };
   const handleLogoutClick = async () => {
-    auth.logoutUser()
+    await auth.logoutUser()
     navigate("/login");
     setAnchorElUser(null);
   };
@@ -173,57 +173,81 @@ function AppBanner() {
                 display: { xs: "none", sm: "block" }, // Hide on very small screens
               }}
             >
-              (Title) by (Name)asdfasdasdasd
+              (Title) by (Name)
             </Typography>}
 
           {/* Spacer to push the user avatar to the right */}
           <Box sx={{ flexGrow: 1 }} />
 
           {/* User Avatar and Menu */}
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Tooltip title="Open settings">
-              <IconButton id="settingsDropdown" onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="User Avatar" src="/static/images/avatar/2.jpg" />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{ vertical: "top", horizontal: "right" }}
-              keepMounted
-              transformOrigin={{ vertical: "top", horizontal: "right" }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              <Box
-                sx={{
-                  maxWidth: 200,
-                  p: 1,
-                  display: "flex",
-                  flexDirection: "column",
-                  p: "15px",
-                }}
+          {auth.loggedIn && (
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Tooltip title="Open settings">
+                <IconButton id="settingsDropdown" onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar alt="User Avatar" src="/static/images/avatar/2.jpg" />
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{ mt: "45px" }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                keepMounted
+                transformOrigin={{ vertical: "top", horizontal: "right" }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
               >
-                <Typography sx={{ fontWeight: "bold" }}>Username:</Typography>
-                <Typography
+                <Box
                   sx={{
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
+                    maxWidth: 200,
+                    p: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    p: "15px",
                   }}
                 >
-                  {auth.user != null ? auth.user.username : ""}
-                </Typography>
-              </Box>
-              <MenuItem id="settingsDropdownOption" key={"Account Settings"} onClick={handleAccountSettingClick}>
-                <Typography textAlign="center">Account Settings</Typography>
-              </MenuItem>
-              <MenuItem key={"Logout"} onClick={handleLogoutClick}>
-                <Typography textAlign="center">Logout</Typography>
-              </MenuItem>
-            </Menu>
-          </Box>
+                  <Typography sx={{ fontWeight: "bold" }}>Username:</Typography>
+                  <Typography
+                    sx={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {auth.user != null ? auth.user.username : ""}
+                  </Typography>
+                </Box>
+                <MenuItem id="settingsDropdownOption" key={"Account Settings"} onClick={handleAccountSettingClick}>
+                  <Typography textAlign="center">Account Settings</Typography>
+                </MenuItem>
+                <MenuItem key={"Logout"} onClick={handleLogoutClick}>
+                  <Typography textAlign="center">Logout</Typography>
+                </MenuItem>
+              </Menu>
+            </Box>
+          )}
+
+          {/* When the user continues as guest */}
+          {!auth.loggedIn && (
+            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => navigate('/login')}
+                sx={{ mr: 1 }}
+              >
+                Login
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => navigate('/register')}
+              >
+                Register
+              </Button>
+            </Box>
+          )}
+
         </Toolbar>
       </Container>
     </AppBar>
