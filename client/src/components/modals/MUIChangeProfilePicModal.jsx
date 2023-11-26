@@ -28,9 +28,9 @@ function MUIChangeProfilePicModal({ open, onClose, onSave }) {
                     onChange={handleFileChange}
                 />
             </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
-                <Button onClick={handleSave} sx={{ bgcolor: theme.palette.primary.main }}>Save</Button>
+            <DialogActions sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+                <Button onClick={handleSave} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", mr: '5px' }}>Save</Button>
+                <Button onClick={onClose} variant="outlined" sx={{ color: "black", ml: '5px' }}>Cancel</Button>
             </DialogActions>
         </Dialog>
     );
