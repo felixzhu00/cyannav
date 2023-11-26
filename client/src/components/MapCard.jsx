@@ -32,6 +32,7 @@ export default function MapCard({ map }) {
 
     const handleSubmitName = () => {
         setIsEditing(false);
+        store.renameMap(map._id, newName);
         // TODO: Save name to backend!
     };
 
@@ -47,11 +48,10 @@ export default function MapCard({ map }) {
                 store.setCurrentModal("PublishMapModal")
                 break;
             case "duplicate":
-                //duplicates map                
-
+                store.duplicateMap(map._id);
                 break;
             case "delete":
-                store.setCurrentModal("DeleteMapModal")
+                store.setCurrentModal("DeleteMapModal", map._id)
                 break;
             default:
                 console.log(`${option} is incorrect`);
@@ -88,6 +88,12 @@ export default function MapCard({ map }) {
                             variant="h5"
                             component="div"
                             onDoubleClick={handleDoubleClick}
+                            sx={{
+                                maxWidth: '100%',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                            }}
                         >
                             {newName}
                         </Typography>

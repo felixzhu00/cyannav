@@ -40,38 +40,76 @@ const handleError = (error) => {
 
 // Map-related functions
 export const getMapById = (id) =>
-    api.get(`/api/map${id}`).then(handleResponse).catch(handleError)
+    api
+        .get(`/api/map${id}`)
+        .then(handleResponse)
+        .catch(handleError)
+
 export const getUserMaps = (id) =>
-    api.get(`/api/mapbyuser/${id}`).then(handleResponse).catch(handleError)
+    api
+        .get(`/api/mapbyuser/${id}`)
+        .then(handleResponse)
+        .catch(handleError)
+
 export const getAllMaps = () =>
-    api.get("/api/allmap").then(handleResponse).catch(handleError)
+    api
+        .get("/api/allmap")
+        .then(handleResponse)
+        .catch(handleError)
+
 export const getMapJsonbyId = (id) =>
-    api.get(`/api/mapjson${id}`).then(handleResponse).catch(handleError)
+    api
+        .get(`/api/mapjson${id}`)
+        .then(handleResponse)
+        .catch(handleError)
+
 export const createNewMap = (title, type, GeoJsonSchemabuf) =>
     api
         .post("/api/newmap", { title, type, GeoJsonSchemabuf })
         .then(handleResponse)
         .catch(handleError)
+
 export const createDuplicateMapById = (id) =>
     api
-        .post("/api/duplicatemap", { id })
+        .post(`/api/duplicatemap/${id}`)
         .then(handleResponse)
         .catch(handleError)
+
 export const createForkMapById = (id) =>
-    api.post("/api/forkmap", { id }).then(handleResponse).catch(handleError)
+    api
+        .post("/api/forkmap", { id })
+        .then(handleResponse)
+        .catch(handleError)
+
 export const deleteMapById = (id) =>
-    api.delete(`/map/${id}`).then(handleResponse).catch(handleError)
-export const updateMapNamebyId = (id, name) =>
-    api.put(`/mapname/${id}`, { name }).then(handleResponse).catch(handleError)
+    api
+        .delete(`api/deletemap/${id}`)
+        .then(handleResponse)
+        .catch(handleError)
+
+export const updateMapNameById = (id, name) =>
+    api
+        .put(`/api/mapname/${id}`, { name })
+        .then(handleResponse)
+        .catch(handleError)
+
 export const updateMapTag = (id, tag) =>
-    api.put(`/maptag/${id}`, { tag }).then(handleResponse).catch(handleError)
+    api
+        .put(`/maptag/${id}`, { tag })
+        .then(handleResponse)
+        .catch(handleError)
+
 export const updateMapPublishStatus = (id, status) =>
     api
         .put(`/mapstatus/${id}`, { status })
         .then(handleResponse)
         .catch(handleError)
+
 export const updateMapJson = (id, json) =>
-    api.put(`/mapjson/${id}`, { json }).then(handleResponse).catch(handleError)
+    api
+        .put(`/mapjson/${id}`, { json })
+        .then(handleResponse)
+        .catch(handleError)
 
 // Auth-related functions
 export const getLoggedIn = () => {
@@ -94,14 +132,20 @@ export const loginUser = (email, password) =>
         .then(handleResponse)
         .catch(handleError)
 export const logoutUser = () =>
-    api.post("/auth/logout").then(handleResponse).catch(handleError)
+    api
+        .post("/auth/logout")
+        .then(handleResponse)
+        .catch(handleError)
 export const registerUser = (email, username, password, passwordVerify) =>
     api
         .post("/auth/register", { email, username, password, passwordVerify })
         .then(handleResponse)
         .catch(handleError)
 export const requestReset = (email) =>
-    api.post("/auth/reset", { email }).then(handleResponse).catch(handleError)
+    api
+        .post("/auth/reset", { email })
+        .then(handleResponse)
+        .catch(handleError)
 export const updatePasscode = (
     email,
     password,
@@ -147,7 +191,7 @@ const apis = {
     createDuplicateMapById,
     createForkMapById,
     deleteMapById,
-    updateMapNamebyId,
+    updateMapNameById,
     updateMapTag,
     updateMapPublishStatus,
     updateMapJson,

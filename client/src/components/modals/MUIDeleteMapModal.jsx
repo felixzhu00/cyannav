@@ -6,6 +6,8 @@ import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import { Close } from '@mui/icons-material';
 import { useTheme } from '@emotion/react';
+import { GlobalStoreContext } from '../../store'
+import { useContext, useEffect, useState } from 'react';
 
 
 const style = {
@@ -22,12 +24,22 @@ const style = {
 
 export default function MUIDeleteAccountModal(props) {
     const theme = useTheme();
+    const { store } = useContext(GlobalStoreContext);
+
+    const currentMapId = store.currentModalMapId;
 
     const [open, setOpen] = React.useState(props.open);
     const handleClose = () => {
         setOpen(false)
         props.onClose()
     };
+
+    const handleDelete = () => {
+        store.deleteMap(currentMapId);
+
+        handleClose();
+    }
+
 
     return (
         <div>
@@ -51,7 +63,7 @@ export default function MUIDeleteAccountModal(props) {
                     </Typography>
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
                         <Button
-                            onClick={handleClose}
+                            onClick={handleDelete}
                             variant="contained"
                             sx={{
                                 backgroundColor: "red",
