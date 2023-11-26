@@ -70,7 +70,7 @@ getAllPublishedMaps = async (req, res) => {
     }
 }
 
-getGeoJsonSchemaById = async (req, res) => {
+getGeoJsonById = async (req, res) => {
     try {
         const { id } = req.body
 
