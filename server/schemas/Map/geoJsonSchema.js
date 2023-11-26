@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 
-const fieldDataSchema = new Schema({
+const geoJsonSchema = new Schema({
     // TODO: (build4) TO BE IMPLEMENTED
     geoBuf: {
         type: Buffer,
@@ -9,5 +9,5 @@ const fieldDataSchema = new Schema({
     },
 })
 
-const fieldDataModel = mongoose.model("fieldData", fieldDataSchema)
-module.exports = fieldDataModel
+const geoJsonModel = mongoose.model("geojson", geoJsonSchema)
+module.exports = geoJsonModel

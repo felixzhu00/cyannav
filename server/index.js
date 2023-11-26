@@ -27,6 +27,8 @@ const authRouter = require("./routes/auth-router")
 app.use("/auth", authRouter)
 const apiRouter = require("./routes/api-router")
 app.use("/api", apiRouter)
+const mapapiRouter = require("./routes/mapapi-router")
+app.use("/mapapi", mapapiRouter)
 
 // Initialize database connection
 const db = require("./db")
