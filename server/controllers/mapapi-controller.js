@@ -344,3 +344,19 @@ updateMapNameById = async (req, res) => {
 // Rest of the update functions to be written later.
 
 // like dislikes and comment to be written here.
+
+module.exports = {
+    getMapById,
+    getUserMaps,
+    getAllPublishedMaps,
+    getGeoJsonById,
+    getMapFieldsById,
+    createNewMap,
+    createDuplicateMapById,
+    createForkMapById,
+    deleteMapById,
+    updateMapNameById,
+    // updateMapTag,
+    // updateMapPublishStatus,
+    // updateMapJson,
+}
