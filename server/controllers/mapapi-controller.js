@@ -1,5 +1,5 @@
 const MapMetadata = require("../schemas/Map/mapMetadataSchema")
-const GeoJSON = require("../schemas/Map/geoJsonSchema")
+const GeoJsonSchema = require("../schemas/Map/geoJsonSchema")
 const MapFields = require("../schemas/Map/fieldDataSchema")
 
 getMapById = async (req, res) => {
@@ -70,21 +70,21 @@ getAllPublishedMaps = async (req, res) => {
     }
 }
 
-getGeoJsonById = async (req, res) => {
+getGeoJsonSchemaById = async (req, res) => {
     try {
         const { id } = req.body
 
-        const geoJson = await GeoJSON.findById(id)
+        const GeoJsonSchema = await GeoJsonSchema.findById(id)
 
-        if (!geoJson) {
+        if (!GeoJsonSchema) {
             return res.status(404).end()
         }
 
         return res.status(200).json({
-            geoBuf: geoJson.buf, // TODO: (later) figure out geobuf
+            geoBuf: GeoJsonSchema.buf, // TODO: (later) figure out geobuf
         })
     } catch (err) {
-        console.error("mapapi-controller::getGeoJsonById")
+        console.error("mapapi-controller::getGeoJsonSchemaById")
         console.error(err)
         return res.status(500).end()
     }
@@ -112,9 +112,9 @@ getMapFieldsById = async (req, res) => {
 
 createNewMap = async (req, res) => {
     try {
-        const { title, type, geojsonbuf } = req.body
+        const { title, type, GeoJsonSchemabuf } = req.body
 
-        if (!title || !type || !geojson) {
+        if (!title || !type || !GeoJsonSchema) {
             return res.status(400).json({
                 errorMessage: "Invalid request.",
             })
@@ -142,11 +142,11 @@ createNewMap = async (req, res) => {
             })
         }
 
-        const newGeoJson = new GeoJSON({
-            geoBuf: geojsonbuf,
+        const newGeoJsonSchema = new GeoJsonSchema({
+            geoBuf: GeoJsonSchemabuf,
         })
-        const savedGeoJson = await newGeoJson.save()
-        if (!savedGeoJson) {
+        const savedGeoJsonSchema = await newGeoJsonSchema.save()
+        if (!savedGeoJsonSchema) {
             return res.status(500).end()
         }
 
@@ -158,8 +158,8 @@ createNewMap = async (req, res) => {
             mapType: type,
             // TODO: (later)
             // Generate thumbnail here?
-            geojsonId: savedGeoJson._id,
-            fieldDataId: savedGeoJson._id,
+            GeoJsonSchemaId: savedGeoJsonSchema._id,
+            fieldDataId: savedGeoJsonSchema._id,
             // Create fieldData object
         })
 
@@ -207,7 +207,7 @@ createDuplicateMapById = async (req, res) => {
             }
         }
 
-        // TODO: (later) Current both maps point towards the same geojson and fielddata, to be implemented after fielddata is implemented.
+        // TODO: (later) Current both maps point towards the same GeoJsonSchema and fielddata, to be implemented after fielddata is implemented.
         delete srcMap._id
         srcMap.title = newMapTitle
         srcMap.commentsId = []
@@ -256,7 +256,7 @@ createForkMapById = async (req, res) => {
             }
         }
 
-        // TODO: (later) Current both maps point towards the same geojson and fielddata, to be implemented after fielddata is implemented.
+        // TODO: (later) Current both maps point towards the same GeoJsonSchema and fielddata, to be implemented after fielddata is implemented.
         srcMap.parentMapId = srcMap._id
         delete srcMap._id
         srcMap.title = newMapTitle
