@@ -21,14 +21,14 @@ router.get(
 router.get(
     "/allpublishedmap",
     auth.verify,
-    mapMetadataSchemaController.getAllMaps
+    mapMetadataSchemaController.getAllPublishedMaps
 )
 
 //Handles getting the geojson of the map by id
 router.get(
     "/mapgeojson/:id",
     auth.verify,
-    mapMetadataSchemaController.getMapJsonById
+    mapMetadataSchemaController.getGeoJsonById
 )
 
 //Handles gettings the field datas of a map.
@@ -86,5 +86,17 @@ router.post(
 router.post("/likemap", auth.verify, mapMetadataSchemaController.likeMap)
 
 router.post("/dislikemap", auth.verify, mapMetadataSchemaController.dislikeMap)
+
+router.post(
+    "/postcomment",
+    auth.verify,
+    mapMetadataSchemaController.postComment
+)
+
+router.post(
+    "/likecomment",
+    auth.verify,
+    mapMetadataSchemaController.likeComment
+)
 
 module.exports = router
