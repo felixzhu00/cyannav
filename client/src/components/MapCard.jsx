@@ -6,14 +6,14 @@ import mapSample from '../assets/map_sample.jpg';
 import { GlobalStoreContext } from '../store'
 import AuthContext from '../auth'
 
-export default function MapCard() {
+export default function MapCard({ map }) {
     const { store } = useContext(GlobalStoreContext);
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
     const [isEditing, setIsEditing] = useState(false);
-    const [newName, setNewName] = useState("NAME OF MAP");
+    const [newName, setNewName] = useState(map.title || "Unnamed Map");
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -108,7 +108,7 @@ export default function MapCard() {
                     </Menu>
                 </Box>
                 <Typography id="createdByUser" variant="body2" color="text.secondary">
-                    By (OWNER)
+                    By {map.user} {/* Replace with actual map owner's name */}
                 </Typography>
             </CardContent>
         </Card>

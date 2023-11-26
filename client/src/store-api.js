@@ -41,8 +41,8 @@ const handleError = (error) => {
 // Map-related functions
 export const getMapById = (id) =>
     api.get(`/api/map${id}`).then(handleResponse).catch(handleError)
-export const getUserMaps = (userId) =>
-    api.get(`/api/user${userId}`).then(handleResponse).catch(handleError)
+export const getUserMaps = (id) =>
+    api.get(`/api/mapbyuser/${id}`).then(handleResponse).catch(handleError)
 export const getAllMaps = () =>
     api.get("/api/allmap").then(handleResponse).catch(handleError)
 export const getMapJsonbyId = (id) =>

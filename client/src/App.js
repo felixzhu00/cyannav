@@ -1,6 +1,5 @@
 import './App.css';
 import APITester from './components/APITester.jsx';
-import Map from './components/Map.jsx'
 import AppBanner from './components/AppBanner.jsx'
 import LoginScreen from './components/LoginScreen.jsx'
 import RegisterScreen from './components/RegisterScreen.jsx'
@@ -22,9 +21,11 @@ import MUIAddTagModal from './components/modals/MUIAddTagModal.jsx';
 import AppBannerwithRouter from './components/AppBanner.jsx';
 import BrowsePage from './components/BrowsePage.jsx';
 import MapViewingPage from './components/MapViewingPage.jsx';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 import { GlobalStoreContextProvider } from './store'
 import { AuthContextProvider } from './auth';
+import AuthContext from './auth'
+
 
 
 // Define your color palette
@@ -78,7 +79,7 @@ const theme = createTheme({
 });
 
 const App = () => {
-
+  const auth = useContext(AuthContext);
   const [guest, setGuest] = useState(true);
 
   useEffect(() => {

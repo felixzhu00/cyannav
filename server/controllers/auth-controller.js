@@ -31,6 +31,7 @@ loggedIn = async (req, res) => {
                 username: loggedInUser.username,
                 email: loggedInUser.email,
                 picture: null, // TODO: figure out profile picture
+                userId: userId
             },
         })
     } catch (err) {
