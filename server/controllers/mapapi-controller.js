@@ -31,18 +31,17 @@ getMapById = async (req, res) => {
 
 getUserMaps = async (req, res) => {
     try {
-        const { id } = req.body
-
+        const id = req.params.id
         if (!id) {
             return res.status(400).end()
         }
 
         var userMaps
-        if (res.locals.userId === userId) {
+        if (res.locals.userId === id) { // get all my maps
             userMaps = await MapMetadata.find({ user: id })
         } else {
-            userMaps = await MapMetadata.find({
-                user: userId,
+            userMaps = await MapMetadata.find({ // search by user id
+                user: id,
                 published: true,
             })
         }

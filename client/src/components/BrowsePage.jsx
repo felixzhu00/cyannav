@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Typography, Grid, Box, InputBase, Menu, MenuItem, Paper, InputAdornment, Button, IconButton, ListItemIcon, FormControl, Select, Fab } from '@mui/material';
 import { Search, KeyboardArrowDown, Home, Store, Add } from '@mui/icons-material';
 import Pagination from '@mui/material/Pagination';
@@ -7,10 +7,12 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import MapCard from './MapCard.jsx'
 import { GlobalStoreContext } from '../store'
 import CssBaseline from '@mui/material/CssBaseline';
+import AuthContext from "../auth.js";
 
 
 function BrowsePage() {
   const { store } = useContext(GlobalStoreContext);
+  const { auth } = useContext(AuthContext);
   const theme = useTheme();
   const isMediumOrSmaller = useMediaQuery(theme.breakpoints.down('md'));
   const [anchorElSort, setAnchorElSort] = useState(null);
@@ -33,6 +35,12 @@ function BrowsePage() {
   const lastMapIndex = firstMapIndex + mapsPerPage;
   const mapCardsToShow = Array.from({ length: mapsPerPage }, (_, index) => index + firstMapIndex).filter(index => index < totalMaps);
 
+  useEffect(() => {
+    if (auth.user != null) {
+      store.getMyMapCollection(auth.user.userId);
+    }
+
+  }, [auth.user]);
 
   const handleChangePage = (event, value) => {
     setCurrentPage(value);
@@ -57,7 +65,6 @@ function BrowsePage() {
 
   const handleCreateMapModal = () => {
     store.setCurrentModal("CreateMapModal")
-
   }
 
   const searchAndSort = () => (
@@ -148,9 +155,9 @@ function BrowsePage() {
       <Button id="createMapOuterBtn" onClick={handleCreateMapModal} variant="contained" aria-label="add" sx={{ position: 'absolute', top: 85, right: 20 }}>Import Map</Button>
 
       <Grid container spacing={2} sx={{ mt: 2 }}>
-        {mapCardsToShow.map((index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
-            <MapCard />
+        {store.currentMyMapCollection && store.currentMyMapCollection.map((map, index) => (
+          <Grid item xs={12} sm={6} md={3} key={map._id}>
+            <MapCard map={map} />
           </Grid>
         ))}
       </Grid>

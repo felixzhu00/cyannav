@@ -12,7 +12,6 @@ import { useTheme } from '@emotion/react';
 import { GlobalStoreContext } from '../../store'
 import { useContext } from 'react';
 
-
 const style = {
     position: 'absolute',
     top: '50%',
@@ -55,7 +54,6 @@ export default function MUICreateMapModal(props) {
     const handleCreateMap = () => { // calls store function
         console.log(title, fileType, template, files)
         store.createMap(title, fileType, template, files);
-
         // closes modal
         setOpen(false)
         props.onClose()

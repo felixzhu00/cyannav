@@ -1,5 +1,5 @@
 //temp global store
-import { createContext, useState } from 'react';
+import { createContext, useState, useContext } from 'react';
 import MUIAddFieldModal from './components/modals/MUIAddFieldModal';
 import MUIAddTagModal from './components/modals/MUIAddTagModal';
 import MUIChangeEmailModal from './components/modals/MUIChangeEmailModal';
@@ -12,6 +12,7 @@ import MUIDeleteAccountModal from './components/modals/MUIDeleteAccountModal';
 import MUIDeleteMapModal from './components/modals/MUIDeleteMapModal';
 import MUIExportMapModal from './components/modals/MUIExportMapModal';
 import MUIPublishMapModal from './components/modals/MUIPublishMapModal';
+import AuthContext from './auth'
 import api from './store-api'
 
 const geobuf = require('geobuf')
@@ -26,6 +27,8 @@ export const GlobalStoreActionType = {
 };
 
 function GlobalStoreContextProvider(props) {
+    const { auth } = useContext(AuthContext);
+
     const [store, setStore] = useState({
         //access global state
         togglebrowseHome: true, //Nav Icon at home
@@ -34,21 +37,22 @@ function GlobalStoreContextProvider(props) {
         currentMap: null,
         mapNameActive: false,
 
-        currentMapCollection: null, // What to display on mymap and browsepage
+        currentMyMapCollection: null, // What to display on mymap and browsepage
+        currentMarketplaceCollection: null,
         currentModal: null,
     });
 
 
 
     //Nav Global Handlers
-    store.toggleBrowsePage = function (option) {
+    store.toggleBrowsePage = async (option) => {
         return setStore({
             ...store,
             togglebrowseHome: option == "home" ? true : false
         });
     }
 
-    store.createMap = async function (title, fileType, mapTemplate, files) {
+    store.createMap = async (title, fileType, mapTemplate, files) => {
         console.log(files);
         var buffer = geobuf.encode(files, new Pbf());
         console.log(buffer);
@@ -56,6 +60,14 @@ function GlobalStoreContextProvider(props) {
         const response = await api.createNewMap(title, mapTemplate, buffer);
     }
 
+    store.getMyMapCollection = async (userId) => {
+        const response = await api.getUserMaps(userId);
+        return setStore({
+            ...store,
+            currentMyMapCollection: response.data.userMaps
+        });
+        console.log(response);
+    }
     //Browse Global Handlers
 
 
