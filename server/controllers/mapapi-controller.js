@@ -177,11 +177,51 @@ createNewMap = async (req, res) => {
 }
 
 createDuplicateMapById = async (req, res) => {
-    // TODO: (later)
-    // needs to create a new geojson object
-    // and a new fieldsdata object
-    // Then duplicate
-    return
+    try {
+        const { id } = req.body
+
+        if (!id) {
+            return res.status(400).end()
+        }
+
+        const srcMap = Map.findById(id)
+        if (!srcMap) {
+            return res.status(404).end()
+        }
+        if (srcMap.user !== res.locals.userId) {
+            return res.status(401).end()
+        }
+
+        // TODO: (collaborate) deal with collabotor permissions later
+
+        var newMapTitle
+        for (let i = 0; i < 9999; i++) {
+            // hard-cap... our app will probably break before this much attempts.
+            newMapTitle = `${srcMap.title} (${i})`
+            let mapExist = await Map.find({
+                title: newMapTitle,
+                user: res.locals.userId,
+            })
+            if (!mapExist) {
+                break
+            }
+        }
+
+        // TODO: (later) Current both maps point towards the same geojson and fielddata, to be implemented after fielddata is implemented.
+        delete srcMap._id
+        srcMap.title = newMapTitle
+
+        const newMap = new Map(srcMap)
+        const saved = await newMap.save()
+
+        if (!saved) {
+            return res.status(500).end()
+        }
+    } catch (err) {
+        console.error("mapapi-controller::createDuplicatedMapById")
+        console.error(err)
+        return res.status(500).end()
+    }
 }
 
 createForkMapById = async (req, res) => {
