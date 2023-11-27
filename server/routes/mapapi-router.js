@@ -43,7 +43,7 @@ router.post("/newmap", auth.verify, mapMetadataSchemaController.createNewMap)
 
 //Handles duplicating a map (by ID) request
 router.post(
-    "/duplicatemap/:id",
+    "/duplicatemap",
     auth.verify,
     mapMetadataSchemaController.createDuplicateMapById
 )
