@@ -61,6 +61,7 @@ function GlobalStoreContextProvider(props) {
 
     store.getMyMapCollection = async (userId) => {
         const response = await api.getUserMaps(userId);
+
         return setStore({
             ...store,
             currentMyMapCollection: response.data.userMaps
