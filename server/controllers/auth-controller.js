@@ -103,12 +103,21 @@ login = async (req, res) => {
 register = async (req, res) => {
     try {
         const { email, username, password, passwordVerify } = req.body
+        console.log(req.body);
+        if (!email || !username || !password || !passwordVerify) {
+            console.log("HERE");
+            return res.status(400).json({
+                loggedIn: false,
+                user: null,
+                errorMessage: "Required fields empty.",
+            })
+        }
 
         if (password != passwordVerify) {
             return res.status(401).json({
                 loggedIn: false,
                 user: null,
-                // errorMessage: "Passwords does not match",
+                errorMessage: "Passwords does not match",
             })
         }
 
@@ -121,7 +130,7 @@ register = async (req, res) => {
             return res.status(401).json({
                 loggedIn: false,
                 user: null,
-                // errorMessage: "Password fails security requirement.",
+                errorMessage: "Password fails security requirement.",
             })
         }
 
@@ -131,7 +140,7 @@ register = async (req, res) => {
             return res.status(401).json({
                 loggedIn: false,
                 user: null,
-                // errorMessage: "Email is already in use.",
+                errorMessage: "Email is already in use.",
             })
         }
 
@@ -141,7 +150,7 @@ register = async (req, res) => {
             return res.status(401).json({
                 loggedIn: false,
                 user: null,
-                // errorMessage: "Username is already taken.",
+                errorMessage: "Username is already taken.",
             })
         }
 
