@@ -228,6 +228,7 @@ createDuplicateMapById = async (req, res) => {
         if (!saved) {
             return res.status(500).end()
         }
+        return res.status(200).end()
     } catch (err) {
         console.error("mapapi-controller::createDuplicatedMapById")
         console.error(err)
@@ -279,6 +280,7 @@ createForkMapById = async (req, res) => {
         if (!saved) {
             return res.status(500).end()
         }
+        return res.status(200).end()
     } catch (err) {
         console.error("mapapi-controller::createForkMapById")
         console.error(err)
