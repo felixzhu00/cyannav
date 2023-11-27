@@ -1,6 +1,6 @@
 describe('app banner specs', () => {
     before(() => {
-        cy.registerUser("autotest4", "autotest4", "11223344&&", "11223344&&")
+        cy.registerUser("autotest5", "autotest5", "11223344&&", "11223344&&")
         cy.wait(2000)
         cy.get("#settingsDropdown").click()
         cy.get("#settingsDropdownOption").first().click()
@@ -8,7 +8,7 @@ describe('app banner specs', () => {
     })
 
     beforeEach(() => {
-        cy.signInUser("autotest4", "11223344&&")
+        cy.signInUser("autotest5", "11223344&&")
     })
   
     it('should have /browsepage in the url', () => {
