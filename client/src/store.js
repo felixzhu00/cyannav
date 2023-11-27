@@ -108,6 +108,7 @@ function GlobalStoreContextProvider(props) {
 
     store.deleteMap = async (mapId) => {
         console.log("6")
+        console.log(mapId);
         const response = await api.deleteMapById(mapId);
         console.log(response)
         if (response.success) {
@@ -153,7 +154,7 @@ function GlobalStoreContextProvider(props) {
         if (response.success) {
             // Update the map name in the currentMyMapCollection state
             // Assuming each map object has an id and a name
-            const updatedCollection = store.currentMyMapCollection.map(map => {
+            const updatedCollection = store.mapCollection.map(map => {
                 if (map.id === mapId) {
                     return { ...map, name: newName };
                 }
@@ -161,7 +162,7 @@ function GlobalStoreContextProvider(props) {
             });
             setStore({
                 ...store,
-                currentMyMapCollection: updatedCollection,
+                mapCollection: updatedCollection,
             });
         }
     }
@@ -251,11 +252,12 @@ function GlobalStoreContextProvider(props) {
     };
 
 
-    store.setCurrentModal = (option) => {
+    store.setCurrentModal = (option, id) => {
         console.log("11", option)
         return setStore({
             ...store,
             currentModal: option,
+            currentModalMapId: id,
         });
     }
 
@@ -265,6 +267,7 @@ function GlobalStoreContextProvider(props) {
             currentMap: id
         })
     }
+
 
 
     return (

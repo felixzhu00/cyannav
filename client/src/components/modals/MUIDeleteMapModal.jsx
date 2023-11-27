@@ -22,7 +22,7 @@ const style = {
     p: 4,
 };
 
-export default function MUIDeleteAccountModal(props) {
+export default function MUIDeleteMapModal(props) {
     const theme = useTheme();
     const { store } = useContext(GlobalStoreContext);
 
