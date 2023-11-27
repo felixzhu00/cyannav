@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 import { useTheme } from '@emotion/react';
 import { GlobalStoreContext } from '../../store'
 import { useContext } from 'react';
-
+import AuthContext from "../../auth.js";
 const style = {
     position: 'absolute',
     top: '50%',
@@ -26,6 +26,7 @@ const style = {
 
 export default function MUICreateMapModal(props) {
     const { store } = useContext(GlobalStoreContext);
+    const { auth } = useContext(AuthContext);
     const theme = useTheme();
 
     const [open, setOpen] = React.useState(props.open);
@@ -51,12 +52,14 @@ export default function MUICreateMapModal(props) {
         setFiles(files);
     };
 
-    const handleCreateMap = () => { // calls store function
+    const handleCreateMap = async () => { // calls store function
         console.log(title, fileType, template, files)
-        store.createMap(title, fileType, template, files);
+        await store.createMap(title, fileType, template, files);
+        
         // closes modal
         setOpen(false)
         props.onClose()
+        await store.getMyMapCollection(auth.user.userId);
     }
 
     return (

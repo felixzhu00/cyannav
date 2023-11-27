@@ -43,6 +43,7 @@ function GlobalStoreContextProvider(props) {
 
     //Nav Global Handlers
     store.toggleBrowsePage = async (option) => {
+        console.log("1")
         return setStore({
             ...store,
             togglebrowseHome: option == "home" ? true : false
@@ -50,24 +51,28 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.createMap = async (title, fileType, mapTemplate, files) => {
+        console.log("2")
         var buffer = geobuf.encode(files, new Pbf())
 
-        const response = await api.createNewMap(title, mapTemplate, buffer);
+        return await api.createNewMap(title, mapTemplate, buffer);
     }
 
     store.getMyMapCollection = async (userId) => {
+        console.log("3")
         const response = await api.getUserMaps(userId)
 
-        console.log(response.data.userMaps)
-        setStore({
-            ...store,
+        console.log(store)
+
+        setStore(prevStore => ({
+            ...prevStore,
             mapCollection: response.data.userMaps,
-        })
+        }));
 
         return response.data.userMaps
     }
 
     store.getMarketplaceCollection = async (userId) => {
+        console.log("4")
         const response = await api.getAllMaps()
 
         setStore({
@@ -79,6 +84,7 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.renameMap = async (mapId, newName) => {
+        console.log("5")
         // Call to backend API to update the map name
         console.log(mapId, newName);
         const response = await api.updateMapNameById(mapId, newName);
@@ -101,6 +107,7 @@ function GlobalStoreContextProvider(props) {
     }    //Browse Global Handlers
 
     store.deleteMap = async (mapId) => {
+        console.log("6")
         const response = await api.deleteMapById(mapId);
         console.log(response)
         if (response.success) {
@@ -120,6 +127,7 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.duplicateMap = async (mapId) => {
+        console.log("7")
         console.log(mapId);
         const response = await api.createDuplicateMapById(mapId);
         console.log(response)
@@ -140,6 +148,7 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.publishMap = async (mapId) => {
+        console.log("8")
         const response = await api.updateMapPublishStatus(mapId);
         if (response.success) {
             // Update the map name in the currentMyMapCollection state
@@ -171,6 +180,7 @@ function GlobalStoreContextProvider(props) {
 
     //Map Card Global Handlers
     store.searchForMapBy = async (filter, string) => {
+        console.log("9")
         const response = await store.getMyMapCollection(auth.user.userId);
 
 
@@ -200,6 +210,7 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.sortMapBy = async (key, order) => {
+        console.log("10")
         //key: 'alphabetical-order' or 'recent'
         //order: 'asc' for ascending, 'dec' for decending
         const sortedArray = [...store.mapCollection]
@@ -240,11 +251,11 @@ function GlobalStoreContextProvider(props) {
     };
 
 
-    store.setCurrentModal = (option, id) => {
+    store.setCurrentModal = (option) => {
+        console.log("11", option)
         return setStore({
             ...store,
             currentModal: option,
-            currentModalMapId: id
         });
     }
 
