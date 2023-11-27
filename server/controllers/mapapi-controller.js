@@ -199,12 +199,11 @@ createNewMap = async (req, res) => {
 createDuplicateMapById = async (req, res) => {
     try {
         const { id } = req.body
-
         if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
-        const srcMap = MapMetadata.findById(id)
+        const srcMap = await MapMetadata.findById(id)
         if (!srcMap) {
             return res.status(404).end()
         }
@@ -218,23 +217,24 @@ createDuplicateMapById = async (req, res) => {
         for (let i = 1; i < 9999; i++) {
             // hard-cap... our app will probably break before this much attempts.
             newMapTitle = `${srcMap.title} (${i})`
-            let mapExist = await MapMetadata.find({
+            let mapExist = await MapMetadata.countDocuments({
                 title: newMapTitle,
                 user: res.locals.userId,
             })
-            if (!mapExist) {
+            if (mapExist == 0) {
                 break
             }
         }
 
         // TODO: (later) Current both maps point towards the same GeoJsonSchema and fielddata, to be implemented after fielddata is implemented.
-        delete srcMap._id
-        srcMap.title = newMapTitle
-        srcMap.commentsId = []
-        srcMap.like = []
-        srcMap.dislike = []
+        let x = srcMap.toObject();
+        delete x._id
+        x.title = newMapTitle
+        x.commentsId = []
+        x.like = []
+        x.dislike = []
 
-        const newMap = new Map(srcMap)
+        const newMap = new MapMetadata(x)
         const saved = await newMap.save()
 
         if (!saved) {
@@ -333,7 +333,8 @@ deleteMapById = async (req, res) => {
 updateMapNameById = async (req, res) => {
     try {
         const { id, title } = req.body
-
+        console.log(id);
+        console.log(title);
         if (!id || !ObjectId.isValid(id) || !title) {
             return res.status(400).end()
         }
