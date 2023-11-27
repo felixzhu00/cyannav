@@ -45,7 +45,7 @@ export default function MapCard({ map }) {
                 store.setCurrentModal("AddTagModal")
                 break;
             case "publish":
-                store.setCurrentModal("PublishMapModal")
+                store.setCurrentModal("PublishMapModal", map._id)
                 break;
             case "duplicate":
                 store.duplicateMap(map._id);

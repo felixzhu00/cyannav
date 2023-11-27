@@ -365,7 +365,8 @@ updateMapNameById = async (req, res) => {
 
 updateMapPublishStatus = async (req, res) => {
     try {
-        const id = req.params.id
+        const { id } = req.body
+        console.log(id);
 
         if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
