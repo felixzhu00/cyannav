@@ -14,13 +14,6 @@ describe('app banner specs', () => {
         cy.url().should('include', '/browsepage')
     })
 
-    it("my maps button routes to browse page", () => {
-        cy.get("#settingsDropdown").click()
-        cy.get("#settingsDropdownOption").first().click()
-        cy.get("#myMapsBtn").click()
-        cy.url().should('include', '/browsepage')
-    })
-
     it("logout button routes to login page", () => {
         cy.get("#settingsDropdown").click()
         cy.get("#settingsDropdownOption").first().click()

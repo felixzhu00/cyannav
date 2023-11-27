@@ -44,10 +44,10 @@ describe("mapgeojson/:id", () => {
         const res = await request(app).get("/api/mapgeojson/:id").send({})
         expect(res.statusCode).toEqual(400)
     })
-    // it('returns code 500 if no map matches id given', async () => {
-    //     const res = await request(app).get('/api/mapjson/:id').send({id: 100298});
-    //     expect(res.statusCode).toEqual(500);
-    // });
+    it('returns code 400 if no map matches id given', async () => {
+        const res = await request(app).get('/api/mapgeojson/:id').send({id: "100298"});
+        expect(res.statusCode).toEqual(400);
+    });
     //write test for if id is associated with map
 })
 
@@ -68,10 +68,10 @@ describe("newMap", () => {
             .send({ title: "US states", type: "map", json: " " })
         expect(res.statusCode).toEqual(400)
     })
-    // it('returns code 500 since json is empty string', async () => {
-    //     const res = await request(app).post('/api/newmap').send({ title: "US states", type: "heatmap", json: " " });
-    //     expect(res.statusCode).toEqual(500);
-    // });
+    it('returns code 400 since json is empty string', async () => {
+        const res = await request(app).post('/api/newmap').send({ title: "US states", type: "heatmap", json: " " });
+        expect(res.statusCode).toEqual(400);
+    });
 })
 
 describe("duplicatemap", () => {
@@ -103,10 +103,10 @@ describe("deletemap/:id", () => {
         const res = await request(app).delete("/api/deletemap/:id").send({})
         expect(res.statusCode).toEqual(400)
     })
-    // it('returns code 500 if no map matches the id sent', async () => {
-    //     const res = await request(app).delete('/api/deletemap/:id').send({id: 100629});
-    //     expect(res.statusCode).toEqual(500);
-    // });
+    it('returns code 400 if no map matches the id sent', async () => {
+        const res = await request(app).delete('/api/deletemap/:id').send({id: 100629});
+        expect(res.statusCode).toEqual(400);
+    });
 })
 
 describe("loggedIn", () => {
@@ -129,10 +129,10 @@ describe("login", () => {
             .send({ password: "password" })
         expect(res.statusCode).toEqual(400)
     })
-    // it('returns 401 if no user associated with email and password', async () => {
-    //     const res = await request(app).post('/auth/login').send({email: "hi@hello.com", password: "password"});
-    //     expect(res.statusCode).toEqual(401);
-    // });
+    it('returns 401 if no user associated with email and password', async () => {
+        const res = await request(app).post('/auth/login').send({email: "hi@hello.com", password: "password"});
+        expect(res.statusCode).toEqual(401);
+    });
 })
 
 describe("logout", () => {
@@ -155,35 +155,35 @@ describe("register", () => {
             .send({ password: "hi", passwordVerify: "hi" })
         expect(res.statusCode).toEqual(401)
     })
-    // it('returns ??? ', async () => {
-    //     const res = await request(app).post('/auth/register').send({
-    //         username: "john",
-    //         email: "hello@hi.com",
-    //         password: "password123$$$",
-    //         passwordVerify: "password123$$$"
-    //     });
-    //     expect(res.statusCode).toEqual(500);
-    // });
+    it('returns 401', async () => {
+        const res = await request(app).post('/auth/register').send({
+            username: "john",
+            email: "hello@hi.com",
+            password: "password123$$$",
+            passwordVerify: "password123$$$"
+        });
+        expect(res.statusCode).toEqual(401);
+    });
 })
 
 // describe('reset', () => {
 //     it('returns 400 if no id', async () => {
-//         const res = await request(app).get('/auth/reset').send({});
+//         const res = await request(app).post('/auth/reset').send({});
 //         expect(res.statusCode).toEqual(400);
 //     });
 //     it('returns 404 if id does not match map', async () => {
-//         const res = await request(app).get('/auth/reset').send({id: 0});
+//         const res = await request(app).post('/auth/reset').send({id: 0});
 //         expect(res.statusCode).toEqual(404);
 //     });
 // });
 
 // describe('verifyCode', () => {
 //     it('returns 400 if no id', async () => {
-//         const res = await request(app).get('/auth/verifyCode').send({});
+//         const res = await request(app).post('/auth/verifyCode').send({});
 //         expect(res.statusCode).toEqual(400);
 //     });
 //     it('returns 404 if id does not match map', async () => {
-//         const res = await request(app).get('/auth/verifyCode').send({id: 0});
+//         const res = await request(app).post('/auth/verifyCode').send({id: "168943"});
 //         expect(res.statusCode).toEqual(404);
 //     });
 // });
@@ -221,45 +221,45 @@ describe("deleteAccount", () => {
     })
 })
 
-// describe('updatePass', () => {
-//     it('returns 400 if no id', async () => {
-//         const res = await request(app).get('/auth/updatePass').send({});
-//         expect(res.statusCode).toEqual(400);
-//     });
-//     it('returns 404 if id does not match map', async () => {
-//         const res = await request(app).get('/auth/updatePass').send({id: 0});
-//         expect(res.statusCode).toEqual(404);
-//     });
-// });
+describe('updatePass', () => {
+    it('returns 400 if no id', async () => {
+        const res = await request(app).post('/auth/updatePass').send({});
+        expect(res.statusCode).toEqual(400);
+    });
+    it('returns 400 if id does not match map', async () => {
+        const res = await request(app).post('/auth/updatePass').send({id: 0});
+        expect(res.statusCode).toEqual(400);
+    });
+});
 
-// describe('mapname', () => {
-//     it('returns code 201 if map added to db, otherwise 404', async () => {
-//         const res = await request(app).post('/api/mapname').send({ type: "map" });
+describe('mapname', () => {
+    it('returns code 400 since no id is being passed', async () => {
+        const res = await request(app).post('/api/mapname').send({ type: "map" });
+        expect(res.statusCode).toEqual(400);
+        //add more tests sending different info to the endpoint
+    });
+});
 
-//         expect(res.statusCode).toEqual(404);
-//     });
-// });
+describe('maptag', () => {
+    it('returns code 201 if map added to db, otherwise 404', async () => {
+        const res = await request(app).post('/api/maptag').send({ type: "map" });
 
-// describe('maptag', () => {
-//     it('returns code 201 if map added to db, otherwise 404', async () => {
-//         const res = await request(app).post('/api/maptag').send({ type: "map" });
+        expect(res.statusCode).toEqual(404);
+    });
+});
 
-//         expect(res.statusCode).toEqual(404);
-//     });
-// });
+describe('mapstatus', () => {
+    it('returns code 201 if map added to db, otherwise 404', async () => {
+        const res = await request(app).post('/api/mapstatus').send({ type: "map" });
 
-// describe('mapstatus', () => {
-//     it('returns code 201 if map added to db, otherwise 404', async () => {
-//         const res = await request(app).post('/api/mapstatus').send({ type: "map" });
+        expect(res.statusCode).toEqual(404);
+    });
+});
 
-//         expect(res.statusCode).toEqual(404);
-//     });
-// });
+describe('mapjson', () => {
+    it('returns code 201 if map added to db, otherwise 404', async () => {
+        const res = await request(app).post('/api/mapjson').send({ type: "map" });
 
-// describe('mapjson', () => {
-//     it('returns code 201 if map added to db, otherwise 404', async () => {
-//         const res = await request(app).post('/api/mapjson').send({ type: "map" });
-
-//         expect(res.statusCode).toEqual(404);
-//     });
-// });
+        expect(res.statusCode).toEqual(404);
+    });
+});
