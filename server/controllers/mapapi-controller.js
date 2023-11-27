@@ -44,7 +44,10 @@ getUserMaps = async (req, res) => {
         var userMaps
         if (res.locals.userId === id) {
             // get all my maps
-            userMaps = await MapMetadata.find({ user: id })
+            userMaps = await MapMetadata.find({ user: id }).populate(
+                "user",
+                "username -_id"
+            )
         } else {
             userMaps = await MapMetadata.find({
                 // search by user id
