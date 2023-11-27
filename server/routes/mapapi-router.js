@@ -63,8 +63,8 @@ router.delete(
 )
 
 //Handles updating the name of a map (by ID) request
-router.put(
-    "/mapname/:id",
+router.post(
+    "/mapname",
     auth.verify,
     mapMetadataSchemaController.updateMapNameById
 )

@@ -320,8 +320,7 @@ deleteMapById = async (req, res) => {
 
 updateMapNameById = async (req, res) => {
     try {
-        const id = req.params.id
-        const title = req.body.name
+        const { id, title } = req.body
 
         if (!id || !title) {
             return res.status(400).end()
