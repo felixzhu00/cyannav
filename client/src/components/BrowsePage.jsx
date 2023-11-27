@@ -58,6 +58,17 @@ function BrowsePage() {
   }, [sortBy, store.mapCollection]);
   
 
+  useEffect(() => {
+    console.log("something happened")
+    if (auth.user != null) {
+      if (store.togglebrowseHome) {
+        store.getMyMapCollection(auth.user.userId);
+      }else{
+        store.getMarketplaceCollection();
+      }
+    }
+  }, [store.togglebrowseHome]);
+
   // // Runs when there is a change in mapCollection
   // useEffect(() => {
   //   if (store.mapCollection != null) {

@@ -67,6 +67,17 @@ function GlobalStoreContextProvider(props) {
         return response.data.userMaps
     }
 
+    store.getMarketplaceCollection = async (userId) => {
+        const response = await api.getAllMaps()
+
+        setStore({
+            ...store,
+            mapCollection: response.data.publishedMaps
+        })
+        return response.data.publishedMaps
+
+    }
+
     store.renameMap = async (mapId, newName) => {
         // Call to backend API to update the map name
         console.log(mapId, newName)
