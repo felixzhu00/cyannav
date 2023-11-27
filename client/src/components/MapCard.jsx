@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Box, Card, CardMedia, CardContent, Typography, IconButton, Menu, MenuItem, useMediaQuery, useTheme, TextField } from '@mui/material';
 import { MoreVert, Publish } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
@@ -14,7 +14,12 @@ export default function MapCard({ map }) {
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
     const [isEditing, setIsEditing] = useState(false);
     const [newName, setNewName] = useState(map.title[0] || "Unnamed Map");
-    const [isPublished, setIsPublished] = useState(false);
+    const [isPublished, setIsPublished] = useState(map.published);
+
+    // useEffect(() => {
+    //     setIsPublished(map.published);
+    // }, [map.published]);
+
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -69,17 +74,21 @@ export default function MapCard({ map }) {
         setAnchorEl(null);
     }
 
+    const handleNavToMap = () => {
+        store.setCurrentMap(map)
+    }
+
     return (
         <Card sx={{ maxWidth: isSmallScreen ? 300 : 'relative' }}>
             <Box sx={{ position: 'relative' }}>
-                <Link id="mapImage" to="/mapview" style={{ textDecoration: 'none' }}>
+                <Link id="mapImage" to="/mapview" onClick={handleNavToMap} style={{ textDecoration: 'none' }}>
                     <CardMedia
                         sx={{ height: 300, cursor: 'pointer' }}
                         image={mapSample}
                         title="mapImage"
                     />
                 </Link>
-                {true && (
+                {isPublished && (
                     <Publish sx={{
                         position: 'absolute',
                         top: '10px',
@@ -128,8 +137,8 @@ export default function MapCard({ map }) {
                         onClose={handleClose}
                     >
                         {/* <MenuItem onClick={() => { handleKebab("rename") }}>Rename</MenuItem> */}
-                        <MenuItem onClick={() => { handleKebab("addTag") }}>Add Tag</MenuItem>
-                        <MenuItem onClick={() => { handleKebab("publish") }}>Publish</MenuItem>
+                        <MenuItem disabled={isPublished} onClick={() => { handleKebab("addTag") }}>Add Tag</MenuItem>
+                        <MenuItem disabled={isPublished} onClick={() => { handleKebab("publish") }}>Publish</MenuItem>
                         <MenuItem onClick={() => { handleKebab("duplicate") }}>Duplicate</MenuItem>
                         <MenuItem onClick={() => { handleKebab("fork") }}>Fork</MenuItem>
                         <MenuItem onClick={() => { handleKebab("delete") }}>Delete</MenuItem>

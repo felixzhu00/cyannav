@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { MapContainer, GeoJSON } from "react-leaflet";
 import 'leaflet/dist/leaflet.css';
 import sha256 from 'crypto-js/sha256';
@@ -11,10 +11,11 @@ import MUIAddFieldModal from './modals/MUIAddFieldModal'
 import MUICommentModal from './modals/MUICommentModal'
 
 import hardcodegeojson from '../assets/South Korea.geo.json'
+import { GlobalStoreContext } from '../store'
 
 function MapViewingPage() {
     const theme = useTheme(); // Use the theme
-
+    const { store } = useContext(GlobalStoreContext);
     const [value, setValue] = useState('1');
     const [fields, setFields] = useState([
         { id: 1, text: 'Temperature', value: '' },
@@ -58,8 +59,7 @@ function MapViewingPage() {
     const [dislikes, setDislikes] = useState(0);
     const [hasLiked, setHasLiked] = useState(false);
     const [hasDisliked, setHasDisliked] = useState(false);
-
-
+    const [isPublished, setIsPublished] = useState(store.currentMap.published);
     /**
      * Handler functions
      */
@@ -166,19 +166,19 @@ function MapViewingPage() {
                     <Button variant="contained" onClick={handleExport} sx={{ width: '100px', marginRight: '10px', backgroundColor: theme.palette.secondary.main, color: 'black' }}>
                         Export
                     </Button>
-                    <Button variant="contained" onClick={handlePublish} sx={{ width: '100px', backgroundColor: theme.palette.secondary.main, color: 'black' }}>
+                    <Button disabled={isPublished} variant="contained" onClick={handlePublish} sx={{ width: '100px', backgroundColor: theme.palette.secondary.main, color: 'black' }}>
                         Publish
                     </Button>
                 </Box>
 
                 {/* Right-aligned Icons with like/dislike counts */}
                 <Box display="flex" alignItems="center"> {/* Ensure flex layout for this Box */}
-                    <IconButton id="likeBtn" onClick={handleLike} sx={{ color: hasLiked ? 'black' : 'default' }}>
+                    <IconButton disabled={!isPublished} id="likeBtn" onClick={handleLike} sx={{ color: hasLiked ? 'black' : 'default' }}>
                         <ThumbUp />
                     </IconButton>
                     <Typography sx={{ mx: 1 }}>{likes}</Typography> {/* Added margin for spacing */}
 
-                    <IconButton id="dislikeBtn" onClick={handleDislike} sx={{ color: hasDisliked ? 'black' : 'default' }}>
+                    <IconButton disabled={!isPublished} id="dislikeBtn" onClick={handleDislike} sx={{ color: hasDisliked ? 'black' : 'default' }}>
                         <ThumbDown />
                     </IconButton>
                     <Typography sx={{ mx: 1 }}>{dislikes}</Typography> {/* Added margin for spacing */}
@@ -210,8 +210,8 @@ function MapViewingPage() {
                         variant="fullWidth"
                         aria-label="edit-comment-tab-bar"
                     >
-                        <Tab id="editTab" sx={{ '&.Mui-selected': { color: 'black' } }} onClick={handleEdit} value="1" label="Edit" />
-                        <Tab id="commentTab" sx={{ '&.Mui-selected': { color: 'black' } }} onClick={handleEdit} value="2" label="Comment" />
+                        <Tab disabled={isPublished} id="editTab" sx={{ '&.Mui-selected': { color: 'black' } }} onClick={handleEdit} value="1" label="Edit" />
+                        <Tab disabled={!isPublished} id="commentTab" sx={{ '&.Mui-selected': { color: 'black' } }} onClick={handleEdit} value="2" label="Comment" />
                     </Tabs>
                 </Box>
             </Box>
@@ -458,7 +458,6 @@ function MapViewingPage() {
             </Box>
         );
     };
-
     return (
         <Box
             sx={{

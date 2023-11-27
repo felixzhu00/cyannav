@@ -69,7 +69,10 @@ getUserMaps = async (req, res) => {
 
 getAllPublishedMaps = async (req, res) => {
     try {
-        const publishedMaps = await MapMetadata.find({ published: true })
+        const publishedMaps = await MapMetadata.find({ published: true }).populate(
+            "user",
+            "username -_id"
+        )
         return res.status(200).json({
             publishedMaps: publishedMaps,
         })
@@ -82,20 +85,21 @@ getAllPublishedMaps = async (req, res) => {
 
 getGeoJsonById = async (req, res) => {
     try {
-        const { id } = req.body
+        const id = req.params.id
 
         if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
-        const GeoJsonSchema = await GeoJsonSchema.findById(id)
+        const geojson = await GeoJsonSchema.findById(id)
 
-        if (!GeoJsonSchema) {
+        if (!geojson) {
             return res.status(404).end()
         }
 
+        console.log(geojson.geoBuf);
         return res.status(200).json({
-            geoBuf: GeoJsonSchema.buf, // TODO: (later) figure out geobuf
+            geoBuf: geojson.geoBuf, // TODO: (later) figure out geobuf
         })
     } catch (err) {
         console.error("mapapi-controller::getGeoJsonById")
@@ -233,6 +237,7 @@ createDuplicateMapById = async (req, res) => {
         x.commentsId = []
         x.like = []
         x.dislike = []
+        x.published = false
 
         const newMap = new MapMetadata(x)
         const saved = await newMap.save()
