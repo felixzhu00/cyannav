@@ -8,7 +8,7 @@ getMapById = async (req, res) => {
     try {
         const { id } = req.body
 
-        if (!id) {
+        if (!id || !Number(id)) {
             return res.status(400).end()
         }
 
@@ -37,7 +37,7 @@ getMapById = async (req, res) => {
 getUserMaps = async (req, res) => {
     try {
         const id = req.params.id
-        if (!id) {
+        if (!id || !Number(id)) {
             return res.status(400).end()
         }
 
@@ -80,6 +80,10 @@ getGeoJsonById = async (req, res) => {
     try {
         const { id } = req.body
 
+        if (!id || !Number(id)) {
+            return res.status(400).end()
+        }
+
         const GeoJsonSchema = await GeoJsonSchema.findById(id)
 
         if (!GeoJsonSchema) {
@@ -99,6 +103,10 @@ getGeoJsonById = async (req, res) => {
 getMapFieldsById = async (req, res) => {
     try {
         const { id } = req.body
+
+        if (!id || !Number(id)) {
+            return res.status(400).end()
+        }
 
         const mapFields = await MapFields.findById(id)
 
@@ -188,7 +196,7 @@ createDuplicateMapById = async (req, res) => {
     try {
         const { id } = req.body
 
-        if (!id) {
+        if (!id || !Number(id)) {
             return res.status(400).end()
         }
 
@@ -240,7 +248,7 @@ createForkMapById = async (req, res) => {
     try {
         const { id } = req.body
 
-        if (!id) {
+        if (!id || !Number(id)) {
             return res.status(400).end()
         }
 
@@ -292,7 +300,7 @@ deleteMapById = async (req, res) => {
     try {
         const id = req.params.id
 
-        if (!id) {
+        if (!id || !Number(id)) {
             return res.status(400).end()
         }
 
@@ -322,7 +330,7 @@ updateMapNameById = async (req, res) => {
     try {
         const { id, title } = req.body
 
-        if (!id || !title) {
+        if (!id || !Number(id) || !title) {
             return res.status(400).end()
         }
 
@@ -355,7 +363,7 @@ updateMapPublishStatus = async (req, res) => {
     try {
         const id = req.params.id
 
-        if (!id) {
+        if (!id || !Number(id)) {
             return res.status(400).end()
         }
 
