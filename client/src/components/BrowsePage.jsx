@@ -22,7 +22,7 @@ function BrowsePage() {
   //Search Sort options
   const [searchBy, setSearchBy] = useState('mapName'); // 'mapName' or 'username'
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('recent');
+  const [sortBy, setSortBy] = useState('');
 
 
   // PAGE STUFF
@@ -47,15 +47,20 @@ function BrowsePage() {
     }
   }, [auth.user]);
 
+  useEffect(() => {
+    if (store.mapCollection != null) {
+      setSearchTerm('');
+      setCurrentPage(1);
+    }
+  }, [store.togglebrowseHome]);
 
   // Sort functionality
   useEffect(() => {
-    console.log("hi runing")
     if (store.mapCollection != null) {
       store.sortMapBy(sortBy, 'asc');
     }
   }, [sortBy]);
-  
+
 
   useEffect(() => {
     if (auth.user != null) {
@@ -71,6 +76,9 @@ function BrowsePage() {
   useEffect(() => {
     if (store.mapCollection != null) {
       setTotalMaps(store.mapCollection.length)
+      if (sortBy == '') {
+        setSortBy('recent');
+      }
     }
   }, [store.mapCollection]);
 
@@ -99,6 +107,7 @@ function BrowsePage() {
   const handleCreateMapModal = async () => {
     await store.setCurrentModal("CreateMapModal")
   }
+
 
   //Search condition of pressing enter in search bar or search icon
   const handleSearch = async () => {
