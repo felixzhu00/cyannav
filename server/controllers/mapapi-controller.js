@@ -90,7 +90,7 @@ getGeoJsonById = async (req, res) => {
             geoBuf: GeoJsonSchema.buf, // TODO: (later) figure out geobuf
         })
     } catch (err) {
-        console.error("mapapi-controller::getGeoJsonSchemaById")
+        console.error("mapapi-controller::getGeoJsonById")
         console.error(err)
         return res.status(500).end()
     }
