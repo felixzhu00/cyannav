@@ -34,15 +34,13 @@ function BrowsePage() {
   // Calculate the range of MapCards for the current page
   const firstMapIndex = (currentPage - 1) * mapsPerPage;
   const lastMapIndex = firstMapIndex + mapsPerPage;
-  // const mapCardsToShow = Array.from({ length: mapsPerPage }, (_, index) => index + firstMapIndex).filter(index => index < totalMaps);
 
 
-  // Rerender the whole componenet when MapCollection is updated
-  useEffect(() => {
-    console.log("mapCollection change")
-  }, [store.mapCollection]);
+  // // Rerender the whole componenet when MapCollection is updated
+  // useEffect(() => {
+  // }, [store.mapCollection]);
+
   // Runs only when there is an user
-
   useEffect(() => {
     if (auth.user != null) {
       store.getMyMapCollection(auth.user.userId);
@@ -59,7 +57,6 @@ function BrowsePage() {
 
 
   useEffect(() => {
-    console.log("something happened")
     if (auth.user != null) {
       if (store.togglebrowseHome) {
         store.getMyMapCollection(auth.user.userId);
@@ -113,7 +110,6 @@ function BrowsePage() {
       await store.searchForMapBy(searchBy, searchTerm)
     }
   };
-
 
   const searchAndSort = () => (
     <Box sx={{
@@ -213,14 +209,29 @@ function BrowsePage() {
         }
       </Grid>
 
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-        <Pagination
-          count={numberOfPages}
-          page={currentPage}
-          onChange={handleChangePage}
-          color="primary"
-        />
-      </Box>
+      {totalMaps == 0 && (
+        <Box sx={{ pt: 10, flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+          {/* Main Welcome Message */}
+          <Typography variant="h3" sx={{ fontWeight: 'bold', color: 'primary.main', textAlign: 'center', mb: 2 }}>
+            👋🏼 Welcome to CyanNav!
+          </Typography>
+          {/* Secondary Message */}
+          <Typography variant="h6" sx={{ textAlign: 'center', color: 'secondary.main' }}>
+            Click on the Import Map button to start!
+          </Typography>
+        </Box>
+      )}
+
+      {totalMaps > 0 && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+          <Pagination
+            count={numberOfPages}
+            page={currentPage}
+            onChange={handleChangePage}
+            color="primary"
+          />
+        </Box>
+      )}
     </Box>
   );
 }
