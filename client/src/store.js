@@ -40,10 +40,7 @@ function GlobalStoreContextProvider(props) {
         currentMyMapCollection: null, // What to display on mymap and browsepage
         currentMarketplaceCollection: null,
         currentModal: null,
-        currentModalMapId: null
     });
-
-    console.log(store.currentModal);
 
 
     //Nav Global Handlers
@@ -131,6 +128,8 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
+    // store.publishMap = async
+
     //Map Card Global Handlers
 
 
@@ -150,12 +149,7 @@ function GlobalStoreContextProvider(props) {
         });
     }
 
-    // store.setCurrentModalMapId = (id) => {
-    //     return setStore({
-    //         ...store,
-    //         currentModalMapId: id
-    //     });
-    // }
+
     return (
         <GlobalStoreContext.Provider value={{ store }}>
             {store.currentModal === "AddFieldModal" && (

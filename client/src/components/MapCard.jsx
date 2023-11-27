@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { Box, Card, CardMedia, CardContent, Typography, IconButton, Menu, MenuItem, useMediaQuery, useTheme, TextField } from '@mui/material';
-import { MoreVert, StoreTwoTone } from '@mui/icons-material';
+import { MoreVert, Publish } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import mapSample from '../assets/map_sample.jpg';
 import { GlobalStoreContext } from '../store'
@@ -69,13 +69,24 @@ export default function MapCard({ map }) {
 
     return (
         <Card sx={{ maxWidth: isSmallScreen ? 300 : 'relative' }}>
-            <Link id="mapImage" to="/mapview" style={{ textDecoration: 'none' }}>
-                <CardMedia
-                    sx={{ height: 300, cursor: 'pointer' }}
-                    image={mapSample}
-                    title="mapImage"
-                />
-            </Link>
+            <Box sx={{ position: 'relative' }}>
+                <Link id="mapImage" to="/mapview" style={{ textDecoration: 'none' }}>
+                    <CardMedia
+                        sx={{ height: 300, cursor: 'pointer' }}
+                        image={mapSample}
+                        title="mapImage"
+                    />
+                </Link>
+                {true && (
+                    <Publish sx={{
+                        position: 'absolute',
+                        top: '10px',
+                        right: '10px',
+                        color: 'black',
+                        fontSize: '50px'
+                    }} />
+                )}
+            </Box>
             <CardContent sx={{ bgcolor: theme.palette.background.paper }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     {isEditing ? (

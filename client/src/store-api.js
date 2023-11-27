@@ -101,7 +101,7 @@ export const updateMapTag = (id, tag) =>
 
 export const updateMapPublishStatus = (id, status) =>
     api
-        .put(`/mapstatus/${id}`, { status })
+        .put(`/publishmap/${id}`, { status })
         .then(handleResponse)
         .catch(handleError)
 
@@ -136,9 +136,9 @@ export const logoutUser = () =>
         .post("/auth/logout")
         .then(handleResponse)
         .catch(handleError)
-export const registerUser = (email, username, password, passwordVerify) =>
+export const registerUser = (email, username, password, passwordVerify, profilePic) =>
     api
-        .post("/auth/register", { email, username, password, passwordVerify })
+        .post("/auth/register", { email, username, password, passwordVerify, profilePic })
         .then(handleResponse)
         .catch(handleError)
 export const requestReset = (email) =>
