@@ -4,7 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "test": "jest --forceExit --detectOpenHandles --watchAll --maxWorkers=1 --setupFiles dotenv/config"
+        "test": "jest --setupFiles dotenv/config"
     },
     "author": "",
     "license": "ISC",
