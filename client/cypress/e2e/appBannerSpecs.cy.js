@@ -1,20 +1,20 @@
 describe('app banner specs', () => {
     before(() => {
-        cy.registerUser("autotest11", "autotest11", "11223344&&", "11223344&&")
+        cy.registerUser("autotest12", "autotest12", "11223344&&", "11223344&&")
         cy.wait(2000)
     })
 
     beforeEach(() => {
-        cy.visit("129.213.145.105")
+        cy.visit("localhost:3000")
     })
   
     it('should have /browsepage in the url', () => {
-        cy.visit("129.213.145.105")
+        cy.visit("localhost:3000")
       cy.url().should('include', '/browsepage')
     })
   
     it("marketplace button routes to browse page", () => {
-        cy.signInUser("autotest11", "11223344&&")
+        cy.signInUser("autotest12", "11223344&&")
         cy.get("#settingsDropdown").click()
         cy.get("#settingsDropdownOption").first().click()
         cy.get("#marketplaceBtn").click()
