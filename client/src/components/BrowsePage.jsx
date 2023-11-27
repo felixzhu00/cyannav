@@ -52,10 +52,11 @@ function BrowsePage() {
 
   // Sort functionality
   useEffect(() => {
+    console.log("hi runing")
     if (store.mapCollection != null) {
       store.sortMapBy(sortBy, 'asc');
     }
-  }, [sortBy, store.mapCollection]);
+  }, [sortBy]);
   
 
   useEffect(() => {
@@ -70,11 +71,11 @@ function BrowsePage() {
   }, [store.togglebrowseHome]);
 
   // // Runs when there is a change in mapCollection
-  // useEffect(() => {
-  //   if (store.mapCollection != null) {
-  //     setTotalMaps(store.mapCollection.length)
-  //   }
-  // }, [store.mapCollection]);
+  useEffect(() => {
+    if (store.mapCollection != null) {
+      setTotalMaps(store.mapCollection.length)
+    }
+  }, [store.mapCollection]);
 
 
   const handleChangePage = (event, value) => {
@@ -98,8 +99,8 @@ function BrowsePage() {
     setSearchTerm(event.target.value);
   };
 
-  const handleCreateMapModal = () => {
-    store.setCurrentModal("CreateMapModal")
+  const handleCreateMapModal = async () => {
+    await store.setCurrentModal("CreateMapModal")
   }
 
   //Search condition of pressing enter in search bar or search icon
