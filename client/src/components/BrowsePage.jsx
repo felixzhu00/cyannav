@@ -38,9 +38,9 @@ function BrowsePage() {
 
 
   // Rerender the whole componenet when MapCollection is updated
-  // useEffect(() => {
-  //   console.log("mapCollection change")
-  // }, [store.mapCollection]);
+  useEffect(() => {
+    console.log("mapCollection change")
+  }, [store.mapCollection]);
   // Runs only when there is an user
 
   useEffect(() => {
@@ -56,25 +56,25 @@ function BrowsePage() {
       store.sortMapBy(sortBy, 'asc');
     }
   }, [sortBy, store.mapCollection]);
-  
+
 
   useEffect(() => {
     console.log("something happened")
     if (auth.user != null) {
       if (store.togglebrowseHome) {
         store.getMyMapCollection(auth.user.userId);
-      }else{
+      } else {
         store.getMarketplaceCollection();
       }
     }
   }, [store.togglebrowseHome]);
 
-  // // Runs when there is a change in mapCollection
-  // useEffect(() => {
-  //   if (store.mapCollection != null) {
-  //     setTotalMaps(store.mapCollection.length)
-  //   }
-  // }, [store.mapCollection]);
+  // Runs when there is a change in mapCollection
+  useEffect(() => {
+    if (store.mapCollection != null) {
+      setTotalMaps(store.mapCollection.length)
+    }
+  }, [store.mapCollection]);
 
 
   const handleChangePage = (event, value) => {
