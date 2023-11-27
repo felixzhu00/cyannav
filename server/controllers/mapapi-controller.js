@@ -312,12 +312,9 @@ deleteMapById = async (req, res) => {
 }
 
 updateMapNameById = async (req, res) => {
-    console.log("bydasdas")
     try {
         const id = req.params.id
         const title = req.body.name
-        console.log(id);
-        console.log(title);
 
         if (!id || !title) {
             return res.status(400).end()
