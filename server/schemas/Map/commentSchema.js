@@ -34,6 +34,10 @@ const commentSchema = new Schema({
         type: Date,
         default: date,
     },
+    text: {
+        type: String,
+        required: true,
+    },
 })
 
 const commentModel = mongoose.model("comment", commentSchema)
