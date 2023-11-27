@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -17,25 +17,37 @@ export default function RegisterScreen() {
 
     const [errorMessage, setErrorMessage] = useState('');
 
-    const handleSubmit = (event) => {
+    useEffect(() => {
+        console.log(auth.user);
+        if (auth.user == null) {
+            console.log(auth.error)
+            setErrorMessage(auth.error)
+        } else {
+            console.log(auth.user, auth.loggedIn)
+            navigate('/browsepage');
+        }
+    }, [auth]);
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         const input = {
             email: data.get('email'),
             username: data.get('username'),
             password: data.get('password'),
+            verifyPassword: data.get('verify-password')
         }
-        if (data.get('password') !== data.get('verify-password')) { // checks if two fields match
-            setErrorMessage('The passwords do not match.');
-            return;
-        }
+        // if (data.get('password') !== data.get('verify-password')) { // checks if two fields match
+        //     setErrorMessage('The passwords do not match.');
+        //     return;
+        // }
 
-        auth.registerUser(input.email, input.username, input.password, input.password)
-        if (auth.error != null) {
-            console.log(auth.error)
-        } else {
+        try {
+            await auth.registerUser(input.email, input.username, input.password, input.verifyPassword);
             setErrorMessage('');
-            navigate('/login');
+        } catch (error) {
+            console.log(error.message);
+            setErrorMessage(error.message);
         }
     };
 

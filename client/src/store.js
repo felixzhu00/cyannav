@@ -173,7 +173,7 @@ function GlobalStoreContextProvider(props) {
     store.searchForMapBy = async (filter, string) => {
         const response = await store.getMyMapCollection(auth.user.userId);
 
-        
+
         let filteredArray = []
 
         if (string !== "") {

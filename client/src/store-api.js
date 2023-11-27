@@ -136,9 +136,9 @@ export const logoutUser = () =>
         .post("/auth/logout")
         .then(handleResponse)
         .catch(handleError)
-export const registerUser = (email, username, password, passwordVerify, profilePic) =>
+export const registerUser = (email, username, password, passwordVerify) =>
     api
-        .post("/auth/register", { email, username, password, passwordVerify, profilePic })
+        .post("/auth/register", { email, username, password, passwordVerify })
         .then(handleResponse)
         .catch(handleError)
 export const requestReset = (email) =>
