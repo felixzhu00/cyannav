@@ -71,7 +71,7 @@ export const createNewMap = (title, type, GeoJsonSchemabuf) =>
 
 export const createDuplicateMapById = (id) =>
     api
-        .post(`/api/duplicatemap/${id}`)
+        .post(`/api/duplicatemap`, { id })
         .then(handleResponse)
         .catch(handleError)
 
@@ -83,13 +83,13 @@ export const createForkMapById = (id) =>
 
 export const deleteMapById = (id) =>
     api
-        .delete(`api/deletemap/${id}`)
+        .delete(`/api/deletemap/${id}`)
         .then(handleResponse)
         .catch(handleError)
 
-export const updateMapNameById = (id, name) =>
+export const updateMapNameById = (id, title) =>
     api
-        .put(`/api/mapname/${id}`, { name })
+        .post(`/api/mapname`, { id, title })
         .then(handleResponse)
         .catch(handleError)
 
