@@ -1,5 +1,3 @@
-const date = new Date(Date.now()) // TODO: (later) verify this actualy works.
-
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 
@@ -48,7 +46,7 @@ const mapMetadataSchema = new Schema({
     },
     dateCreated: {
         type: Date,
-        default: date,
+        default: Date.now(),
     },
     thumbnail: {
         data: Buffer,

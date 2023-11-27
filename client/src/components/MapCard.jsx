@@ -13,7 +13,7 @@ export default function MapCard({ map }) {
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
     const [isEditing, setIsEditing] = useState(false);
-    const [newName, setNewName] = useState(map.title || "Unnamed Map");
+    const [newName, setNewName] = useState(map.title[0] || "Unnamed Map");
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };

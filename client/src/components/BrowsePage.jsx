@@ -76,6 +76,19 @@ function BrowsePage() {
     store.setCurrentModal("CreateMapModal")
   }
 
+  //Search condition of pressing enter in search bar or search icon
+  const handleSearch = async () => {
+    await store.searchForMapBy(searchBy, searchTerm)
+    console.log(searchBy, searchTerm)
+  };
+
+  const handleKeyPress = async (e) => {
+    if (e.key === 'Enter') {
+      await store.searchForMapBy(searchBy, searchTerm)
+    }
+  };
+
+
   const searchAndSort = () => (
     <Box sx={{
       display: 'flex',
@@ -106,8 +119,9 @@ function BrowsePage() {
             inputProps={{ 'aria-label': 'search' }}
             value={searchTerm}
             onChange={handleSearchInputChange}
+            onKeyPress={handleKeyPress}
           />
-          <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
+          <IconButton type="submit" sx={{ p: '10px' }} aria-label="search" onClick={handleSearch}>
             <Search />
           </IconButton>
         </Paper>
