@@ -50,11 +50,12 @@ function BrowsePage() {
 
   // Sort functionality
   useEffect(() => {
+    console.log("hi runing")
     if (store.mapCollection != null) {
       store.sortMapBy(sortBy, 'asc');
     }
-  }, [sortBy, store.mapCollection]);
-
+  }, [sortBy]);
+  
 
   useEffect(() => {
     if (auth.user != null) {
@@ -95,8 +96,8 @@ function BrowsePage() {
     setSearchTerm(event.target.value);
   };
 
-  const handleCreateMapModal = () => {
-    store.setCurrentModal("CreateMapModal")
+  const handleCreateMapModal = async () => {
+    await store.setCurrentModal("CreateMapModal")
   }
 
   //Search condition of pressing enter in search bar or search icon
