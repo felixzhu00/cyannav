@@ -1,7 +1,6 @@
 describe("my maps specs", () => {
     beforeEach(() => {
-        cy.visit("localhost:3000")
-        cy.get("#signInBtn").click()
+      cy.registerUser("autotest@hi.com", "autotest", "11223344!!", "11223344!!")
     })
 
     // it('import map button ', () => {
@@ -35,32 +34,32 @@ describe("my maps specs", () => {
       .click();
     })
   
-  //   it('sort by name button displays correctly', () => {
-  //     cy.get("#outerSortByMenuBtn")
-  //     .click()
-  //     cy.get("#nameSortSelect")
-  //     .should("have.text", "Name")
-  //     .click();
-  //   })
+    it('sort by name button displays correctly', () => {
+      cy.get("#outerSortByMenuBtn")
+      .click()
+      cy.get("#nameSortSelect")
+      .should("have.text", "Alphabetical Order")
+      .click();
+    })
   
-  //   it('map info displays correctly', () => {
-  //     cy.get("#createdByUser")
-  //     .should("have.text", "CREATED BY USER")
-  //   })
+    // it('map info displays correctly', () => {
+    //   cy.get("#createdByUser")
+    //   .should("have.text", "CREATED BY USER")
+    // })
   
-  //   it('by username/mapName info displays correctly', () => {
-  //     cy.get("#outerMenuByName")
-  //     .click()
-  //     cy.get("#byUsernameBtn")
-  //     .should("have.text", "By Username")
-  //     .click()
-  //   })
+    it('by username/mapName info displays correctly', () => {
+      cy.get("#outerMenuByName")
+      .click()
+      cy.get("#byUsernameBtn")
+      .should("have.text", "Username")
+      .click()
+    })
   
-  //   it('by username/mapName info displays correctly', () => {
-  //     cy.get("#outerMenuByName")
-  //     .click()
-  //     cy.get("#byMapNameBtn")
-  //     .should("have.text", "By Map Name")
-  //     .click()
-  //   })
+    it('by username/mapName info displays correctly', () => {
+      cy.get("#outerMenuByName")
+      .click()
+      cy.get("#byMapNameBtn")
+      .should("have.text", "Map Name")
+      .click()
+    })
 })

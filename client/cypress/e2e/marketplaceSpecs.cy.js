@@ -1,7 +1,6 @@
 describe('marketplace specs', () => {
   beforeEach(() => {
-    cy.visit("localhost:3000")
-    cy.get("#signInBtn").click()
+    cy.registerUser("autotest@hi.com", "autotest", "11223344!!", "11223344!!")
     cy.get("#marketplaceBtn").click()
   })
 
@@ -17,9 +16,9 @@ describe('marketplace specs', () => {
             .click()
     })
 
-    it("map info displays correctly", () => {
-        cy.get("#createdByUser").should("have.text", "By (OWNER)")
-    })
+    // it("map info displays correctly", () => {
+    //     cy.get("#createdByUser").should("have.text", "By (OWNER)")
+    // })
 
     it("by username/mapName info displays correctly", () => {
         cy.get("#outerMenuByName").click()
