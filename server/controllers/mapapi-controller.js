@@ -200,7 +200,7 @@ createDuplicateMapById = async (req, res) => {
             return res.status(400).end()
         }
 
-        const srcMap = Map.findById(id)
+        const srcMap = MapMetadata.findById(id)
         if (!srcMap) {
             return res.status(404).end()
         }
@@ -214,7 +214,7 @@ createDuplicateMapById = async (req, res) => {
         for (let i = 1; i < 9999; i++) {
             // hard-cap... our app will probably break before this much attempts.
             newMapTitle = `${srcMap.title} (${i})`
-            let mapExist = await Map.find({
+            let mapExist = await MapMetadata.find({
                 title: newMapTitle,
                 user: res.locals.userId,
             })
@@ -252,7 +252,7 @@ createForkMapById = async (req, res) => {
             return res.status(400).end()
         }
 
-        const srcMap = Map.findById(id)
+        const srcMap = MapMetadata.findById(id)
         if (!srcMap) {
             return res.status(404).end()
         }
@@ -264,7 +264,7 @@ createForkMapById = async (req, res) => {
         for (let i = 1; i < 9999; i++) {
             // hard-cap... our app will probably break before this much attempts.
             newMapTitle = `${srcMap.title} (${i})`
-            let mapExist = await Map.find({
+            let mapExist = await MapMetadata.find({
                 title: newMapTitle,
                 user: res.locals.userId,
             })
