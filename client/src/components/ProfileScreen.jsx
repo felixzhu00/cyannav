@@ -42,6 +42,7 @@ export default function ProfileScreen() {
                 }}
             >
                 <Box
+                    id="changeProfilePictureBtn"
                     sx={{
                         position: 'relative',
                         m: 5,

@@ -3,6 +3,9 @@ describe("my maps specs", () => {
       cy.registerUser("autotest@hi.com", "autotest", "11223344!!", "11223344!!")
     })
 
+    it('should have /browsepage in the url', () => {
+      cy.url().should('include', '/browsepage')
+  })
     // it('import map button ', () => {
     //     cy.get("#createMapOuterBtn")
     //     .click()

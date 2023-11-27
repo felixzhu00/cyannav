@@ -4,6 +4,10 @@ describe('marketplace specs', () => {
     cy.get("#marketplaceBtn").click()
   })
 
+  it('should have /browsepage in the url', () => {
+    cy.url().should('include', '/browsepage')
+})
+
     it("sort by recent button displays correctly", () => {
         cy.get("#outerSortByMenuBtn").click()
         cy.get("#recentSortSelect").should("have.text", "Recent").click()

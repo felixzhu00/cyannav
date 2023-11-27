@@ -4,6 +4,10 @@ describe("register page specs", () => {
         cy.get("#registerLink").click()
     })
 
+    it('should have /register in the url', () => {
+        cy.url().should('include', '/register')
+    })
+
     it("checks that email is displayed", () => {
         cy.get('label[for="email"]').should("have.text", "Email Address")
     })
