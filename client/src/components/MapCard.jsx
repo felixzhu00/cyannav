@@ -54,6 +54,10 @@ export default function MapCard({ map }) {
                 //forks map
 
                 break;
+            case "fork":
+                //forks map
+
+                break;
             case "delete":
                 store.setCurrentModal("DeleteMapModal", map._id)
                 break;
