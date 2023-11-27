@@ -13,7 +13,7 @@ export default function MapCard({ map }) {
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
     const [isEditing, setIsEditing] = useState(false);
-    const [newName, setNewName] = useState(map.title || "Unnamed Map");
+    const [newName, setNewName] = useState(map.title[0] || "Unnamed Map");
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -134,7 +134,7 @@ export default function MapCard({ map }) {
                     </Menu>
                 </Box>
                 <Typography id="createdByUser" variant="body2" color="text.secondary">
-                    By {map.user} {/* Replace with actual map owner's name */}
+                    By {map.user[0].username} {/* Replace with actual map owner's name */}
                 </Typography>
             </CardContent>
         </Card>
