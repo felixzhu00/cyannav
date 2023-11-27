@@ -17,7 +17,10 @@ getMapById = async (req, res) => {
             return res.status(404).end()
         }
 
-        if (!targetMap.published && targetMap.user !== res.locals.userId) {
+        if (
+            !targetMap.published &&
+            targetMap.user.toString() !== res.locals.userId
+        ) {
             return res.status(401).end()
         }
 
@@ -193,7 +196,7 @@ createDuplicateMapById = async (req, res) => {
         if (!srcMap) {
             return res.status(404).end()
         }
-        if (srcMap.user !== res.locals.userId) {
+        if (srcMap.user.toString() !== res.locals.userId) {
             return res.status(401).end()
         }
 
