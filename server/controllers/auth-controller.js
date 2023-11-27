@@ -50,7 +50,7 @@ login = async (req, res) => {
             return res.status(400).json({
                 loggedIn: false,
                 user: null,
-                // errorMessage: "Required fields empty.",
+                errorMessage: "Required fields empty.",
             })
         }
 
@@ -60,7 +60,7 @@ login = async (req, res) => {
             return res.status(401).json({
                 loggedIn: false,
                 user: null,
-                // errorMessage: "Wrong email or password",
+                errorMessage: "Wrong email or password",
             })
         }
 
@@ -70,7 +70,7 @@ login = async (req, res) => {
             return res.status(401).json({
                 loggedIn: false,
                 user: null,
-                // errorMessage: "Wrong email or password",
+                errorMessage: "Wrong email or password",
             })
         }
 

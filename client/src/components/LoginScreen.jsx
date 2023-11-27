@@ -38,7 +38,13 @@ export default function LoginScreen(props) {
             email: data.get('email'),
             password: data.get('password'),
         }
-        await auth.loginUser(input.email, input.password)
+        try {
+            await auth.loginUser(input.email, input.password);
+            setErrorMessage('');
+        } catch (error) {
+            console.log(error.message);
+            setErrorMessage(error.message);
+        }
     };
 
     const handleContAsGuest = () => {
