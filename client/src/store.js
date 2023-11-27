@@ -1,19 +1,19 @@
 //temp global store
-import { createContext, useState, useContext } from 'react';
-import MUIAddFieldModal from './components/modals/MUIAddFieldModal';
-import MUIAddTagModal from './components/modals/MUIAddTagModal';
-import MUIChangeEmailModal from './components/modals/MUIChangeEmailModal';
-import MUIChangePasswordModal from './components/modals/MUIChangePasswordModal';
-import MUIChangeProfilePicModal from './components/modals/MUIChangeProfilePicModal';
-import MUIChangeUsernameModal from './components/modals/MUIChangeUsernameModal';
-import MUICommentModal from './components/modals/MUICommentModal';
-import MUICreateMapModal from './components/modals/MUICreateMapModal';
-import MUIDeleteAccountModal from './components/modals/MUIDeleteAccountModal';
-import MUIDeleteMapModal from './components/modals/MUIDeleteMapModal';
-import MUIExportMapModal from './components/modals/MUIExportMapModal';
-import MUIPublishMapModal from './components/modals/MUIPublishMapModal';
-import AuthContext from './auth'
-import api from './store-api'
+import { createContext, useState, useContext, useEffect } from "react"
+import MUIAddFieldModal from "./components/modals/MUIAddFieldModal"
+import MUIAddTagModal from "./components/modals/MUIAddTagModal"
+import MUIChangeEmailModal from "./components/modals/MUIChangeEmailModal"
+import MUIChangePasswordModal from "./components/modals/MUIChangePasswordModal"
+import MUIChangeProfilePicModal from "./components/modals/MUIChangeProfilePicModal"
+import MUIChangeUsernameModal from "./components/modals/MUIChangeUsernameModal"
+import MUICommentModal from "./components/modals/MUICommentModal"
+import MUICreateMapModal from "./components/modals/MUICreateMapModal"
+import MUIDeleteAccountModal from "./components/modals/MUIDeleteAccountModal"
+import MUIDeleteMapModal from "./components/modals/MUIDeleteMapModal"
+import MUIExportMapModal from "./components/modals/MUIExportMapModal"
+import MUIPublishMapModal from "./components/modals/MUIPublishMapModal"
+import AuthContext from "./auth"
+import api from "./store-api"
 
 const geobuf = require('geobuf')
 const Pbf = require('pbf')
@@ -37,11 +37,9 @@ function GlobalStoreContextProvider(props) {
         currentMap: null,
         mapNameActive: false,
 
-        currentMyMapCollection: null, // What to display on mymap and browsepage
-        currentMarketplaceCollection: null,
+        mapCollection: null, // What to display on mymap and browsepage
         currentModal: null,
-    });
-
+    })
 
     //Nav Global Handlers
     store.toggleBrowsePage = async (option) => {
@@ -52,20 +50,21 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.createMap = async (title, fileType, mapTemplate, files) => {
-        console.log(files);
-        var buffer = geobuf.encode(files, new Pbf());
-        console.log(buffer);
+        var buffer = geobuf.encode(files, new Pbf())
 
         const response = await api.createNewMap(title, mapTemplate, buffer);
     }
 
     store.getMyMapCollection = async (userId) => {
-        const response = await api.getUserMaps(userId);
+        const response = await api.getUserMaps(userId)
 
-        return setStore({
+        console.log(response.data.userMaps)
+        setStore({
             ...store,
-            currentMyMapCollection: response.data.userMaps
-        });
+            mapCollection: response.data.userMaps,
+        })
+
+        return response.data.userMaps
     }
 
     store.renameMap = async (mapId, newName) => {
@@ -75,18 +74,18 @@ function GlobalStoreContextProvider(props) {
         console.log(response);
 
         if (response.success) {
-            // Update the map name in the currentMyMapCollection state
+            // Update the map name in the mapCollection state
             // Assuming each map object has an id and a name
-            const updatedCollection = store.currentMyMapCollection.map(map => {
+            const updatedCollection = store.mapCollection.map((map) => {
                 if (map.id === mapId) {
-                    return { ...map, name: newName };
+                    return { ...map, name: newName }
                 }
-                return map;
-            });
+                return map
+            })
             setStore({
                 ...store,
-                currentMyMapCollection: updatedCollection,
-            });
+                mapCollection: updatedCollection,
+            })
         }
     }    //Browse Global Handlers
 
@@ -94,18 +93,18 @@ function GlobalStoreContextProvider(props) {
         const response = await api.deleteMapById(mapId);
         console.log(response)
         if (response.success) {
-            // Update the map name in the currentMyMapCollection state
+            // Update the map name in the mapCollection state
             // Assuming each map object has an id and a name
-            const updatedCollection = store.currentMyMapCollection.map(map => {
+            const updatedCollection = store.mapCollection.map((map) => {
                 if (map.id === mapId) {
-                    return { ...map, name: newName };
+                    return { ...map, name: newName }
                 }
-                return map;
-            });
+                return map
+            })
             setStore({
                 ...store,
-                currentMyMapCollection: updatedCollection,
-            });
+                mapCollection: updatedCollection,
+            })
         }
     }
 
@@ -114,18 +113,18 @@ function GlobalStoreContextProvider(props) {
         const response = await api.createDuplicateMapById(mapId);
         console.log(response)
         if (response.success) {
-            // Update the map name in the currentMyMapCollection state
+            // Update the map name in the mapCollection state
             // Assuming each map object has an id and a name
-            const updatedCollection = store.currentMyMapCollection.map(map => {
+            const updatedCollection = store.mapCollection.map((map) => {
                 if (map.id === mapId) {
-                    return { ...map, name: newName };
+                    return { ...map, name: newName }
                 }
-                return map;
-            });
+                return map
+            })
             setStore({
                 ...store,
-                currentMyMapCollection: updatedCollection,
-            });
+                mapCollection: updatedCollection,
+            })
         }
     }
 
@@ -148,8 +147,68 @@ function GlobalStoreContextProvider(props) {
     }
 
     //Map Card Global Handlers
+    store.searchForMapBy = async (filter, string) => {
+        const response = await store.getMyMapCollection(auth.user.userId);
 
+        
+        let filteredArray = []
 
+        if (string !== "") {
+            if (filter == "mapName") {
+                filteredArray = response.filter((item) => {
+                    return item.title[0].includes(string)
+                })
+            } else if (filter == "username") {
+                filteredArray = response.filter((item) => {
+                    return item.user[0].username.includes(string)
+                })
+            } else if (filter == "tag") {
+                //Need UI implemenation and Backend
+                filteredArray = response.filter((item) => {
+                    return item.tag[0].includes(string)
+                })
+            }
+        }
+
+        return setStore({
+            ...store,
+            mapCollection: filteredArray,
+        })
+    }
+
+    store.sortMapBy = async (key, order) => {
+        //key: 'alphabetical-order' or 'recent'
+        //order: 'asc' for ascending, 'dec' for decending
+        const sortedArray = [...store.mapCollection]
+
+        sortedArray.sort((a, b) => {
+            if (key === "alphabetical-order") {
+                //'title' field
+                const valueA = a.title[0].toString().toLowerCase()
+                const valueB = b.title[0].toString().toLowerCase()
+                return order === "asc"
+                    ? valueA.localeCompare(valueB)
+                    : valueB.localeCompare(valueA)
+            } else if (key === "recent") {
+                //'dateCreated' field
+                const valueA = new Date(a.dateCreated).getTime()
+                const valueB = new Date(b.dateCreated).getTime()
+                return order === "dec" ? valueA - valueB : valueB - valueA
+            } else if (key === "popularity") {
+                // Need UI implementation to check
+                //'like' and 'dislike' field
+                const valueA = a.like.length - a.dislike.length
+                const valueB = b.like.length - b.dislike.length
+                return order === "dec" ? valueA - valueB : valueB - valueA
+            }
+            return 0 // Default to no sorting
+        })
+
+        return setStore({
+            ...store,
+            mapCollection: sortedArray,
+        })
+    }
 
     // Modal Global Handlers
     const modalProps = {
