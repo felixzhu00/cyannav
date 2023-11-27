@@ -8,6 +8,8 @@ const request = require("supertest")
 
 /* MapEditor API Tests */
 
+//renamed because of weird error during testing causing cases to fail. will fix bug and naming in build 5
+
 // Random test to, remove later
 describe("mapmetadata/:id", () => {
     it("returns 400 if no id", async () => {
