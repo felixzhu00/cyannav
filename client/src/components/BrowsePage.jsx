@@ -27,7 +27,7 @@ function BrowsePage() {
 
   // PAGE STUFF
   const [currentPage, setCurrentPage] = useState(1);
-  // console.log(store.currentMyMapCollection)
+  // console.log(store.mapCollection)
   const [totalMaps, setTotalMaps] = useState('');
   const mapsPerPage = 8; // Display 8 MapCards per page
   const numberOfPages = Math.ceil(totalMaps / mapsPerPage);
@@ -36,19 +36,45 @@ function BrowsePage() {
   const lastMapIndex = firstMapIndex + mapsPerPage;
   // const mapCardsToShow = Array.from({ length: mapsPerPage }, (_, index) => index + firstMapIndex).filter(index => index < totalMaps);
 
+
+  // Rerender the whole componenet when MapCollection is updated
+  // useEffect(() => {
+  //   console.log("mapCollection change")
+  // }, [store.mapCollection]);
   // Runs only when there is an user
+
   useEffect(() => {
     if (auth.user != null) {
       store.getMyMapCollection(auth.user.userId);
     }
   }, [auth.user]);
 
-  // Runs when there is a change in currentMyMapCollection
+
+  // Sort functionality
   useEffect(() => {
-    if (store.currentMyMapCollection != null) {
-      setTotalMaps(store.currentMyMapCollection.length)
+    if (store.mapCollection != null) {
+      store.sortMapBy(sortBy, 'asc');
     }
-  }, [store.currentMyMapCollection]);
+  }, [sortBy, store.mapCollection]);
+  
+
+  useEffect(() => {
+    console.log("something happened")
+    if (auth.user != null) {
+      if (store.togglebrowseHome) {
+        store.getMyMapCollection(auth.user.userId);
+      }else{
+        store.getMarketplaceCollection();
+      }
+    }
+  }, [store.togglebrowseHome]);
+
+  // // Runs when there is a change in mapCollection
+  // useEffect(() => {
+  //   if (store.mapCollection != null) {
+  //     setTotalMaps(store.mapCollection.length)
+  //   }
+  // }, [store.mapCollection]);
 
 
   const handleChangePage = (event, value) => {
@@ -176,8 +202,8 @@ function BrowsePage() {
       <Button id="createMapOuterBtn" onClick={handleCreateMapModal} variant="contained" aria-label="add" sx={{ position: 'absolute', top: 85, right: 20 }}>Import Map</Button>
 
       <Grid container spacing={2} sx={{ mt: 2 }}>
-        {store.currentMyMapCollection &&
-          store.currentMyMapCollection
+        {store.mapCollection &&
+          store.mapCollection
             .slice(firstMapIndex, lastMapIndex) // Only take the maps for the current page
             .map((map, index) => (
               <Grid item xs={12} sm={6} md={3} key={map._id}>

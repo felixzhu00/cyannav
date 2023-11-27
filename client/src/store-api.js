@@ -53,7 +53,7 @@ export const getUserMaps = (id) =>
 
 export const getAllMaps = () =>
     api
-        .get("/api/allmap")
+        .get("/api/allpublishedmap")
         .then(handleResponse)
         .catch(handleError)
 
