@@ -8,6 +8,7 @@ import AuthContext from '../auth'
 
 export default function MapCard({ map }) {
     const { store } = useContext(GlobalStoreContext);
+    const { auth } = useContext(AuthContext);
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const theme = useTheme();
@@ -16,10 +17,9 @@ export default function MapCard({ map }) {
     const [newName, setNewName] = useState(map.title[0] || "Unnamed Map");
     const [isPublished, setIsPublished] = useState(map.published);
 
-    // useEffect(() => {
-    //     setIsPublished(map.published);
-    // }, [map.published]);
-
+    useEffect(() => {
+        setIsPublished(map.published);
+    }, [map.published]);
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -43,19 +43,20 @@ export default function MapCard({ map }) {
         // TODO: Save name to backend!
     };
 
-    const handleKebab = (option) => {
+    const handleKebab = async (option) => {
         switch (option) {
             // case "rename":
             //     setIsEditing(true);
             //     break;
             case "addTag":
-                store.setCurrentModal("AddTagModal")
+                await store.setCurrentModal("AddTagModal")
                 break;
             case "publish":
-                store.setCurrentModal("PublishMapModal", map._id)
+                await store.setCurrentModal("PublishMapModal", map._id)
                 break;
             case "duplicate":
-                store.duplicateMap(map._id);
+                await store.duplicateMap(map._id);
+                await store.getMyMapCollection(auth.user.userId);
                 break;
             case "fork":
                 //forks map
@@ -66,7 +67,7 @@ export default function MapCard({ map }) {
 
                 break;
             case "delete":
-                store.setCurrentModal("DeleteMapModal", map._id)
+                await store.setCurrentModal("DeleteMapModal", map._id)
                 break;
             default:
                 console.log(`${option} is incorrect`);
@@ -137,10 +138,10 @@ export default function MapCard({ map }) {
                         onClose={handleClose}
                     >
                         {/* <MenuItem onClick={() => { handleKebab("rename") }}>Rename</MenuItem> */}
-                        <MenuItem disabled={isPublished} onClick={() => { handleKebab("addTag") }}>Add Tag</MenuItem>
+                        {/* <MenuItem disabled={isPublished} onClick={() => { handleKebab("addTag") }}>Add Tag</MenuItem> */}
                         <MenuItem disabled={isPublished} onClick={() => { handleKebab("publish") }}>Publish</MenuItem>
                         <MenuItem onClick={() => { handleKebab("duplicate") }}>Duplicate</MenuItem>
-                        <MenuItem onClick={() => { handleKebab("fork") }}>Fork</MenuItem>
+                        {/* <MenuItem onClick={() => { handleKebab("fork") }}>Fork</MenuItem> */}
                         <MenuItem onClick={() => { handleKebab("delete") }}>Delete</MenuItem>
                     </Menu>
                 </Box>

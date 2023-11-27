@@ -122,7 +122,7 @@ export default function LoginScreen(props) {
                             </Link>
                         </Grid>
                         <Grid item>
-                            <Link id="registerLink" onClick={() => { navigate('/register') }} variant="body2">
+                            <Link id="registerLink" onClick={() => { navigate('/register'); auth.updateError("") }} variant="body2">
                                 {"Don't have an account? Sign Up"}
                             </Link>
                         </Grid>

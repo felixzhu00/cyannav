@@ -87,84 +87,24 @@ function GlobalStoreContextProvider(props) {
         console.log("5")
         // Call to backend API to update the map name
         console.log(mapId, newName);
-        const response = await api.updateMapNameById(mapId, newName);
-        console.log(response);
-
-        if (response.success) {
-            // Update the map name in the mapCollection state
-            // Assuming each map object has an id and a name
-            const updatedCollection = store.mapCollection.map((map) => {
-                if (map.id === mapId) {
-                    return { ...map, name: newName }
-                }
-                return map
-            })
-            setStore({
-                ...store,
-                mapCollection: updatedCollection,
-            })
-        }
-    }    //Browse Global Handlers
+        await api.updateMapNameById(mapId, newName);
+    }
 
     store.deleteMap = async (mapId) => {
         console.log("6")
         console.log(mapId);
-        const response = await api.deleteMapById(mapId);
-        console.log(response)
-        if (response.success) {
-            // Update the map name in the mapCollection state
-            // Assuming each map object has an id and a name
-            const updatedCollection = store.mapCollection.map((map) => {
-                if (map.id === mapId) {
-                    return { ...map, name: newName }
-                }
-                return map
-            })
-            setStore({
-                ...store,
-                mapCollection: updatedCollection,
-            })
-        }
+        await api.deleteMapById(mapId);
     }
 
     store.duplicateMap = async (mapId) => {
         console.log("7")
         console.log(mapId);
-        const response = await api.createDuplicateMapById(mapId);
-        console.log(response)
-        if (response.success) {
-            // Update the map name in the mapCollection state
-            // Assuming each map object has an id and a name
-            const updatedCollection = store.mapCollection.map((map) => {
-                if (map.id === mapId) {
-                    return { ...map, name: newName }
-                }
-                return map
-            })
-            setStore({
-                ...store,
-                mapCollection: updatedCollection,
-            })
-        }
+        await api.createDuplicateMapById(mapId);
     }
 
     store.publishMap = async (mapId) => {
         console.log("8")
-        const response = await api.updateMapPublishStatus(mapId);
-        if (response.success) {
-            // Update the map name in the currentMyMapCollection state
-            // Assuming each map object has an id and a name
-            const updatedCollection = store.mapCollection.map(map => {
-                if (map.id === mapId) {
-                    return { ...map, name: newName };
-                }
-                return map;
-            });
-            setStore({
-                ...store,
-                mapCollection: updatedCollection,
-            });
-        }
+        await api.updateMapPublishStatus(mapId);
     }
 
     // store.getGeojson = async (geojsonId) => {
@@ -182,27 +122,32 @@ function GlobalStoreContextProvider(props) {
     //Map Card Global Handlers
     store.searchForMapBy = async (filter, string) => {
         console.log("9")
-        const response = await store.getMyMapCollection(auth.user.userId);
+        let response
 
+        if (store.togglebrowseHome) {
+            response = await store.getMyMapCollection(auth.user.userId);
+        } else {
+            response = await store.getMarketplaceCollection();
+        }
 
         let filteredArray = []
 
-        if (string !== "") {
-            if (filter == "mapName") {
-                filteredArray = response.filter((item) => {
-                    return item.title[0].includes(string)
-                })
-            } else if (filter == "username") {
-                filteredArray = response.filter((item) => {
-                    return item.user[0].username.includes(string)
-                })
-            } else if (filter == "tag") {
-                //Need UI implemenation and Backend
-                filteredArray = response.filter((item) => {
-                    return item.tag[0].includes(string)
-                })
-            }
+        // if (string !== "") {
+        if (filter == "mapName") {
+            filteredArray = response.filter((item) => {
+                return item.title[0].includes(string)
+            })
+        } else if (filter == "username") {
+            filteredArray = response.filter((item) => {
+                return item.user[0].username.includes(string)
+            })
+        } else if (filter == "tag") {
+            //Need UI implemenation and Backend
+            filteredArray = response.filter((item) => {
+                return item.tag[0].includes(string)
+            })
         }
+        // } 
 
         return setStore({
             ...store,

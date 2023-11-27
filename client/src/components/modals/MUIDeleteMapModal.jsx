@@ -8,7 +8,7 @@ import { Close } from '@mui/icons-material';
 import { useTheme } from '@emotion/react';
 import { GlobalStoreContext } from '../../store'
 import { useContext, useEffect, useState } from 'react';
-
+import AuthContext from '../../auth'
 
 const style = {
     position: 'absolute',
@@ -25,6 +25,7 @@ const style = {
 export default function MUIDeleteMapModal(props) {
     const theme = useTheme();
     const { store } = useContext(GlobalStoreContext);
+    const { auth } = useContext(AuthContext);
 
     const currentMapId = store.currentModalMapId;
 
@@ -34,10 +35,11 @@ export default function MUIDeleteMapModal(props) {
         props.onClose()
     };
 
-    const handleDelete = () => {
-        store.deleteMap(currentMapId);
+    const handleDelete = async () => {
+        await store.deleteMap(currentMapId);
 
         handleClose();
+        await store.getMyMapCollection(auth.user.userId);
     }
 
 

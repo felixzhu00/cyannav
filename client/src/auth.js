@@ -13,6 +13,7 @@ export const AuthActionType = {
     LOGOUT_USER: "LOGOUT_USER",
     REGISTER_USER: "REGISTER_USER",
     UPDATE_USERNAME: "UPDATE_USERNAME",
+    SET_ERROR: "SET_ERROR"
 }
 
 function AuthContextProvider(props) {
@@ -67,6 +68,12 @@ function AuthContextProvider(props) {
                     loggedIn: true,
                     error: payload.error,
                 })
+            }
+            case AuthActionType.SET_ERROR: {
+                return setAuth(prevStore => ({
+                    ...prevStore,
+                    error: payload.error,
+                }));
             }
             default:
                 return auth;
@@ -156,6 +163,15 @@ function AuthContextProvider(props) {
         if (response.status === 200) {
             await auth.getLoggedIn()
         }
+    }
+
+    auth.updateError = async function (errorMessage) {
+        authReducer({
+            type: AuthActionType.SET_ERROR,
+            payload: {
+                error: errorMessage
+            },
+        })
     }
 
 

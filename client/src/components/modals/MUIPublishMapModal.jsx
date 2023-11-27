@@ -8,6 +8,7 @@ import { Close } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { GlobalStoreContext } from '../../store';
 import { useContext } from 'react';
+import AuthContext from '../../auth';
 
 const style = {
     position: 'absolute',
@@ -24,6 +25,8 @@ const style = {
 export default function MUIPublishMapModal(props) {
     const theme = useTheme();
     const { store } = useContext(GlobalStoreContext);
+    const { auth } = useContext(AuthContext);
+
     const [open, setOpen] = React.useState(props.open);
     const handleClose = () => {
         setOpen(false)
@@ -32,9 +35,10 @@ export default function MUIPublishMapModal(props) {
 
     const currentMapId = store.currentModalMapId;
 
-    const handlePublish = () => {
-        store.publishMap(currentMapId);
-        handleClose()
+    const handlePublish = async () => {
+        await store.publishMap(currentMapId);
+        handleClose();
+        await store.getMyMapCollection(auth.user.userId);
     }
 
     return (
