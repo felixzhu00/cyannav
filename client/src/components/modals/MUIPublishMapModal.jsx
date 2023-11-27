@@ -6,6 +6,8 @@ import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import { Close } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
+import { GlobalStoreContext } from '../../store';
+import { useContext } from 'react';
 
 const style = {
     position: 'absolute',
@@ -21,11 +23,19 @@ const style = {
 
 export default function MUIPublishMapModal(props) {
     const theme = useTheme();
+    const { store } = useContext(GlobalStoreContext);
     const [open, setOpen] = React.useState(props.open);
     const handleClose = () => {
         setOpen(false)
         props.onClose()
     };
+
+    const currentMapId = store.currentModalMapId;
+
+    const handlePublish = () => {
+        store.publishMap(currentMapId);
+        handleClose()
+    }
 
     return (
         <div>
@@ -51,7 +61,7 @@ export default function MUIPublishMapModal(props) {
 
                         <Button
                             id="publishBtnOnModal"
-                            onClick={handleClose}
+                            onClick={handlePublish}
                             variant="contained"
                             sx={{
                                 bgcolor: theme.palette.primary.main,

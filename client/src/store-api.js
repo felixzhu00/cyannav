@@ -99,9 +99,9 @@ export const updateMapTag = (id, tag) =>
         .then(handleResponse)
         .catch(handleError)
 
-export const updateMapPublishStatus = (id, status) =>
+export const updateMapPublishStatus = (id) =>
     api
-        .put(`/publishmap/${id}`, { status })
+        .post("/api/publishmap", { id })
         .then(handleResponse)
         .catch(handleError)
 
