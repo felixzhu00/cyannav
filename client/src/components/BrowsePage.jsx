@@ -179,8 +179,6 @@ function BrowsePage() {
     </Box>
   );
 
-
-
   return (
     <Box sx={{ p: 3, overflow: 'hidden', bgcolor: theme.palette.background.default }}>
       <CssBaseline />
