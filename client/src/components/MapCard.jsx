@@ -50,6 +50,14 @@ export default function MapCard({ map }) {
             case "duplicate":
                 store.duplicateMap(map._id);
                 break;
+            case "fork":
+                //forks map
+
+                break;
+            case "fork":
+                //forks map
+
+                break;
             case "delete":
                 store.setCurrentModal("DeleteMapModal", map._id)
                 break;
@@ -121,6 +129,7 @@ export default function MapCard({ map }) {
                         <MenuItem onClick={() => { handleKebab("addTag") }}>Add Tag</MenuItem>
                         <MenuItem onClick={() => { handleKebab("publish") }}>Publish</MenuItem>
                         <MenuItem onClick={() => { handleKebab("duplicate") }}>Duplicate</MenuItem>
+                        <MenuItem onClick={() => { handleKebab("fork") }}>Fork</MenuItem>
                         <MenuItem onClick={() => { handleKebab("delete") }}>Delete</MenuItem>
                     </Menu>
                 </Box>

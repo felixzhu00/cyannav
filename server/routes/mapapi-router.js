@@ -39,13 +39,11 @@ router.get(
 )
 
 //Handles creating a new map request
-router.post("/newmap",
-    auth.verify,
-    mapMetadataSchemaController.createNewMap)
+router.post("/newmap", auth.verify, mapMetadataSchemaController.createNewMap)
 
 //Handles duplicating a map (by ID) request
 router.post(
-    "/duplicatemap/:id",
+    "/duplicatemap",
     auth.verify,
     mapMetadataSchemaController.createDuplicateMapById
 )
@@ -65,8 +63,8 @@ router.delete(
 )
 
 //Handles updating the name of a map (by ID) request
-router.put(
-    "/mapname/:id",
+router.post(
+    "/mapname",
     auth.verify,
     mapMetadataSchemaController.updateMapNameById
 )
@@ -78,10 +76,10 @@ router.put(
 // )
 
 //Handles updating a map's publish status request(published/unpublished)
-router.put(
-    "/publishmap/:id",
+router.post(
+    "/publishmap",
     auth.verify,
-    // mapMetadataSchemaController.updateMapPublishStatus
+    mapMetadataSchemaController.updateMapPublishStatus
 )
 
 // router.post("/likemap", auth.verify, mapMetadataSchemaController.likeMap)
