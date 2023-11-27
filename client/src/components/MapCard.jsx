@@ -133,6 +133,7 @@ export default function MapCard({ map }) {
                         <MenuItem onClick={() => { handleKebab("delete") }}>Delete</MenuItem>
                     </Menu>
                 </Box>
+
                 <Typography id="createdByUser" variant="body2" color="text.secondary">
                     By {map.user[0].username} {/* Replace with actual map owner's name */}
                 </Typography>
