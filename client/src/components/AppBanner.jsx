@@ -100,7 +100,7 @@ function AppBanner() {
               onClose={handleCloseNavMenu}
             >
               <MenuItem onClick={() => {/* navigate('/mymaps') */ }}>
-                <IconButton sx={{ color: "black", mr: 1 }}>
+                <IconButton id="myMapsBtn" sx={{ color: "black", mr: 1 }}>
                   <Home />
                 </IconButton>
                 <Typography textAlign="center">My Maps</Typography>
@@ -118,6 +118,7 @@ function AppBanner() {
 
           {/* Logo */}
           <Button
+            id="logoBtn"
             onClick={() => {
               handleIconClick()
               /* navigate('/browsepage') */
@@ -218,7 +219,7 @@ function AppBanner() {
                 <MenuItem id="settingsDropdownOption" key={"Account Settings"} onClick={handleAccountSettingClick}>
                   <Typography textAlign="center">Account Settings</Typography>
                 </MenuItem>
-                <MenuItem key={"Logout"} onClick={handleLogoutClick}>
+                <MenuItem id="logoutBtn" key={"Logout"} onClick={handleLogoutClick}>
                   <Typography textAlign="center">Logout</Typography>
                 </MenuItem>
               </Menu>

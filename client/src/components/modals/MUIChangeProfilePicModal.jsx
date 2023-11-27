@@ -20,7 +20,7 @@ function MUIChangeProfilePicModal({ open, onClose, onSave }) {
 
     return (
         <Dialog open={open} onClose={onClose}>
-            <DialogTitle>Change Profile Picture</DialogTitle>
+            <DialogTitle id="changePictureText">Change Profile Picture</DialogTitle>
             <DialogContent>
                 <input
                     type="file"
