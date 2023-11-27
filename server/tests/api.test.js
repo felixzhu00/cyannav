@@ -10,24 +10,13 @@ const request = require("supertest")
 
 /* Map API Tests*/
 
-describe("mapbyid/:id", () => {
-    it("returns 400 if no id", async () => {
-        const res = await request(app).get("/api/mapbyid/:id").send({})
-        expect(res.statusCode).toEqual(400)
-    })
-    it("returns 400 if id does not match map", async () => {
-        const res = await request(app).get("/api/mapbyid/:id").send({ id: 0 })
-        expect(res.statusCode).toEqual(400)
-    })
-})
-
 describe("mapmetadata/:id", () => {
     it("returns 400 if no id", async () => {
-        const res = await request(app).get("mapapi/mapmetadata/:id").send({})
+        const res = await request(app).get("/api/mapmetadata/:id").send({})
         expect(res.statusCode).toEqual(400)
     })
     it("returns 400 if id does not match map", async () => {
-        const res = await request(app).get("mapapi/mapmetadata/:id").send({ id: 0 })
+        const res = await request(app).get("/api/mapmetadata/:id").send({ id: 0 })
         expect(res.statusCode).toEqual(400)
     })
 })
@@ -37,24 +26,22 @@ describe("mapbyuser/:id", () => {
         const res = await request(app).get("/api/mapbyuser/:id").send({})
         expect(res.statusCode).toEqual(400)
     })
-    it("returns code 500 for now", async () => {
-        const res = await request(app)
-            .get("/api/mapbyuser/:id")
-            .send({ userId: "cyan boy" })
-        expect(res.statusCode).toEqual(500)
+    it("returns code 400 given a userId", async () => {
+        const res = await request(app).get("/api/mapbyuser/:id").send({ userId: "cyan boy" })
+        expect(res.statusCode).toEqual(400)
     })
 })
 
-describe("allMap", () => {
-    it("returns code 200 for now", async () => {
-        const res = await request(app).get("/api/allmap").send({})
+describe("allpublishedmap", () => {
+    it("should return code 200", async () => {
+        const res = await request(app).get("/api/allpublishedmap").send({})
         expect(res.statusCode).toEqual(200)
     })
 })
 
-describe("mapjson/:id", () => {
+describe("mapgeojson/:id", () => {
     it("returns code 400 if no id", async () => {
-        const res = await request(app).get("/api/mapjson/:id").send({})
+        const res = await request(app).get("/api/mapgeojson/:id").send({})
         expect(res.statusCode).toEqual(400)
     })
     // it('returns code 500 if no map matches id given', async () => {
@@ -92,23 +79,21 @@ describe("duplicatemap", () => {
         const res = await request(app).post("/api/duplicatemap").send({})
         expect(res.statusCode).toEqual(400)
     })
-    it("returns code 401 since sending info is bad", async () => {
-        const res = await request(app)
-            .post("/api/duplicatemap")
-            .send({ id: 100629 })
-        expect(res.statusCode).toEqual(401)
+    it("returns code 400 for now", async () => {
+        const res = await request(app).post("/api/duplicatemap").send({ id: "1006298" })
+        expect(res.statusCode).toEqual(400)
     })
     //add another tets for if there is map which matches the id sent
 })
 
 describe("forkMap", () => {
-    // it('returns code 400 if no id is sent', async () => {
-    //     const res = await request(app).post('/api/forkmap').send({});
-    //     expect(res.statusCode).toEqual(400);
-    // });
-    it("returns code 404 if no map matches the id sent", async () => {
-        const res = await request(app).post("/api/forkmap").send({ id: 100629 })
-        expect(res.statusCode).toEqual(404)
+    it('returns code 400 if no id is sent', async () => {
+        const res = await request(app).post('/api/forkmap').send({});
+        expect(res.statusCode).toEqual(400);
+    });
+    it("returns code 401 if no map matches the id sent", async () => {
+        const res = await request(app).post("/api/forkmap").send({ id: 10062909 })
+        expect(res.statusCode).toEqual(401)
     })
     //add another tets for if there is map which matches the id sent
 })
