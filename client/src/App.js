@@ -25,6 +25,7 @@ import { useState, useRef, useEffect, useContext } from 'react';
 import { GlobalStoreContextProvider } from './store'
 import { AuthContextProvider } from './auth';
 import AuthContext from './auth'
+import { GlobalStoreContext } from './store'
 
 
 
@@ -80,6 +81,7 @@ const theme = createTheme({
 
 const App = () => {
   const auth = useContext(AuthContext);
+  const { store } = useContext(GlobalStoreContext);
   const [guest, setGuest] = useState(true);
 
   useEffect(() => {
