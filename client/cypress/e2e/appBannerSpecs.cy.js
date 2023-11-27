@@ -1,7 +1,8 @@
 describe('app banner specs', () => {
 
     beforeEach(() => {
-        cy.signInUser("autotest2", "11223344##")
+        cy.registerUser("autotest4", "autotest4", "11223344&&", "11223344&&")
+        cy.signInUser("autotest4", "11223344&&")
     })
   
     it('should have /browsepage in the url', () => {

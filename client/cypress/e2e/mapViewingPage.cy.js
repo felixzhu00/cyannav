@@ -1,6 +1,6 @@
 describe("map viewing specs", () => {
     beforeEach(() => {
-        cy.signInUser("autotest2", "11223344##")
+        cy.signInUser("autotest4", "11223344&&")
         //cy.get("#mapImage").first().click()
     })
 
