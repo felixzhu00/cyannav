@@ -2,7 +2,7 @@ const MapMetadata = require("../schemas/Map/mapMetadataSchema")
 const GeoJsonSchema = require("../schemas/Map/geoJsonSchema")
 const MapFields = require("../schemas/Map/fieldDataSchema")
 
-const mongoose = require('mongoose');
+const mongoose = require("mongoose")
 
 getMapById = async (req, res) => {
     try {
@@ -39,10 +39,12 @@ getUserMaps = async (req, res) => {
         }
 
         var userMaps
-        if (res.locals.userId === id) { // get all my maps
+        if (res.locals.userId === id) {
+            // get all my maps
             userMaps = await MapMetadata.find({ user: id })
         } else {
-            userMaps = await MapMetadata.find({ // search by user id
+            userMaps = await MapMetadata.find({
+                // search by user id
                 user: id,
                 published: true,
             })
@@ -114,8 +116,8 @@ getMapFieldsById = async (req, res) => {
 createNewMap = async (req, res) => {
     try {
         const { title, type, GeoJsonSchemabuf } = req.body
-        let bufferArray = Object.values(GeoJsonSchemabuf);
-        let buffer = Buffer.from(bufferArray);
+        let bufferArray = Object.values(GeoJsonSchemabuf)
+        let buffer = Buffer.from(bufferArray)
         console.log(title, type, GeoJsonSchemabuf)
         if (!title || !type || !GeoJsonSchemabuf) {
             return res.status(400).json({
@@ -345,6 +347,37 @@ updateMapNameById = async (req, res) => {
     }
 }
 
+updateMapPublishStatus = async (req, res) => {
+    try {
+        const id = req.params.id
+
+        if (!id) {
+            return res.status(400).end()
+        }
+
+        const toBeUpdated = await MapMetadata.findById(id)
+        if (!toBeUpdated) {
+            return res.status(404).end()
+        }
+        if (toBeUpdated.user.toString() !== res.locals.userId) {
+            return res.status(401).end()
+        }
+
+        const updated = await MapMetadata.findByIdAndUpdate(id, {
+            published: true,
+        })
+
+        if (!updated) {
+            return res.status(500).end()
+        }
+        return res.status(200).end()
+    } catch (err) {
+        console.error("mapapi-controller::updateMapPublishStatus")
+        console.error(err)
+        return res.status(500).end()
+    }
+}
+
 // Rest of the update functions to be written later.
 
 // like dislikes and comment to be written here.
@@ -361,6 +394,6 @@ module.exports = {
     deleteMapById,
     updateMapNameById,
     // updateMapTag,
-    // updateMapPublishStatus,
+    updateMapPublishStatus,
     // updateMapJson,
 }
