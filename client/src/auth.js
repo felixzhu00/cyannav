@@ -22,11 +22,11 @@ function AuthContextProvider(props) {
         error: null,
     });
 
-    
+
 
 
     useEffect(() => {
-        auth.getLoggedIn(); 
+        auth.getLoggedIn();
     }, []);
 
 
@@ -72,7 +72,7 @@ function AuthContextProvider(props) {
                 return auth;
         }
     }
-    
+
     auth.getLoggedIn = async function () {
         const response = await api.getLoggedIn();
         if (response.status === 200) {
@@ -84,15 +84,14 @@ function AuthContextProvider(props) {
                     user: response.data.user
                 }
             });
-            console.log(auth.user)
         }
     }
 
-    auth.registerUser = async function(email, username, password, passwordVerify) {
-        const response = await api.registerUser(email, username, password, passwordVerify);      
+    auth.registerUser = async function (email, username, password, passwordVerify) {
+        const response = await api.registerUser(email, username, password, passwordVerify);
         // console.log(response)
         if (response.status === 200) {
-            
+
             authReducer({
                 type: AuthActionType.REGISTER_USER,
                 payload: {
@@ -100,22 +99,22 @@ function AuthContextProvider(props) {
                     error: null,
                 }
             })
-        }else{
-            if(response.data.errorMessage){
+        } else {
+            if (response.data.errorMessage) {
                 authReducer({
                     type: AuthActionType.REGISTER_USER,
                     payload: {
                         error: response.data.errorMessage
                     }
                 })
-            }else{
+            } else {
                 console.log("There is no error message")
             }
-            
+
         }
     }
 
-    auth.loginUser = async function(email, password) {
+    auth.loginUser = async function (email, password) {
         const response = await api.loginUser(email, password);
         if (response.status === 200) {
             authReducer({
@@ -125,23 +124,17 @@ function AuthContextProvider(props) {
                     loggedIn: true,
                 }
             })
-        }else{
-            if(response.data.errorMessage){
-                authReducer({
-                    type: AuthActionType.LOGIN_USER,
-                })
-            }else{
-                console.log("There is no error message")
-            }
-            
+        } else {
+            const errorMessage = response.data.errorMessage || "Login failed. Please try again.";
+            throw new Error(errorMessage);
         }
     }
 
-    auth.logoutUser = async function() {
+    auth.logoutUser = async function () {
         const response = await api.logoutUser();
         console.log(response)
         if (response.status === 200) {
-            authReducer( {
+            authReducer({
                 type: AuthActionType.LOGOUT_USER,
                 payload: null
             })
@@ -149,16 +142,16 @@ function AuthContextProvider(props) {
     }
 
 
-    auth.updateUsername = async function(loginToken, newUsername) {
-        const response = await api.updateUsername(newUsername , newUsername);
+    auth.updateUsername = async function (loginToken, newUsername) {
+        const response = await api.updateUsername(newUsername, newUsername);
         console.log(response)
         if (response.status === 200) {
             await auth.getLoggedIn()
         }
     }
 
-    auth.updateEmail = async function(loginToken, newEmail) {
-        const response = await api.updateEmail(newEmail , newEmail);
+    auth.updateEmail = async function (loginToken, newEmail) {
+        const response = await api.updateEmail(newEmail, newEmail);
         console.log(response)
         if (response.status === 200) {
             await auth.getLoggedIn()
