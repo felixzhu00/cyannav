@@ -1,7 +1,13 @@
 describe('app banner specs', () => {
+    before(() => {
+        cy.registerUser("autotest4", "autotest4", "11223344&&", "11223344&&")
+        cy.wait(2000)
+        cy.get("#settingsDropdown").click()
+        cy.get("#settingsDropdownOption").first().click()
+        cy.get("#logoutBtn").click()
+    })
 
     beforeEach(() => {
-        cy.registerUser("autotest4", "autotest4", "11223344&&", "11223344&&")
         cy.signInUser("autotest4", "11223344&&")
     })
   
