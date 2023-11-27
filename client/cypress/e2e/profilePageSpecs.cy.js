@@ -1,6 +1,6 @@
 describe('profile page specs', () => {
     beforeEach(() => {
-        cy.signInUser("autotest4", "11223344&&")
+        cy.signInUser("autotest5", "11223344&&")
         cy.get("#settingsDropdown").click()
         cy.get("#settingsDropdownOption").first().click()
     })
