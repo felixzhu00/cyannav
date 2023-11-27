@@ -157,6 +157,18 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
+    // store.getGeojson = async (geojsonId) => {
+    //     const response = await api.getGeoJsonById(geojsonId);
+    //     console.log(response.data.geoBuf);
+    //     console.log(response.status);
+    //     if (response.status == 200) {
+
+    //         var geojson = geobuf.decode(new Pbf(response.data.geoBuf.arrayBuffer()));
+    //         console.log(geojson);
+    //         // return geojson;
+    //     }
+    // }
+
     //Map Card Global Handlers
     store.searchForMapBy = async (filter, string) => {
         const response = await store.getMyMapCollection(auth.user.userId);
@@ -234,6 +246,13 @@ function GlobalStoreContextProvider(props) {
             currentModal: option,
             currentModalMapId: id
         });
+    }
+
+    store.setCurrentMap = (id) => {
+        return setStore({
+            ...store,
+            currentMap: id
+        })
     }
 
 
