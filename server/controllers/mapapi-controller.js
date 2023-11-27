@@ -127,14 +127,14 @@ getMapFieldsById = async (req, res) => {
 createNewMap = async (req, res) => {
     try {
         const { title, type, GeoJsonSchemabuf } = req.body
-        let bufferArray = Object.values(GeoJsonSchemabuf)
-        let buffer = Buffer.from(bufferArray)
-        console.log(title, type, GeoJsonSchemabuf)
         if (!title || !type || !GeoJsonSchemabuf) {
             return res.status(400).json({
                 errorMessage: "Invalid request.",
             })
         }
+
+        let bufferArray = Object.values(GeoJsonSchemabuf)
+        let buffer = Buffer.from(bufferArray)
 
         if (
             type !== "heatmap" &&
