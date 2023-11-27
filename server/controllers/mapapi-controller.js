@@ -3,12 +3,13 @@ const GeoJsonSchema = require("../schemas/Map/geoJsonSchema")
 const MapFields = require("../schemas/Map/fieldDataSchema")
 
 const mongoose = require("mongoose")
+var ObjectId = mongoose.Types.ObjectId
 
 getMapById = async (req, res) => {
     try {
         const { id } = req.body
 
-        if (!id || !Number(id)) {
+        if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
@@ -37,14 +38,17 @@ getMapById = async (req, res) => {
 getUserMaps = async (req, res) => {
     try {
         const id = req.params.id
-        if (!id || !Number(id)) {
+        if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
         var userMaps
         if (res.locals.userId === id) {
             // get all my maps
-            userMaps = await MapMetadata.find({ user: id })
+            userMaps = await MapMetadata.find({ user: id }).populate(
+                "user",
+                "username -_id"
+            )
         } else {
             userMaps = await MapMetadata.find({
                 // search by user id
@@ -80,7 +84,7 @@ getGeoJsonById = async (req, res) => {
     try {
         const { id } = req.body
 
-        if (!id || !Number(id)) {
+        if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
@@ -104,7 +108,7 @@ getMapFieldsById = async (req, res) => {
     try {
         const { id } = req.body
 
-        if (!id || !Number(id)) {
+        if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
@@ -127,14 +131,14 @@ getMapFieldsById = async (req, res) => {
 createNewMap = async (req, res) => {
     try {
         const { title, type, GeoJsonSchemabuf } = req.body
-        let bufferArray = Object.values(GeoJsonSchemabuf)
-        let buffer = Buffer.from(bufferArray)
-        console.log(title, type, GeoJsonSchemabuf)
         if (!title || !type || !GeoJsonSchemabuf) {
             return res.status(400).json({
                 errorMessage: "Invalid request.",
             })
         }
+
+        let bufferArray = Object.values(GeoJsonSchemabuf)
+        let buffer = Buffer.from(bufferArray)
 
         if (
             type !== "heatmap" &&
@@ -196,7 +200,7 @@ createDuplicateMapById = async (req, res) => {
     try {
         const { id } = req.body
 
-        if (!id || !Number(id)) {
+        if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
@@ -248,7 +252,7 @@ createForkMapById = async (req, res) => {
     try {
         const { id } = req.body
 
-        if (!id || !Number(id)) {
+        if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
@@ -300,7 +304,7 @@ deleteMapById = async (req, res) => {
     try {
         const id = req.params.id
 
-        if (!id || !Number(id)) {
+        if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
@@ -330,7 +334,7 @@ updateMapNameById = async (req, res) => {
     try {
         const { id, title } = req.body
 
-        if (!id || !Number(id) || !title) {
+        if (!id || !ObjectId.isValid(id) || !title) {
             return res.status(400).end()
         }
 
@@ -363,7 +367,7 @@ updateMapPublishStatus = async (req, res) => {
     try {
         const id = req.params.id
 
-        if (!id || !Number(id)) {
+        if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
