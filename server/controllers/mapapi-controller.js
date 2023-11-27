@@ -1,6 +1,7 @@
 const MapMetadata = require("../schemas/Map/mapMetadataSchema")
 const GeoJsonSchema = require("../schemas/Map/geoJsonSchema")
 const MapFields = require("../schemas/Map/fieldDataSchema")
+const Comment = require("../schemas/Map/commentSchema")
 
 const mongoose = require("mongoose")
 var ObjectId = mongoose.Types.ObjectId
@@ -403,6 +404,69 @@ updateMapPublishStatus = async (req, res) => {
 // Rest of the update functions to be written later.
 
 // like dislikes and comment to be written here.
+postComment = async (req, res) => {
+    try {
+        const { text, parentCommentId, mapId } = req.body
+
+        if (
+            !text ||
+            !mapId ||
+            !ObjectId.isValid(mapId) ||
+            !ObjectId.isValid(parentCommentId)
+        ) {
+            return res.status(400).end()
+        }
+
+        var parentComment = undefined
+        var map = undefined
+        if (!parentCommentId) {
+            parentComment = await Comment.findById(parentCommentId)
+            if (!parentComment) {
+                return res.status(404).end()
+            }
+        } else {
+            // Root map,
+            map = await MapMetadata.findById(mapId)
+            if (!map) {
+                return res.status(404).end()
+            }
+        }
+
+        const newComment = new Comment({
+            author: res.locals.userId,
+            text: text,
+        })
+
+        const saved = await newComment.save()
+        if (!saved) {
+            return res.status(500).end()
+        }
+
+        if (parentComment != undefined) {
+            parentComment.childComments = [
+                ...parentComment.childComments,
+                saved._id,
+            ]
+            const pSaved = await parentComment.save()
+            if (!pSaved) {
+                return res.status(500).end()
+            }
+        } else {
+            // This is root comment.
+            map.commentsId = [...map.commentsId, saved._id]
+            const mSaved = await map.save()
+            if (!mSaved) {
+                return res.status(500).end()
+            }
+        }
+
+        return res.status(200).end()
+    } catch (err) {
+        console.error("mapapi-controller::postComment")
+        console.error(err)
+        return res.status(500).end()
+    }
+}
 
 module.exports = {
     getMapById,
@@ -418,4 +482,5 @@ module.exports = {
     // updateMapTag,
     updateMapPublishStatus,
     // updateMapJson,
+    postComment,
 }

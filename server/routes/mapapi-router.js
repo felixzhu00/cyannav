@@ -86,11 +86,11 @@ router.post(
 
 // router.post("/dislikemap", auth.verify, mapMetadataSchemaController.dislikeMap)
 
-// router.post(
-//     "/postcomment",
-//     auth.verify,
-//     mapMetadataSchemaController.postComment
-// )
+router.post(
+    "/postcomment",
+    auth.verify,
+    mapMetadataSchemaController.postComment
+)
 
 // router.post(
 //     "/likecomment",
