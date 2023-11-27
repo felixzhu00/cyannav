@@ -1,6 +1,7 @@
 describe('marketplace specs', () => {
+      
   beforeEach(() => {
-    cy.registerUser("autotest@hi.com", "autotest", "11223344!!", "11223344!!")
+    cy.signInUser("autotest2", "11223344##")
     cy.get("#marketplaceBtn").click()
   })
 

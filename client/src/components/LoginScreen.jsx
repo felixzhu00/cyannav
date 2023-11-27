@@ -91,7 +91,7 @@ export default function LoginScreen(props) {
                         required
                     />
                     {errorMessage && (
-                        <Typography color='red' variant="subtitle2" sx={{ mt: 1 }}>
+                        <Typography id="errMsg1" color='red' variant="subtitle2" sx={{ mt: 1 }}>
                             {errorMessage}
                         </Typography>
                     )}

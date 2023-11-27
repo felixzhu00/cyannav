@@ -109,7 +109,7 @@ export default function RegisterScreen() {
                                 autoComplete="new-password"
                             />
                             {errorMessage && (
-                                <Typography color="error" variant='subtitle2' sx={{ mt: 1 }}>
+                                <Typography id="errMsg2" color="error" variant='subtitle2' sx={{ mt: 1 }}>
                                     {errorMessage}
                                 </Typography>
                             )}
