@@ -3,12 +3,13 @@ const GeoJsonSchema = require("../schemas/Map/geoJsonSchema")
 const MapFields = require("../schemas/Map/fieldDataSchema")
 
 const mongoose = require("mongoose")
+var ObjectId = mongoose.Types.ObjectId
 
 getMapById = async (req, res) => {
     try {
         const { id } = req.body
 
-        if (!id || !Number(id)) {
+        if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
@@ -37,7 +38,7 @@ getMapById = async (req, res) => {
 getUserMaps = async (req, res) => {
     try {
         const id = req.params.id
-        if (!id || !Number(id)) {
+        if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
@@ -83,7 +84,7 @@ getGeoJsonById = async (req, res) => {
     try {
         const { id } = req.body
 
-        if (!id || !Number(id)) {
+        if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
@@ -107,7 +108,7 @@ getMapFieldsById = async (req, res) => {
     try {
         const { id } = req.body
 
-        if (!id || !Number(id)) {
+        if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
@@ -199,7 +200,7 @@ createDuplicateMapById = async (req, res) => {
     try {
         const { id } = req.body
 
-        if (!id || !Number(id)) {
+        if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
@@ -251,7 +252,7 @@ createForkMapById = async (req, res) => {
     try {
         const { id } = req.body
 
-        if (!id || !Number(id)) {
+        if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
@@ -303,7 +304,7 @@ deleteMapById = async (req, res) => {
     try {
         const id = req.params.id
 
-        if (!id || !Number(id)) {
+        if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
@@ -333,7 +334,7 @@ updateMapNameById = async (req, res) => {
     try {
         const { id, title } = req.body
 
-        if (!id || !Number(id) || !title) {
+        if (!id || !ObjectId.isValid(id) || !title) {
             return res.status(400).end()
         }
 
@@ -366,7 +367,7 @@ updateMapPublishStatus = async (req, res) => {
     try {
         const id = req.params.id
 
-        if (!id || !Number(id)) {
+        if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
