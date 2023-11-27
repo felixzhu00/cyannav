@@ -57,9 +57,9 @@ export const getAllMaps = () =>
         .then(handleResponse)
         .catch(handleError)
 
-export const getMapJsonbyId = (id) =>
+export const getGeoJsonById = (id) =>
     api
-        .get(`/api/mapjson${id}`)
+        .get(`/api/mapgeojson/${id}`)
         .then(handleResponse)
         .catch(handleError)
 
@@ -186,7 +186,7 @@ const apis = {
     getMapById,
     getUserMaps,
     getAllMaps,
-    getMapJsonbyId,
+    getGeoJsonById,
     createNewMap,
     createDuplicateMapById,
     createForkMapById,
