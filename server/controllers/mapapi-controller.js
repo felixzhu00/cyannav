@@ -69,10 +69,9 @@ getUserMaps = async (req, res) => {
 
 getAllPublishedMaps = async (req, res) => {
     try {
-        const publishedMaps = await MapMetadata.find({ published: true }).populate(
-            "user",
-            "username -_id"
-        )
+        const publishedMaps = await MapMetadata.find({
+            published: true,
+        }).populate("user", "username -_id")
         return res.status(200).json({
             publishedMaps: publishedMaps,
         })
@@ -97,7 +96,7 @@ getGeoJsonById = async (req, res) => {
             return res.status(404).end()
         }
 
-        console.log(geojson.geoBuf);
+        console.log(geojson.geoBuf)
         return res.status(200).json({
             geoBuf: geojson.geoBuf, // TODO: (later) figure out geobuf
         })
@@ -231,7 +230,7 @@ createDuplicateMapById = async (req, res) => {
         }
 
         // TODO: (later) Current both maps point towards the same GeoJsonSchema and fielddata, to be implemented after fielddata is implemented.
-        let x = srcMap.toObject();
+        let x = srcMap.toObject()
         delete x._id
         x.title = newMapTitle
         x.commentsId = []
@@ -291,7 +290,7 @@ createForkMapById = async (req, res) => {
         srcMap.like = []
         srcMap.dislike = []
 
-        const newMap = new Map(srcMap)
+        const newMap = new MapMetadata(srcMap)
         const saved = await newMap.save()
 
         if (!saved) {
@@ -338,8 +337,8 @@ deleteMapById = async (req, res) => {
 updateMapNameById = async (req, res) => {
     try {
         const { id, title } = req.body
-        console.log(id);
-        console.log(title);
+        console.log(id)
+        console.log(title)
         if (!id || !ObjectId.isValid(id) || !title) {
             return res.status(400).end()
         }
@@ -372,7 +371,7 @@ updateMapNameById = async (req, res) => {
 updateMapPublishStatus = async (req, res) => {
     try {
         const { id } = req.body
-        console.log(id);
+        console.log(id)
 
         if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
