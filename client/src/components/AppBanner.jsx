@@ -99,7 +99,8 @@ function AppBanner() {
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
             >
-              <MenuItem onClick={() => {/* navigate('/mymaps') */ }}>
+              <MenuItem
+                onClick={handleHome}>
                 <IconButton id="myMapsBtn" sx={{ color: "black", mr: 1 }}>
                   <Home />
                 </IconButton>
