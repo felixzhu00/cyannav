@@ -106,9 +106,7 @@ function AppBanner() {
                 <Typography textAlign="center">My Maps</Typography>
               </MenuItem>
               <MenuItem
-                onClick={handleStore
-                  // () => {navigate('/marketplace')}
-                }
+                onClick={handleStore}
               >
                 <IconButton id="marketplaceBtn" sx={{ color: "black", mr: 1 }}>
                   <Store />
@@ -184,7 +182,7 @@ function AppBanner() {
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Tooltip title="Open settings">
                 <IconButton id="settingsDropdown" onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="User Avatar" src="/static/images/avatar/2.jpg" />
+                  <Avatar alt="User Avatar" src={logo} />
                 </IconButton>
               </Tooltip>
               <Menu

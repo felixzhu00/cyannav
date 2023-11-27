@@ -77,12 +77,12 @@ router.put(
 //     mapMetadataSchemaController.updateMapTag
 // )
 
-// //Handles updating a map's publish status request(published/unpublished)
-// router.post(
-//     "/publishmap",
-//     auth.verify,
-//     mapMetadataSchemaController.updateMapPublishStatus
-// )
+//Handles updating a map's publish status request(published/unpublished)
+router.put(
+    "/publishmap/:id",
+    auth.verify,
+    // mapMetadataSchemaController.updateMapPublishStatus
+)
 
 // router.post("/likemap", auth.verify, mapMetadataSchemaController.likeMap)
 
