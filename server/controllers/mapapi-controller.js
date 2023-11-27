@@ -8,7 +8,7 @@ getMapById = async (req, res) => {
     try {
         const { id } = req.body
 
-        if (!id) {
+        if (!id || !Number(id)) {
             return res.status(400).end()
         }
 
@@ -17,7 +17,10 @@ getMapById = async (req, res) => {
             return res.status(404).end()
         }
 
-        if (!targetMap.published && targetMap.user !== res.locals.userId) {
+        if (
+            !targetMap.published &&
+            targetMap.user.toString() !== res.locals.userId
+        ) {
             return res.status(401).end()
         }
 
@@ -34,7 +37,7 @@ getMapById = async (req, res) => {
 getUserMaps = async (req, res) => {
     try {
         const id = req.params.id
-        if (!id) {
+        if (!id || !Number(id)) {
             return res.status(400).end()
         }
 
@@ -77,6 +80,10 @@ getGeoJsonById = async (req, res) => {
     try {
         const { id } = req.body
 
+        if (!id || !Number(id)) {
+            return res.status(400).end()
+        }
+
         const GeoJsonSchema = await GeoJsonSchema.findById(id)
 
         if (!GeoJsonSchema) {
@@ -87,7 +94,7 @@ getGeoJsonById = async (req, res) => {
             geoBuf: GeoJsonSchema.buf, // TODO: (later) figure out geobuf
         })
     } catch (err) {
-        console.error("mapapi-controller::getGeoJsonSchemaById")
+        console.error("mapapi-controller::getGeoJsonById")
         console.error(err)
         return res.status(500).end()
     }
@@ -96,6 +103,10 @@ getGeoJsonById = async (req, res) => {
 getMapFieldsById = async (req, res) => {
     try {
         const { id } = req.body
+
+        if (!id || !Number(id)) {
+            return res.status(400).end()
+        }
 
         const mapFields = await MapFields.findById(id)
 
@@ -185,15 +196,15 @@ createDuplicateMapById = async (req, res) => {
     try {
         const { id } = req.body
 
-        if (!id) {
+        if (!id || !Number(id)) {
             return res.status(400).end()
         }
 
-        const srcMap = Map.findById(id)
+        const srcMap = MapMetadata.findById(id)
         if (!srcMap) {
             return res.status(404).end()
         }
-        if (srcMap.user !== res.locals.userId) {
+        if (srcMap.user.toString() !== res.locals.userId) {
             return res.status(401).end()
         }
 
@@ -203,7 +214,7 @@ createDuplicateMapById = async (req, res) => {
         for (let i = 1; i < 9999; i++) {
             // hard-cap... our app will probably break before this much attempts.
             newMapTitle = `${srcMap.title} (${i})`
-            let mapExist = await Map.find({
+            let mapExist = await MapMetadata.find({
                 title: newMapTitle,
                 user: res.locals.userId,
             })
@@ -225,6 +236,7 @@ createDuplicateMapById = async (req, res) => {
         if (!saved) {
             return res.status(500).end()
         }
+        return res.status(200).end()
     } catch (err) {
         console.error("mapapi-controller::createDuplicatedMapById")
         console.error(err)
@@ -236,11 +248,11 @@ createForkMapById = async (req, res) => {
     try {
         const { id } = req.body
 
-        if (!id) {
+        if (!id || !Number(id)) {
             return res.status(400).end()
         }
 
-        const srcMap = Map.findById(id)
+        const srcMap = MapMetadata.findById(id)
         if (!srcMap) {
             return res.status(404).end()
         }
@@ -252,7 +264,7 @@ createForkMapById = async (req, res) => {
         for (let i = 1; i < 9999; i++) {
             // hard-cap... our app will probably break before this much attempts.
             newMapTitle = `${srcMap.title} (${i})`
-            let mapExist = await Map.find({
+            let mapExist = await MapMetadata.find({
                 title: newMapTitle,
                 user: res.locals.userId,
             })
@@ -276,6 +288,7 @@ createForkMapById = async (req, res) => {
         if (!saved) {
             return res.status(500).end()
         }
+        return res.status(200).end()
     } catch (err) {
         console.error("mapapi-controller::createForkMapById")
         console.error(err)
@@ -287,7 +300,7 @@ deleteMapById = async (req, res) => {
     try {
         const id = req.params.id
 
-        if (!id) {
+        if (!id || !Number(id)) {
             return res.status(400).end()
         }
 
@@ -315,10 +328,9 @@ deleteMapById = async (req, res) => {
 
 updateMapNameById = async (req, res) => {
     try {
-        const id = req.params.id
-        const title = req.body.name
+        const { id, title } = req.body
 
-        if (!id || !title) {
+        if (!id || !Number(id) || !title) {
             return res.status(400).end()
         }
 
@@ -351,7 +363,7 @@ updateMapPublishStatus = async (req, res) => {
     try {
         const id = req.params.id
 
-        if (!id) {
+        if (!id || !Number(id)) {
             return res.status(400).end()
         }
 

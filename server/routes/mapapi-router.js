@@ -43,7 +43,7 @@ router.post("/newmap", auth.verify, mapMetadataSchemaController.createNewMap)
 
 //Handles duplicating a map (by ID) request
 router.post(
-    "/duplicatemap/:id",
+    "/duplicatemap",
     auth.verify,
     mapMetadataSchemaController.createDuplicateMapById
 )
@@ -63,8 +63,8 @@ router.delete(
 )
 
 //Handles updating the name of a map (by ID) request
-router.put(
-    "/mapname/:id",
+router.post(
+    "/mapname",
     auth.verify,
     mapMetadataSchemaController.updateMapNameById
 )
