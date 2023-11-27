@@ -23,14 +23,14 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-before(() => {
-    cy.registerUser("autotest2", "autotest2", "11223344##", "11223344##")
-    cy.wait(2000)
-    cy.get("#settingsDropdown").click()
-    cy.get("#settingsDropdownOption").first().click()
-    cy.get("#logoutBtn").click()
-    cy.url().should('include', '/login')
-  });
+// before(() => {
+//     cy.registerUser("autotest2", "autotest2", "11223344##", "11223344##")
+//     cy.wait(2000)
+//     cy.get("#settingsDropdown").click()
+//     cy.get("#settingsDropdownOption").first().click()
+//     cy.get("#logoutBtn").click()
+//     cy.url().should('include', '/login')
+//   });
 
 Cypress.Commands.add('signInUser', (email, password) => {
     cy.visit("localhost:3000")
