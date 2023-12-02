@@ -98,4 +98,6 @@ router.post(
 //     mapMetadataSchemaController.likeComment
 // )
 
+router.post("/getcommentbyid", mapMetadataSchemaController.getCommentById)
+
 module.exports = router

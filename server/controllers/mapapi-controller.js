@@ -404,6 +404,7 @@ updateMapPublishStatus = async (req, res) => {
 // Rest of the update functions to be written later.
 
 // like dislikes and comment to be written here.
+
 postComment = async (req, res) => {
     try {
         const { text, parentCommentId, mapId } = req.body
@@ -468,6 +469,34 @@ postComment = async (req, res) => {
     }
 }
 
+getCommentById = async (req, res) => {
+    try {
+        const { id } = req.body
+
+        if (!id || !ObjectId.isValid(id)) {
+            return res.status(400).end()
+        }
+
+        const targetComment = await Comment.findById(id)
+        if (!targetComment) {
+            return res.status(404).end()
+        }
+
+        return res.status(200).json({
+            author: targetComment.author,
+            childComments: targetComment.childComments,
+            upvotes: targetComment.upvotes,
+            downvotes: targetComment.downvotes,
+            ask_date: targetComment.ask_date,
+            text: targetComment.text,
+        })
+    } catch (err) {
+        console.error("mapapi-controller::getCommentById")
+        console.error(err)
+        return res.status(500).end()
+    }
+}
+
 module.exports = {
     getMapById,
     getUserMaps,
@@ -483,4 +512,5 @@ module.exports = {
     updateMapPublishStatus,
     // updateMapJson,
     postComment,
+    getCommentById,
 }
