@@ -31,7 +31,7 @@ loggedIn = async (req, res) => {
                 username: loggedInUser.username,
                 email: loggedInUser.email,
                 picture: null, // TODO: figure out profile picture
-                userId: userId
+                userId: userId,
             },
         })
     } catch (err) {
@@ -103,9 +103,9 @@ login = async (req, res) => {
 register = async (req, res) => {
     try {
         const { email, username, password, passwordVerify } = req.body
-        console.log(req.body);
+        console.log(req.body)
         if (!email || !username || !password || !passwordVerify) {
-            console.log("HERE");
+            console.log("HERE")
             return res.status(400).json({
                 loggedIn: false,
                 user: null,
@@ -351,8 +351,32 @@ updateEmail = async (req, res) => {
 
 deleteAccount = async (req, res) => {
     try {
+        const { username, email, password } = req.body
+
+        if (!username || !email || !password) {
+            return res.status(400).end()
+        }
+
         if (res.locals.userId === null) {
             return res.status(401).end()
+        }
+
+        const currentUser = await User.findById(res.locals.userId)
+        if (username !== currentUser.username) {
+            return res.status(401).json({
+                errorMessage: "Username does not match",
+            })
+        }
+        if (email !== currentUser.email) {
+            return res.status(401).json({
+                errorMessage: "Email does not match.",
+            })
+        }
+        const match = await bcrypt.compare(password, currentUser.password)
+        if (!match) {
+            return res.status(401).json({
+                errorMessage: "Password does not match",
+            })
         }
 
         var deleteUser = await User.findByIdAndDelete(res.locals.userId)
