@@ -82,7 +82,7 @@ router.post(
     mapMetadataSchemaController.updateMapPublishStatus
 )
 
-// router.post("/likemap", auth.verify, mapMetadataSchemaController.likeMap)
+router.post("/likemap", auth.verify, mapMetadataSchemaController.likeMap)
 
 // router.post("/dislikemap", auth.verify, mapMetadataSchemaController.dislikeMap)
 
