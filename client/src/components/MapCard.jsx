@@ -26,14 +26,13 @@ export default function MapCard({ map }) {
     const MAX_CHIP_LABEL_LENGTH = 10;
 
     const showChips = () => {
-        if (map.tags) {
+        if (map.tags.length != 0) {
             setVisibleChips(map.tags);
         } else {
             setNoTagMessage("No tags associated with map");
         }
     };
 
-    console.log(map.tags.length);
     // Effect to calculate chips on mount and when map changes
     useEffect(() => {
         showChips();
