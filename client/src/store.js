@@ -59,6 +59,8 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.getMyMapCollection = async (userId) => {
+        if (!userId) return;  // Add this line
+
         const response = await api.getUserMaps(userId)
         setStore(prevStore => ({
             ...prevStore,

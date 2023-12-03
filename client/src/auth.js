@@ -18,7 +18,7 @@ export const AuthActionType = {
 
 function AuthContextProvider(props) {
     const [auth, setAuth] = useState({
-        user: null,
+        user: JSON.parse(localStorage.getItem('user')) || null,
         loggedIn: false,
         error: null,
     });
@@ -133,6 +133,9 @@ function AuthContextProvider(props) {
     auth.loginUser = async function (email, password) {
         const response = await api.loginUser(email, password);
         if (response.status === 200) {
+            // Save user data to localStorage
+            localStorage.setItem('user', JSON.stringify(response.data.user));
+
             authReducer({
                 type: AuthActionType.LOGIN_USER,
                 payload: {
@@ -150,6 +153,8 @@ function AuthContextProvider(props) {
         const response = await api.logoutUser();
         console.log(response)
         if (response.status === 200) {
+            localStorage.removeItem('user');
+
             authReducer({
                 type: AuthActionType.LOGOUT_USER,
                 payload: null
@@ -158,7 +163,7 @@ function AuthContextProvider(props) {
     }
 
 
-    auth.updateUsername = async function (loginToken, newUsername) {
+    auth.updateUsername = async function (newUsername) {
         const response = await api.updateUsername(newUsername, newUsername);
         console.log(response)
         if (response.status === 200) {
@@ -168,11 +173,13 @@ function AuthContextProvider(props) {
         }
     }
 
-    auth.updateEmail = async function (loginToken, newEmail) {
+    auth.updateEmail = async function (newEmail) {
         const response = await api.updateEmail(newEmail, newEmail);
         console.log(response)
         if (response.status === 200) {
-            await auth.getLoggedIn()
+            await auth.getLoggedIn();
+        } else {
+            throw new Error(response.data.errorMessage);
         }
     }
 

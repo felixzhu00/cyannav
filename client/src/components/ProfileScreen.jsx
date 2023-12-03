@@ -18,10 +18,9 @@ import { DropzoneArea } from 'react-mui-dropzone'
 export default function ProfileScreen() {
     const { auth } = useContext(AuthContext);
     const [currentModel, setCurrentModel] = useState('');
-    // Example user data, replace with actual data as needed
 
     useEffect(() => {
-    });
+    }, []);
 
     const [showProfilePicModal, setShowProfilePicModal] = useState(false);
     const [profilePicUrl, setProfilePicUrl] = useState(LoginLogo); // Use the LoginLogo by default
