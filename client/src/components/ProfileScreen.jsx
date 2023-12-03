@@ -11,6 +11,7 @@ import MUIChangeUsernameModal from './modals/MUIChangeUsernameModal';
 import MUIDeleteAccountModal from './modals/MUIDeleteAccountModal';
 import MUIChangeProfilePicModal from './modals/MUIChangeProfilePicModal';
 import AuthContext from '../auth'
+import { DropzoneArea } from 'react-mui-dropzone'
 
 
 
@@ -23,8 +24,14 @@ export default function ProfileScreen() {
     });
 
     const [showProfilePicModal, setShowProfilePicModal] = useState(false);
-    const [profilePicUrl, setProfilePicUrl] = useState(LoginLogo);
+    const [profilePicUrl, setProfilePicUrl] = useState(LoginLogo); // Use the LoginLogo by default
+    // const [image, setImage] = React.useState();
 
+    // const handleImageChange = (image) => { // uploaded image
+    //     setImage(image);
+    // };
+
+    // console.log(auth.user.picture);
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
