@@ -68,12 +68,13 @@ router.post(
     auth.verify,
     mapMetadataSchemaController.updateMapNameById
 )
-// //Handles updating a map's tags request
-// router.post(
-//     "/updatemaptag",
-//     auth.verify,
-//     mapMetadataSchemaController.updateMapTag
-// )
+
+//Handles updating a map's tags request
+router.post(
+    "/updatemaptag",
+    auth.verify,
+    mapMetadataSchemaController.updateMapTag
+)
 
 //Handles updating a map's publish status request(published/unpublished)
 router.post(
