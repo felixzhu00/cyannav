@@ -295,9 +295,7 @@ updateUsername = async (req, res) => {
 
         var existingUser = await User.findOne({ username: newUsername })
         if (existingUser) {
-            return res.status(401).json({
-                errorMessage: "Username not unique.",
-            })
+            return res.status(401).end()
         }
 
         var targetUser = await User.findOneAndUpdate(
