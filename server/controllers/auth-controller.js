@@ -330,11 +330,11 @@ updateEmail = async (req, res) => {
         }
 
         var existingUser = await User.findOne({ username: newEmail })
-        // if (existingUser) {
-        //     return res.status(401).json({
-        //         errorMessage: "Email not unique.",
-        //     })
-        // }
+        if (existingUser) {
+            return res.status(401).json({
+                errorMessage: "Email not unique.",
+            })
+        }
 
         var targetUser = await User.findOneAndUpdate(
             { _id: res.locals.userId },
