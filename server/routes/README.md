@@ -167,3 +167,37 @@ Statuses:
 `401`: Comes with JSON data with `errorMessage`.
 
 ## Map APIs
+
+### `/api/mapmetadata/:id`
+
+### `/api/mapbyuser/:id`
+
+### `/api/allpublishedmap`
+
+### `/api/mapgeojson/:id`
+
+### `/api/mapfields/:id`
+
+### `/api/newmap`
+
+### `/api/duplicatemap`
+
+### `/api/forkmap`
+
+### `/api/deletemap/:id`
+
+### `/api/mapname`
+
+### `/api/updatemaptag`
+
+### `/api/publishmap`
+
+### `/api/likemap`
+
+### `/api/dislikemap`
+
+### `/api/postcomment`
+
+### `/api/likecomment`
+
+### `/api/dislikecomment`
