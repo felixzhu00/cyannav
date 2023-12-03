@@ -7,6 +7,9 @@ import IconButton from '@mui/material/IconButton';
 import { Close } from '@mui/icons-material';
 import { TextField } from '@mui/material';
 import { useTheme } from '@emotion/react';
+import AuthContext from '../../auth.js';
+import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
 
 
 const style = {
@@ -23,9 +26,17 @@ const style = {
 
 export default function MUIDeleteAccountModal() {
     const theme = useTheme();
+    const navigate = useNavigate();
+    const { auth } = useContext(AuthContext);
 
     const [open, setOpen] = React.useState(true);
     const handleClose = () => setOpen(false);
+
+    const handleDelete = async () => {
+        await auth.deleteAccount();
+        handleClose();
+        navigate('/login');
+    }
 
     return (
         <div>
@@ -85,7 +96,7 @@ export default function MUIDeleteAccountModal() {
                         />
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
                             <Button
-                                onClick={handleClose}
+                                onClick={handleDelete}
                                 variant="contained"
                                 sx={{
                                     backgroundColor: "red",

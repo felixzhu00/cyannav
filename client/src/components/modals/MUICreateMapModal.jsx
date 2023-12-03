@@ -55,7 +55,7 @@ export default function MUICreateMapModal(props) {
     const handleCreateMap = async () => { // calls store function
         console.log(title, fileType, template, files)
         await store.createMap(title, fileType, template, files);
-        
+
         // closes modal
         setOpen(false)
         props.onClose()
@@ -93,7 +93,7 @@ export default function MUICreateMapModal(props) {
                                 required
                                 placeholder="Untitled"
                                 onChange={(e) => setTitle(e.target.value)}
-                                sx={{ ml: 2 }}
+                                sx={{ ml: 2, width: "75%" }}
                             />
                         </Box>
 
