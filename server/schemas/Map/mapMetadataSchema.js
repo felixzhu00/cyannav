@@ -73,8 +73,7 @@ const mapMetadataSchema = new Schema({
     ],
     parentMapId: this,
     tags: {
-        type: String,
-        default: "",
+        type: [String],
     },
 })
 

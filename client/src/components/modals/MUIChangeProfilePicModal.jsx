@@ -1,38 +1,55 @@
 import React, { useState } from 'react';
-import { Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
+import { Modal, Box, Button, Typography } from '@mui/material';
+import { DropzoneArea } from 'react-mui-dropzone';
 import { useTheme } from '@emotion/react';
 
 function MUIChangeProfilePicModal({ open, onClose, onSave }) {
     const theme = useTheme();
+    const [selectedFiles, setSelectedFiles] = useState([]);
 
-    const [selectedFile, setSelectedFile] = useState(null);
-
-    const handleFileChange = (event) => {
-        setSelectedFile(event.target.files[0]);
+    const handleFileChange = (files) => {
+        setSelectedFiles(files);
     };
 
     const handleSave = () => {
-        // Implement the logic to handle the file upload
-        let newUrl = URL.createObjectURL(selectedFile);
-        onSave(newUrl);
-        onClose(); // Close the modal after saving
+        if (selectedFiles && selectedFiles.length > 0) {
+            let newUrl = URL.createObjectURL(selectedFiles[0]);
+            onSave(newUrl);
+        }
+        onClose();
+    };
+
+    const style = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 600,
+        bgcolor: 'background.paper',
+        boxShadow: 24,
+        p: 4,
     };
 
     return (
-        <Dialog open={open} onClose={onClose}>
-            <DialogTitle id="changePictureText">Change Profile Picture</DialogTitle>
-            <DialogContent>
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                />
-            </DialogContent>
-            <DialogActions sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
-                <Button onClick={handleSave} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", mr: '5px' }}>Save</Button>
-                <Button onClick={onClose} variant="outlined" sx={{ color: "black", ml: '5px' }}>Cancel</Button>
-            </DialogActions>
-        </Dialog>
+        <Modal open={open} onClose={onClose}>
+            <Box sx={style}>
+                <Typography id="changePictureText" variant="h6" component="h2">
+                    Change Profile Picture
+                </Typography>
+                <Box sx={{ mt: 2, mb: 2 }}>
+                    <DropzoneArea
+                        onChange={handleFileChange}
+                        filesLimit={1}
+                        dropzoneText="Drag and drop an image file here or click"
+                        acceptedFiles={['image/*']}
+                    />
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Button variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", width: "90px", mr: 1 }} onClick={handleSave}>Save</Button>
+                    <Button variant="outlined" sx={{ color: "black" }} onClick={onClose}>Cancel</Button>
+                </Box>
+            </Box>
+        </Modal>
     );
 }
 

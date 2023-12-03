@@ -308,7 +308,6 @@ createForkMapById = async (req, res) => {
 deleteMapById = async (req, res) => {
     try {
         const id = req.params.id
-
         if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
@@ -586,7 +585,6 @@ getCommentById = async (req, res) => {
 updateMapTag = async (req, res) => {
     try {
         const { id, newTags } = req.body
-
         if (!id || !ObjectId.isValid(id) || !newTags) {
             return res.status(400).end()
         }
@@ -599,6 +597,7 @@ updateMapTag = async (req, res) => {
         targetMap.tags = newTags
         const saved = await targetMap.save()
         if (!saved) {
+            console.log("rest")
             return res.status(500).end()
         }
         return res.status(200).end()
@@ -620,7 +619,7 @@ module.exports = {
     createForkMapById,
     deleteMapById,
     updateMapNameById,
-    // updateMapTag,
+    updateMapTag,
     updateMapPublishStatus,
     // updateMapJson,
     postComment,

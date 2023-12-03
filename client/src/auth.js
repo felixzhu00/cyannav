@@ -163,6 +163,8 @@ function AuthContextProvider(props) {
         console.log(response)
         if (response.status === 200) {
             await auth.getLoggedIn()
+        } else {
+            throw new Error(response.data.errorMessage);
         }
     }
 
@@ -183,10 +185,13 @@ function AuthContextProvider(props) {
         })
     }
 
-    auth.deleteAccount = async function () {
-        const response = await api.deleteAccount();
+    auth.deleteAccount = async function (username, email, password) {
+        const response = await api.deleteAccount(username, email, password);
+        console.log("RESPONSE", response);
         if (response.status === 200) {
             clearCookies();
+        } else {
+            throw new Error(response.data.errorMessage);
         }
     }
 

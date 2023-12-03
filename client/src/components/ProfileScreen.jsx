@@ -11,6 +11,7 @@ import MUIChangeUsernameModal from './modals/MUIChangeUsernameModal';
 import MUIDeleteAccountModal from './modals/MUIDeleteAccountModal';
 import MUIChangeProfilePicModal from './modals/MUIChangeProfilePicModal';
 import AuthContext from '../auth'
+import { DropzoneArea } from 'react-mui-dropzone'
 
 
 
@@ -18,18 +19,19 @@ export default function ProfileScreen() {
     const { auth } = useContext(AuthContext);
     const [currentModel, setCurrentModel] = useState('');
     // Example user data, replace with actual data as needed
-    
-    const handleDeleteAccount = () => {
-        // Implement account deletion logic
-        console.log('Delete account');
-    };
-    
-      useEffect(() => {
-      });
+
+    useEffect(() => {
+    });
 
     const [showProfilePicModal, setShowProfilePicModal] = useState(false);
-    const [profilePicUrl, setProfilePicUrl] = useState(LoginLogo);
+    const [profilePicUrl, setProfilePicUrl] = useState(LoginLogo); // Use the LoginLogo by default
+    // const [image, setImage] = React.useState();
 
+    // const handleImageChange = (image) => { // uploaded image
+    //     setImage(image);
+    // };
+
+    // console.log(auth.user.picture);
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
@@ -106,8 +108,8 @@ export default function ProfileScreen() {
                             readOnly: true,
                             endAdornment: (
                                 <InputAdornment position="end">
-                                    <IconButton>
-                                        <Edit id="usernameEditBtn" onClick={() => { setCurrentModel("username") }} />
+                                    <IconButton onClick={() => { setCurrentModel("username") }} >
+                                        <Edit id="usernameEditBtn" />
                                     </IconButton>
                                 </InputAdornment>
                             ),
@@ -129,8 +131,8 @@ export default function ProfileScreen() {
                             readOnly: true,
                             endAdornment: (
                                 <InputAdornment position="end">
-                                    <IconButton>
-                                        <Edit id="emailEditBtn" onClick={() => { setCurrentModel("email") }} />
+                                    <IconButton onClick={() => { setCurrentModel("email") }}>
+                                        <Edit id="emailEditBtn" />
                                     </IconButton>
                                 </InputAdornment>
                             ),
@@ -142,7 +144,7 @@ export default function ProfileScreen() {
                     <TextField
                         id="password"
                         label="Password"
-                        value={ '************'}
+                        value={'************'}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
@@ -152,8 +154,8 @@ export default function ProfileScreen() {
                             readOnly: true,
                             endAdornment: (
                                 <InputAdornment position="end">
-                                    <IconButton>
-                                        <Edit id="passwordEditBtn" onClick={() => { setCurrentModel("password") }} />
+                                    <IconButton onClick={() => { setCurrentModel("password") }}>
+                                        <Edit id="passwordEditBtn" />
                                     </IconButton>
                                 </InputAdornment>
                             ),
