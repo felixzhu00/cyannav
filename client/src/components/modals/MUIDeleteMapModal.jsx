@@ -40,6 +40,8 @@ export default function MUIDeleteMapModal(props) {
 
         handleClose();
         await store.getMyMapCollection(auth.user.userId);
+        console.log(store.mapCollection);
+
     }
 
 

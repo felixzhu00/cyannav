@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
-import { Close, PropaneSharp } from '@mui/icons-material';
+import { Close } from '@mui/icons-material';
 import { FormControl, RadioGroup, Radio, FormControlLabel, FormGroup, Select, MenuItem, InputLabel, TextField } from '@mui/material';
 import { DropzoneArea } from 'react-mui-dropzone'
 import { useEffect, useState } from 'react';
@@ -12,6 +12,7 @@ import { useTheme } from '@emotion/react';
 import { GlobalStoreContext } from '../../store'
 import { useContext } from 'react';
 import AuthContext from "../../auth.js";
+
 const style = {
     position: 'absolute',
     top: '50%',
