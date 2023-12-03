@@ -517,6 +517,9 @@ postComment = async (req, res) => {
             if (!map) {
                 return res.status(404).end()
             }
+            if (!map.published) {
+                return res.status(401).end()
+            }
         }
 
         const newComment = new Comment({
