@@ -49,6 +49,10 @@ function GlobalStoreContextProvider(props) {
         });
     }
 
+    store.updateMapTag = async (mapId, tags) => {
+        return await api.updateMapTag(mapId, tags);
+    }
+
     store.createMap = async (title, fileType, mapTemplate, files) => {
         var buffer = geobuf.encode(files, new Pbf())
         return await api.createNewMap(title, mapTemplate, buffer);
