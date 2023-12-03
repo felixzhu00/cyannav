@@ -72,6 +72,10 @@ const mapMetadataSchema = new Schema({
         },
     ],
     parentMapId: this,
+    tags: {
+        type: String,
+        default: "",
+    },
 })
 
 const mapGraphicModel = mongoose.model("mapMetadata", mapMetadataSchema)

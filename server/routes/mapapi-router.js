@@ -82,20 +82,22 @@ router.post(
     mapMetadataSchemaController.updateMapPublishStatus
 )
 
-// router.post("/likemap", auth.verify, mapMetadataSchemaController.likeMap)
+router.post("/likemap", auth.verify, mapMetadataSchemaController.likeMap)
 
-// router.post("/dislikemap", auth.verify, mapMetadataSchemaController.dislikeMap)
+router.post("/dislikemap", auth.verify, mapMetadataSchemaController.dislikeMap)
 
-// router.post(
-//     "/postcomment",
-//     auth.verify,
-//     mapMetadataSchemaController.postComment
-// )
+router.post(
+    "/postcomment",
+    auth.verify,
+    mapMetadataSchemaController.postComment
+)
 
 // router.post(
 //     "/likecomment",
 //     auth.verify,
 //     mapMetadataSchemaController.likeComment
 // )
+
+router.post("/getcommentbyid", mapMetadataSchemaController.getCommentById)
 
 module.exports = router

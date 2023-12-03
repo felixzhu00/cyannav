@@ -1,6 +1,7 @@
 const MapMetadata = require("../schemas/Map/mapMetadataSchema")
 const GeoJsonSchema = require("../schemas/Map/geoJsonSchema")
 const MapFields = require("../schemas/Map/fieldDataSchema")
+const Comment = require("../schemas/Map/commentSchema")
 
 const mongoose = require("mongoose")
 var ObjectId = mongoose.Types.ObjectId
@@ -69,10 +70,9 @@ getUserMaps = async (req, res) => {
 
 getAllPublishedMaps = async (req, res) => {
     try {
-        const publishedMaps = await MapMetadata.find({ published: true }).populate(
-            "user",
-            "username -_id"
-        )
+        const publishedMaps = await MapMetadata.find({
+            published: true,
+        }).populate("user", "username -_id")
         return res.status(200).json({
             publishedMaps: publishedMaps,
         })
@@ -97,7 +97,7 @@ getGeoJsonById = async (req, res) => {
             return res.status(404).end()
         }
 
-        console.log(geojson.geoBuf);
+        console.log(geojson.geoBuf)
         return res.status(200).json({
             geoBuf: geojson.geoBuf, // TODO: (later) figure out geobuf
         })
@@ -231,7 +231,7 @@ createDuplicateMapById = async (req, res) => {
         }
 
         // TODO: (later) Current both maps point towards the same GeoJsonSchema and fielddata, to be implemented after fielddata is implemented.
-        let x = srcMap.toObject();
+        let x = srcMap.toObject()
         delete x._id
         x.title = newMapTitle
         x.commentsId = []
@@ -291,7 +291,7 @@ createForkMapById = async (req, res) => {
         srcMap.like = []
         srcMap.dislike = []
 
-        const newMap = new Map(srcMap)
+        const newMap = new MapMetadata(srcMap)
         const saved = await newMap.save()
 
         if (!saved) {
@@ -338,8 +338,8 @@ deleteMapById = async (req, res) => {
 updateMapNameById = async (req, res) => {
     try {
         const { id, title } = req.body
-        console.log(id);
-        console.log(title);
+        console.log(id)
+        console.log(title)
         if (!id || !ObjectId.isValid(id) || !title) {
             return res.status(400).end()
         }
@@ -372,7 +372,7 @@ updateMapNameById = async (req, res) => {
 updateMapPublishStatus = async (req, res) => {
     try {
         const { id } = req.body
-        console.log(id);
+        console.log(id)
 
         if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
@@ -404,6 +404,210 @@ updateMapPublishStatus = async (req, res) => {
 // Rest of the update functions to be written later.
 
 // like dislikes and comment to be written here.
+likeMap = async (req, res) => {
+    try {
+        const { id } = req.body
+
+        if (!id || !ObjectId.isValid(id)) {
+            return res.status(400).end()
+        }
+
+        const targetMap = MapMetadata.findById(id)
+        if (!targetMap) {
+            return res.status(404).end()
+        }
+
+        const userObjectId = new ObjectId(res.locals.userId)
+
+        // Remove existing dislike
+        const dislikeIndex = targetMap.dislike.indexOf(userObjectId)
+        if (dislikeIndex > -1) {
+            targetMap.dislike.splice(dislikeIndex, 1)
+        }
+
+        const likeIndex = targetMap.like.indexOf(userObjectId)
+        if (likeIndex > -1) {
+            // Already liked, so remove like.
+            targetMap.like.splice(likeIndex, 1)
+        } else {
+            // Add like to list
+            targetMap.like.push(userObjectId)
+        }
+
+        const saved = await targetMap.save()
+        if (!saved) {
+            return res.status(500).end()
+        }
+
+        return res.status(200)
+    } catch (err) {
+        console.error("mapapi-controller::likeMap")
+        console.error(err)
+        return res.status(500).end()
+    }
+}
+
+dislikeMap = async (req, res) => {
+    try {
+        const { id } = req.body
+
+        if (!id || !ObjectId.isValid(id)) {
+            return res.status(400).end()
+        }
+
+        const targetMap = MapMetadata.findById(id)
+        if (!targetMap) {
+            return res.status(404).end()
+        }
+
+        const userObjectId = new ObjectId(res.locals.userId)
+
+        // Remove existing dislike
+        const dislikeIndex = targetMap.dislike.indexOf(userObjectId)
+        if (dislikeIndex > -1) {
+            // Already disliked, remove dislike
+            targetMap.dislike.splice(dislikeIndex, 1)
+        } else {
+            // Add dislike to list
+            targetMap.dislike.push(userObjectId)
+        }
+
+        const likeIndex = targetMap.like.indexOf(userObjectId)
+        if (likeIndex > -1) {
+            // Remove existing like if exist.
+            targetMap.like.splice(likeIndex, 1)
+        }
+
+        const saved = await targetMap.save()
+        if (!saved) {
+            return res.status(500).end()
+        }
+
+        return res.status(200)
+    } catch (err) {
+        console.error("mapapi-controller::dislikeMap")
+        console.error(err)
+        return res.status(500).end()
+    }
+}
+
+postComment = async (req, res) => {
+    try {
+        const { text, parentCommentId, mapId } = req.body
+
+        if (
+            !text ||
+            !mapId ||
+            !ObjectId.isValid(mapId) ||
+            !ObjectId.isValid(parentCommentId)
+        ) {
+            return res.status(400).end()
+        }
+
+        var parentComment = undefined
+        var map = undefined
+        if (!parentCommentId) {
+            parentComment = await Comment.findById(parentCommentId)
+            if (!parentComment) {
+                return res.status(404).end()
+            }
+        } else {
+            // Root map,
+            map = await MapMetadata.findById(mapId)
+            if (!map) {
+                return res.status(404).end()
+            }
+        }
+
+        const newComment = new Comment({
+            author: res.locals.userId,
+            text: text,
+        })
+
+        const saved = await newComment.save()
+        if (!saved) {
+            return res.status(500).end()
+        }
+
+        if (parentComment != undefined) {
+            parentComment.childComments = [
+                ...parentComment.childComments,
+                saved._id,
+            ]
+            const pSaved = await parentComment.save()
+            if (!pSaved) {
+                return res.status(500).end()
+            }
+        } else {
+            // This is root comment.
+            map.commentsId = [...map.commentsId, saved._id]
+            const mSaved = await map.save()
+            if (!mSaved) {
+                return res.status(500).end()
+            }
+        }
+
+        return res.status(200).end()
+    } catch (err) {
+        console.error("mapapi-controller::postComment")
+        console.error(err)
+        return res.status(500).end()
+    }
+}
+
+getCommentById = async (req, res) => {
+    try {
+        const { id } = req.body
+
+        if (!id || !ObjectId.isValid(id)) {
+            return res.status(400).end()
+        }
+
+        const targetComment = await Comment.findById(id)
+        if (!targetComment) {
+            return res.status(404).end()
+        }
+
+        return res.status(200).json({
+            author: targetComment.author,
+            childComments: targetComment.childComments,
+            upvotes: targetComment.upvotes,
+            downvotes: targetComment.downvotes,
+            ask_date: targetComment.ask_date,
+            text: targetComment.text,
+        })
+    } catch (err) {
+        console.error("mapapi-controller::getCommentById")
+        console.error(err)
+        return res.status(500).end()
+    }
+}
+
+updateMapTag = async (req, res) => {
+    try {
+        const { id, newTags } = req.body
+
+        if (!id || !ObjectId.isValid(id) || !newTags) {
+            return res.status(400).end()
+        }
+
+        var targetMap = await MapMetadata.findById(id)
+        if (!targetMap) {
+            return res.status(404).end()
+        }
+
+        targetMap.tags = newTags
+        const saved = await targetMap.save()
+        if (!saved) {
+            return res.status(500).end()
+        }
+        return res.status(200).end()
+    } catch (err) {
+        console.error("mapapi-controller::updateMapTag")
+        console.error(err)
+        return res.status(500).end()
+    }
+}
 
 module.exports = {
     getMapById,
@@ -419,4 +623,8 @@ module.exports = {
     // updateMapTag,
     updateMapPublishStatus,
     // updateMapJson,
+    postComment,
+    getCommentById,
+    likeMap,
+    dislikeMap,
 }
