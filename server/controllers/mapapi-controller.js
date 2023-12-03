@@ -485,7 +485,7 @@ dislikeMap = async (req, res) => {
 
         return res.status(200)
     } catch (err) {
-        console.error("mapapi-controller::likeMap")
+        console.error("mapapi-controller::dislikeMap")
         console.error(err)
         return res.status(500).end()
     }
