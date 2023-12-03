@@ -198,7 +198,9 @@ logout = async (req, res) => {
         expires: new Date(0),
         secure: true,
         sameSite: "none",
-    }).send()
+    })
+        .status(200)
+        .send()
 }
 
 // TODO: To be implemented once email service is setup.
