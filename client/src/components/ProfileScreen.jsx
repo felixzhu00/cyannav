@@ -18,14 +18,9 @@ export default function ProfileScreen() {
     const { auth } = useContext(AuthContext);
     const [currentModel, setCurrentModel] = useState('');
     // Example user data, replace with actual data as needed
-    
-    const handleDeleteAccount = () => {
-        // Implement account deletion logic
-        console.log('Delete account');
-    };
-    
-      useEffect(() => {
-      });
+
+    useEffect(() => {
+    });
 
     const [showProfilePicModal, setShowProfilePicModal] = useState(false);
     const [profilePicUrl, setProfilePicUrl] = useState(LoginLogo);
@@ -106,8 +101,8 @@ export default function ProfileScreen() {
                             readOnly: true,
                             endAdornment: (
                                 <InputAdornment position="end">
-                                    <IconButton>
-                                        <Edit id="usernameEditBtn" onClick={() => { setCurrentModel("username") }} />
+                                    <IconButton onClick={() => { setCurrentModel("username") }} >
+                                        <Edit id="usernameEditBtn" />
                                     </IconButton>
                                 </InputAdornment>
                             ),
@@ -129,8 +124,8 @@ export default function ProfileScreen() {
                             readOnly: true,
                             endAdornment: (
                                 <InputAdornment position="end">
-                                    <IconButton>
-                                        <Edit id="emailEditBtn" onClick={() => { setCurrentModel("email") }} />
+                                    <IconButton onClick={() => { setCurrentModel("email") }}>
+                                        <Edit id="emailEditBtn" />
                                     </IconButton>
                                 </InputAdornment>
                             ),
@@ -142,7 +137,7 @@ export default function ProfileScreen() {
                     <TextField
                         id="password"
                         label="Password"
-                        value={ '************'}
+                        value={'************'}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
@@ -152,8 +147,8 @@ export default function ProfileScreen() {
                             readOnly: true,
                             endAdornment: (
                                 <InputAdornment position="end">
-                                    <IconButton>
-                                        <Edit id="passwordEditBtn" onClick={() => { setCurrentModel("password") }} />
+                                    <IconButton onClick={() => { setCurrentModel("password") }}>
+                                        <Edit id="passwordEditBtn" />
                                     </IconButton>
                                 </InputAdornment>
                             ),

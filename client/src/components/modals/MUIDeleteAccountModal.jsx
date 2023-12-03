@@ -17,7 +17,7 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 400,
+    width: 500,
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
@@ -32,10 +32,30 @@ export default function MUIDeleteAccountModal() {
     const [open, setOpen] = React.useState(true);
     const handleClose = () => setOpen(false);
 
-    const handleDelete = async () => {
-        await auth.deleteAccount();
-        handleClose();
-        navigate('/login');
+    const [errorMessage, setErrorMessage] = React.useState('');
+
+    const handleDelete = async (event) => {
+        event.preventDefault();
+        const formElement = document.getElementById('deleteAccountForm');
+        const data = new FormData(formElement);
+        const input = {
+            username: data.get('username'),
+            email: data.get('email'),
+            password: data.get('password')
+        }
+        if (input.username != '' || input.email != '' || input.password != '') {
+            try {
+                await auth.deleteAccount(input.username, input.email, input.password);
+                handleClose();
+                await auth.logoutUser();
+                navigate('/login')
+            } catch (error) {
+                console.log(error.message);
+                setErrorMessage(error.message);
+            }
+        } else {
+            setErrorMessage('All fields are required!');
+        }
     }
 
     return (
@@ -60,6 +80,7 @@ export default function MUIDeleteAccountModal() {
                     </Typography>
                     <Box
                         component="form"
+                        id="deleteAccountForm"
                         sx={{
                             '& .MuiTextField-root': { m: 1, width: '95%' },
                             mt: 2,
@@ -69,6 +90,7 @@ export default function MUIDeleteAccountModal() {
                     >
                         <TextField
                             margin="normal"
+                            onChange={() => setErrorMessage('')}
                             required
                             fullWidth
                             name="username"
@@ -78,6 +100,7 @@ export default function MUIDeleteAccountModal() {
                         />
                         <TextField
                             margin="normal"
+                            onChange={() => setErrorMessage('')}
                             required
                             fullWidth
                             name="email"
@@ -87,6 +110,7 @@ export default function MUIDeleteAccountModal() {
                         />
                         <TextField
                             margin="normal"
+                            onChange={() => setErrorMessage('')}
                             required
                             fullWidth
                             name="password"
@@ -94,6 +118,11 @@ export default function MUIDeleteAccountModal() {
                             type="password"
                             id="password"
                         />
+                        {errorMessage && (
+                            <Typography color="error" variant='subtitle2' sx={{ mt: 1, ml: 1 }}>
+                                {errorMessage}
+                            </Typography>
+                        )}
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
                             <Button
                                 onClick={handleDelete}

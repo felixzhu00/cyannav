@@ -43,7 +43,6 @@ function GlobalStoreContextProvider(props) {
 
     //Nav Global Handlers
     store.toggleBrowsePage = async (option) => {
-        console.log("1")
         return setStore({
             ...store,
             togglebrowseHome: option == "home" ? true : false
@@ -51,18 +50,12 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.createMap = async (title, fileType, mapTemplate, files) => {
-        console.log("2")
         var buffer = geobuf.encode(files, new Pbf())
-
         return await api.createNewMap(title, mapTemplate, buffer);
     }
 
     store.getMyMapCollection = async (userId) => {
-        console.log("3")
         const response = await api.getUserMaps(userId)
-
-        console.log(store)
-
         setStore(prevStore => ({
             ...prevStore,
             mapCollection: response.data.userMaps,
@@ -72,7 +65,6 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.getMarketplaceCollection = async (userId) => {
-        console.log("4")
         const response = await api.getAllMaps()
 
         setStore({
@@ -84,26 +76,19 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.renameMap = async (mapId, newName) => {
-        console.log("5")
         // Call to backend API to update the map name
-        console.log(mapId, newName);
         await api.updateMapNameById(mapId, newName);
     }
 
     store.deleteMap = async (mapId) => {
-        console.log("6")
-        console.log(mapId);
         await api.deleteMapById(mapId);
     }
 
     store.duplicateMap = async (mapId) => {
-        console.log("7")
-        console.log(mapId);
         await api.createDuplicateMapById(mapId);
     }
 
     store.publishMap = async (mapId) => {
-        console.log("8")
         await api.updateMapPublishStatus(mapId);
     }
 
@@ -121,7 +106,6 @@ function GlobalStoreContextProvider(props) {
 
     //Map Card Global Handlers
     store.searchForMapBy = async (filter, string) => {
-        console.log("9")
         let response
 
         if (store.togglebrowseHome) {
@@ -156,7 +140,6 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.sortMapBy = async (key, order) => {
-        console.log("10")
         //key: 'alphabetical-order' or 'recent'
         //order: 'asc' for ascending, 'dec' for decending
         const sortedArray = [...store.mapCollection]
@@ -198,7 +181,6 @@ function GlobalStoreContextProvider(props) {
 
 
     store.setCurrentModal = (option, id) => {
-        console.log("11", option)
         return setStore({
             ...store,
             currentModal: option,
