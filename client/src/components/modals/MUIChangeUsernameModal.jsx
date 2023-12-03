@@ -1,4 +1,5 @@
-import {useState , useContext, useEffect} from 'react';
+import * as React from 'react';
+import { useState, useContext, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -29,24 +30,25 @@ export default function MUIChangeUsernameModal(props) {
     const [open, setOpen] = useState(props.open);
     const [newUsername, setNewUsername] = useState('');
 
-
+    const [errorMessage, setErrorMessage] = React.useState('');
 
     const handleClose = () => {
         setOpen(false)
         props.onClose()
     };
 
-    
-    const handleSave = ()=> {
-        auth.updateUsername(newUsername, newUsername);
-        handleClose()
+    const handleSave = async () => {
+        try {
+            await auth.updateUsername(newUsername, newUsername);
+            handleClose();
+        } catch (error) {
+            setErrorMessage(error.message);
+        }
     }
 
     const handleUsernameChange = (event) => {
         setNewUsername(event.target.value);
     };
-
-    // 
 
     return (
         <div>
@@ -77,7 +79,7 @@ export default function MUIChangeUsernameModal(props) {
                             disabled
                             id="outlined-disabled"
                             label="Old Username"
-                            defaultValue=""
+                            defaultValue={auth.user.username}
                             fullWidth
                         />
                         <TextField
@@ -86,8 +88,16 @@ export default function MUIChangeUsernameModal(props) {
                             label="New Username"
                             defaultValue=""
                             fullWidth
-                            onChange={handleUsernameChange}
+                            onChange={(event) => {
+                                handleUsernameChange(event);
+                                setErrorMessage('');
+                            }}
                         />
+                        {errorMessage && (
+                            <Typography color="error" variant='subtitle2' sx={{ mt: 1, ml: 1 }}>
+                                {errorMessage}
+                            </Typography>
+                        )}
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
                             <Button onClick={handleSave} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", mr: "10px", width: "90px" }}>Save</Button>
                             <Button onClick={handleClose} variant="outlined" sx={{ color: "black" }}>Cancel</Button>

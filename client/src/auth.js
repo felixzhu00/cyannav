@@ -163,6 +163,8 @@ function AuthContextProvider(props) {
         console.log(response)
         if (response.status === 200) {
             await auth.getLoggedIn()
+        } else {
+            throw new Error(response.data.errorMessage);
         }
     }
 
