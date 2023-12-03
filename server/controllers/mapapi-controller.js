@@ -583,6 +583,32 @@ getCommentById = async (req, res) => {
     }
 }
 
+updateMapTag = async (req, res) => {
+    try {
+        const { id, newTags } = req.body
+
+        if (!id || !ObjectId.isValid(id) || !newTags) {
+            return res.status(400).end()
+        }
+
+        var targetMap = await MapMetadata.findById(id)
+        if (!targetMap) {
+            return res.status(404).end()
+        }
+
+        targetMap.tags = newTags
+        const saved = await targetMap.save()
+        if (!saved) {
+            return res.status(500).end()
+        }
+        return res.status(200).end()
+    } catch (err) {
+        console.error("mapapi-controller::updateMapTag")
+        console.error(err)
+        return res.status(500).end()
+    }
+}
+
 module.exports = {
     getMapById,
     getUserMaps,
