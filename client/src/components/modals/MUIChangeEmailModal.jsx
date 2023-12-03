@@ -1,3 +1,4 @@
+import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
@@ -5,11 +6,9 @@ import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import { Close } from '@mui/icons-material';
 import { TextField } from '@mui/material';
-import { useState, useRef, useEffect, useContext} from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 import { useTheme } from '@emotion/react';
 import AuthContext from '../../auth.js';
-
-
 
 const style = {
     position: 'absolute',
@@ -28,23 +27,28 @@ export default function MUIChangeEmailModal(props) {
     const { auth } = useContext(AuthContext);
     const [open, setOpen] = useState(props.open);
     const [newEmail, setNewEmail] = useState('');
-
+    const [errorMessage, setErrorMessage] = React.useState('');
 
     const handleClose = () => {
         setOpen(false)
         props.onClose()
     };
-    
-    const handleSave = async ()=> {
-        await auth.updateEmail(newEmail, newEmail);
-        handleClose()
+
+    const handleSave = async () => {
+        try {
+            await auth.updateEmail(newEmail, newEmail);
+            handleClose()
+        } catch (error) {
+            setErrorMessage(error.message);
+        }
+
     }
 
     const handleEmailChange = (event) => {
         setNewEmail(event.target.value);
     };
 
-    
+
 
     return (
         <div>
@@ -72,11 +76,11 @@ export default function MUIChangeEmailModal(props) {
                         autoComplete="off"
                     >
                         <TextField
-                            required
+                            disabled
                             type="email"
                             id="old-email"
                             label="Old Email"
-                            defaultValue=""
+                            defaultValue={auth.user.email}
                             fullWidth
                         />
                         <TextField
@@ -86,8 +90,16 @@ export default function MUIChangeEmailModal(props) {
                             label="New Email"
                             defaultValue=""
                             fullWidth
-                            onChange={handleEmailChange}
+                            onChange={(event) => {
+                                handleEmailChange(event);
+                                setErrorMessage('');
+                            }}
                         />
+                        {errorMessage && (
+                            <Typography color="error" variant='subtitle2' sx={{ mt: 1, ml: 1 }}>
+                                {errorMessage}
+                            </Typography>
+                        )}
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
                             <Button onClick={handleSave} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", mr: "10px", width: "90px" }}>Save</Button>
                             <Button onClick={handleClose} variant="outlined" sx={{ color: "black" }}>Cancel</Button>
