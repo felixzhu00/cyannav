@@ -11,10 +11,7 @@ import AuthContext from '../auth'
 function AppBanner() {
   const location = useLocation();
   const { pathname } = location;
-  if (pathname === '/' || pathname === '/login/' || pathname === '/login' || pathname === '/register/' || pathname === '/register' || pathname === '/forget/' || pathname === '/forget') {
 
-    return null;
-  }
 
 
   const { store } = useContext(GlobalStoreContext);
@@ -71,7 +68,9 @@ function AppBanner() {
   useEffect(() => {
   }, []);
 
-
+  if (pathname === '/' || pathname === '/login/' || pathname === '/login' || pathname === '/register/' || pathname === '/register' || pathname === '/forget/' || pathname === '/forget') {
+    return null;
+  }
 
   return (
     <AppBar position="relative" sx={{ backgroundColor: theme.palette.background.default, width: "100%", zIndex: 2 }}>

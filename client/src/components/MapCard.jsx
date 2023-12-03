@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import { Box, Card, CardMedia, CardContent, Typography, IconButton, Menu, MenuItem, useMediaQuery, useTheme, TextField } from '@mui/material';
 import { MoreVert, Publish } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
-import mapSample from '../assets/map_sample.jpg';
+import usgeojsonpng from "../assets/usgeojson.png"
 import { GlobalStoreContext } from '../store'
 import AuthContext from '../auth'
 
@@ -85,7 +85,7 @@ export default function MapCard({ map }) {
                 <Link id="mapImage" to="/mapview" onClick={handleNavToMap} style={{ textDecoration: 'none' }}>
                     <CardMedia
                         sx={{ height: 300, cursor: 'pointer' }}
-                        image={mapSample}
+                        image={usgeojsonpng}
                         title="mapImage"
                     />
                 </Link>

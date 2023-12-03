@@ -176,9 +176,9 @@ export const updateEmail = (loginToken, newEmail) =>
         .post("/auth/updateEmail", { loginToken, newEmail })
         .then(handleResponse)
         .catch(handleError)
-export const deleteAccount = (loginToken) =>
+export const deleteAccount = () =>
     api
-        .post("/auth/deleteAccount", { loginToken })
+        .post("/auth/deleteAccount")
         .then(handleResponse)
         .catch(handleError)
 
