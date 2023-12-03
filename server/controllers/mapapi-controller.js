@@ -406,13 +406,13 @@ updateMapPublishStatus = async (req, res) => {
 // like dislikes and comment to be written here.
 likeMap = async (req, res) => {
     try {
-        const { mapId } = req.body
+        const { id } = req.body
 
-        if (!mapId || !ObjectId.isValid(mapId)) {
+        if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
-        const targetMap = MapMetadata.findById(mapId)
+        const targetMap = MapMetadata.findById(id)
         if (!targetMap) {
             return res.status(404).end()
         }
@@ -449,13 +449,13 @@ likeMap = async (req, res) => {
 
 dislikeMap = async (req, res) => {
     try {
-        const { mapId } = req.body
+        const { id } = req.body
 
-        if (!mapId || !ObjectId.isValid(mapId)) {
+        if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
-        const targetMap = MapMetadata.findById(mapId)
+        const targetMap = MapMetadata.findById(id)
         if (!targetMap) {
             return res.status(404).end()
         }
