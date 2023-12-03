@@ -324,12 +324,12 @@ updateEmail = async (req, res) => {
             return res.status(400).end()
         }
 
-        var existingUser = await User.findOne({ username: newEmail })
-        // if (existingUser) {
-        //     return res.status(401).json({
-        //         errorMessage: "Email not unique.",
-        //     })
-        // }
+        var existingUser = await User.countDocuments({ username: newEmail })
+        if (existingUser > 0) {
+            return res.status(401).json({
+                errorMessage: "Email not unique.",
+            })
+        }
 
         var targetUser = await User.findOneAndUpdate(
             { _id: res.locals.userId },
