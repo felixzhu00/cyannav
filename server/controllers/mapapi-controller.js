@@ -447,6 +447,50 @@ likeMap = async (req, res) => {
     }
 }
 
+dislikeMap = async (req, res) => {
+    try {
+        const { mapId } = req.body
+
+        if (!mapId || !ObjectId.isValid(mapId)) {
+            return res.status(400).end()
+        }
+
+        const targetMap = MapMetadata.findById(mapId)
+        if (!targetMap) {
+            return res.status(404).end()
+        }
+
+        const userObjectId = new ObjectId(res.locals.userId)
+
+        // Remove existing dislike
+        const dislikeIndex = targetMap.dislike.indexOf(userObjectId)
+        if (dislikeIndex > -1) {
+            // Already disliked, remove dislike
+            targetMap.dislike.splice(dislikeIndex, 1)
+        } else {
+            // Add dislike to list
+            targetMap.dislike.push(userObjectId)
+        }
+
+        const likeIndex = targetMap.like.indexOf(userObjectId)
+        if (likeIndex > -1) {
+            // Remove existing like if exist.
+            targetMap.like.splice(likeIndex, 1)
+        }
+
+        const saved = await targetMap.save()
+        if (!saved) {
+            return res.status(500).end()
+        }
+
+        return res.status(200)
+    } catch (err) {
+        console.error("mapapi-controller::likeMap")
+        console.error(err)
+        return res.status(500).end()
+    }
+}
+
 postComment = async (req, res) => {
     try {
         const { text, parentCommentId, mapId } = req.body
@@ -556,4 +600,5 @@ module.exports = {
     postComment,
     getCommentById,
     likeMap,
+    dislikeMap,
 }
