@@ -41,7 +41,7 @@ const handleError = (error) => {
 // Map-related functions
 export const getMapById = (id) =>
     api
-        .get(`/api/map${id}`)
+        .get(`/api/mapmetadata/${id}`)
         .then(handleResponse)
         .catch(handleError)
 

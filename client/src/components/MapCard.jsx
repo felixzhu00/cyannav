@@ -5,11 +5,13 @@ import { Link } from 'react-router-dom';
 import usgeojsonpng from "../assets/usgeojson.png"
 import { GlobalStoreContext } from '../store'
 import AuthContext from '../auth'
-
+import { useNavigate } from 'react-router-dom';
 
 export default function MapCard({ map }) {
     const { store } = useContext(GlobalStoreContext);
     const { auth } = useContext(AuthContext);
+    const navigate = useNavigate();
+
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const theme = useTheme();
@@ -59,6 +61,7 @@ export default function MapCard({ map }) {
     };
 
     const handleSubmitName = () => {
+
         setIsEditing(false);
         store.renameMap(map._id, newName);
     };
@@ -88,14 +91,16 @@ export default function MapCard({ map }) {
         setAnchorEl(null);
     }
 
-    const handleNavToMap = () => {
-        store.setCurrentMap(map)
+    const handleNavToMap = async () => {
+        console.log(map)
+        await store.setCurrentMap(map)
+        navigate(`/mapview/${map._id}`);
     }
 
     return (
         <Card sx={{ maxWidth: isSmallScreen ? 300 : 'relative', height: '100%' }}>
             <Box sx={{ position: 'relative' }}>
-                <Link id="mapImage" to="/mapview" onClick={handleNavToMap} style={{ textDecoration: 'none' }}>
+                <Link id="mapImage" onClick={handleNavToMap} style={{ textDecoration: 'none' }}>
                     <CardMedia
                         sx={{ height: 300, cursor: 'pointer' }}
                         image={usgeojsonpng}

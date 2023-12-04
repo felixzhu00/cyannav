@@ -101,7 +101,7 @@ const App = () => {
               <Route path="/forget/" element={<ForgetPswdScreen />} />
               <Route path="/profile/" element={<ProfileScreen />} />
               <Route path="/browsepage/" element={<BrowsePage />} />
-              <Route path="/mapview/" element={<MapViewingPage />} />
+              <Route path="/mapview/:id" element={<MapViewingPage />} />
             </Routes>
 
           </BrowserRouter>
