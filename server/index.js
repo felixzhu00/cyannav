@@ -4,34 +4,33 @@ const cors = require("cors")
 const dotenv = require("dotenv")
 const cookieParser = require("cookie-parser")
 const fileuploader = require("express-fileupload")
+const mongoose = require("mongoose")
 
-dotenv.config() // Loads .env
+if (process.env.NODE_ENV === undefined) {
+    process.env.NODE_ENV = "development"
+}
+dotenv.config({ path: `.env.${process.env.NODE_ENV}` }) // Loads .env
 
-const hostname = process.env.SERVER_HOSTNAME
+const corsOrigin = process.env.CORS_ORIGIN
 const port = process.env.SERVER_PORT
-const clientPort = process.env.CLIENT_PORT ? process.env.CLIENT_PORT : ""
 
 const app = express()
 
 // MIDDLE WARE
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }))
 app.use(
     cors({
-        origin: [`http://${hostname}${clientPort}`], // TODO: change to https for production later
+        origin: [`http://${corsOrigin}`], // TODO: change to https for production later
         credentials: true,
     })
 )
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: "10mb" }))
 app.use(cookieParser())
 app.use(fileuploader())
 
-// increase size limit
-
-
+// API routes
 const authRouter = require("./routes/auth-router")
 app.use("/auth", authRouter)
-// const apiRouter = require("./routes/api-router")
-// app.use("/api", apiRouter)
 const mapapiRouter = require("./routes/mapapi-router")
 app.use("/api", mapapiRouter)
 
