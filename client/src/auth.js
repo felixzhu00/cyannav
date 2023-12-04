@@ -182,6 +182,17 @@ function AuthContextProvider(props) {
         }
     }
 
+    auth.updatePassword = async function (currPassword, newPassword, passwordVerify) {
+        const response = await api.updatePasscode(currPassword, newPassword, passwordVerify);
+        console.log(response)
+        if (response.status === 200) {
+            await auth.getLoggedIn()
+        } else {
+            throw new Error(response.data.errorMessage);
+        }
+    }
+
+
     auth.updateError = async function (errorMessage) {
         authReducer({
             type: AuthActionType.SET_ERROR,
