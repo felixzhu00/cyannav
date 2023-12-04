@@ -1,5 +1,4 @@
 import React, { createContext, useEffect, useState } from "react";
-// import { useHistory } from 'react-router-dom'
 import api from './store-api'
 
 
@@ -92,7 +91,6 @@ function AuthContextProvider(props) {
     auth.getLoggedIn = async function () {
         const response = await api.getLoggedIn();
         if (response.status === 200) {
-            console.log(response.data.user)
             authReducer({
                 type: AuthActionType.GET_LOGGED_IN,
                 payload: {
@@ -183,6 +181,17 @@ function AuthContextProvider(props) {
         }
     }
 
+    auth.updatePassword = async function (currPassword, newPassword, passwordVerify) {
+        const response = await api.updatePasscode(currPassword, newPassword, passwordVerify);
+        console.log(response)
+        if (response.status === 200) {
+            await auth.getLoggedIn()
+        } else {
+            throw new Error(response.data.errorMessage);
+        }
+    }
+
+
     auth.updateError = async function (errorMessage) {
         authReducer({
             type: AuthActionType.SET_ERROR,
@@ -202,6 +211,15 @@ function AuthContextProvider(props) {
         }
     }
 
+    auth.updateProfilePic = async function (data) {
+        const response = await api.updateProfilePic(data);
+        console.log(response);
+        if (response.status === 200) {
+            auth.getLoggedIn();
+        } else {
+            throw new Error(response.data.errorMessage);
+        }
+    }
 
 
     return (

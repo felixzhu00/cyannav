@@ -11,7 +11,6 @@ import MUIPublishMapModal from './modals/MUIPublishMapModal'
 import MUIAddFieldModal from './modals/MUIAddFieldModal'
 import MUICommentModal from './modals/MUICommentModal'
 import NavJSON from './NavJSON'
-import hardcodegeojson from '../assets/South Korea.geo.json'
 import usgeojson from '../assets/custom.geo.json'
 import { GlobalStoreContext } from '../store'
 
@@ -176,7 +175,9 @@ function MapViewingPage() {
     /**
      * Like/Dislikes constants and states
      */
-    const [likes, setLikes] = useState(0);
+
+    console.log(store.currentMap.like.length);
+    const [likes, setLikes] = useState(store.currentMap.like.length);
     const [dislikes, setDislikes] = useState(0);
     const [hasLiked, setHasLiked] = useState(false);
     const [hasDisliked, setHasDisliked] = useState(false);
@@ -235,21 +236,19 @@ function MapViewingPage() {
         setCurrentModel("addfield")
     }
 
-    const handleLike = () => { // handles likes
+    const handleLike = async () => { // handles likes
         // TODO: Need to implement to save to DB as well as retrieve from it
-        if (hasLiked) {
-            // If already liked, unlike it
-            setLikes(likes - 1);
-            setHasLiked(false);
-        } else {
-            // Like and remove dislike if it was disliked before
-            setLikes(likes + 1);
-            setHasLiked(true);
-            if (hasDisliked) {
-                setDislikes(dislikes - 1);
-                setHasDisliked(false);
-            }
-        }
+        await store.likeMap(store.currentMap._id);
+
+        // if (hasLiked) {
+        //     // store.likemap()
+        //     setLikes(likes - 1);
+        //     setHasLiked(false);
+        // } else {
+
+        // Like and remove dislike if it was disliked before
+
+        // }
     };
 
     const handleDislike = () => { // handles dislikes

@@ -3,7 +3,7 @@ const express = require("express")
 const cors = require("cors")
 const dotenv = require("dotenv")
 const cookieParser = require("cookie-parser")
-
+const fileuploader = require("express-fileupload")
 
 dotenv.config() // Loads .env
 
@@ -23,6 +23,7 @@ app.use(
 )
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser())
+app.use(fileuploader())
 
 // increase size limit
 
@@ -39,6 +40,8 @@ const db = require("./db")
 db.on("error", console.error.bind(console, "MongoDB connection failed"))
 
 // Run server
-app.listen(port, () => console.log(`Server running on port ${port}`))
+if (process.env.NODE_ENV !== "test") {
+    app.listen(port, () => console.log(`Server running on port ${port}`))
+}
 
 module.exports = app

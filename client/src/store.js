@@ -104,7 +104,7 @@ function GlobalStoreContextProvider(props) {
         return response.data.userMaps
     }
 
-    store.getMarketplaceCollection = async (userId) => {
+    store.getMarketplaceCollection = async () => {
         const response = await api.getAllMaps()
 
         setStore({
@@ -126,6 +126,14 @@ function GlobalStoreContextProvider(props) {
 
     store.duplicateMap = async (mapId) => {
         await api.createDuplicateMapById(mapId);
+    }
+
+    store.likeMap = async (id) => {
+        const response = await api.likeMap(id);
+        console.log(response);
+        if (response.status === 200) {
+            store.setCurrentMap(id)
+        }
     }
 
     store.publishMap = async (mapId) => {

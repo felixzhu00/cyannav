@@ -18,19 +18,32 @@ import { DropzoneArea } from 'react-mui-dropzone'
 export default function ProfileScreen() {
     const { auth } = useContext(AuthContext);
     const [currentModel, setCurrentModel] = useState('');
+    const [profilePicUrl, setProfilePicUrl] = useState(null);
 
     useEffect(() => {
-    }, []);
+        // Convert buffer from auth.user.picture to a Blob
+        if (auth.user && auth.user.picture) {
+            const arrayBuffer = new Uint8Array(auth.user.picture.data).buffer;
+            let blobType = 'image/jpeg'; // Default to JPEG
 
-    const [showProfilePicModal, setShowProfilePicModal] = useState(false);
-    const [profilePicUrl, setProfilePicUrl] = useState(LoginLogo); // Use the LoginLogo by default
-    // const [image, setImage] = React.useState();
+            // Check if the buffer is a PNG by checking the first byte
+            if (auth.user.picture.data[0] === 137) {
+                blobType = 'image/png';
+            }
 
-    // const handleImageChange = (image) => { // uploaded image
-    //     setImage(image);
-    // };
+            const blob = new Blob([arrayBuffer], { type: blobType });
+            const imageUrl = URL.createObjectURL(blob);
+            setProfilePicUrl(imageUrl);
 
-    // console.log(auth.user.picture);
+            // Clean up the object URL on unmount
+            return () => {
+                URL.revokeObjectURL(imageUrl);
+            };
+        } else {
+            setProfilePicUrl(LoginLogo)
+        }
+    }, [auth.user]);
+
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
@@ -55,7 +68,7 @@ export default function ProfileScreen() {
                             display: 'flex',
                         }
                     }}
-                    onClick={() => setShowProfilePicModal(true)}
+                    onClick={() => { setCurrentModel("picture") }}
                 >
                     <Box
                         component="img"
@@ -190,9 +203,9 @@ export default function ProfileScreen() {
                 {currentModel === 'delete' && <MUIDeleteAccountModal
                     open={currentModel === 'delete'}
                     onClose={() => setCurrentModel("")} />}
-                {showProfilePicModal && <MUIChangeProfilePicModal
-                    open={showProfilePicModal}
-                    onClose={() => setShowProfilePicModal(false)}
+                {currentModel === 'picture' && <MUIChangeProfilePicModal
+                    open={currentModel === 'picture'}
+                    onClose={() => setCurrentModel("")}
                     onSave={(newUrl) => setProfilePicUrl(newUrl)}
                 />}
             </Box>

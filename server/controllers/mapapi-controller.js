@@ -162,7 +162,7 @@ createNewMap = async (req, res) => {
             type !== "distributiveflowmap" &&
             type !== "pointmap" &&
             type !== "3drectangle" &&
-            type !== "chroplethmap"
+            type !== "choroplethmap"
         ) {
             return res.status(400).json({
                 errorMessage: "Invalid map type.",
@@ -419,29 +419,35 @@ updateMapPublishStatus = async (req, res) => {
 likeMap = async (req, res) => {
     try {
         const { id } = req.body
-
         if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
-        const targetMap = MapMetadata.findById(id)
+        const targetMap = await MapMetadata.findById(id)
         if (!targetMap) {
             return res.status(404).end()
         }
 
         const userObjectId = new ObjectId(res.locals.userId)
-
+        console.log(userObjectId)
         // Remove existing dislike
+
         const dislikeIndex = targetMap.dislike.indexOf(userObjectId)
+
         if (dislikeIndex > -1) {
             targetMap.dislike.splice(dislikeIndex, 1)
         }
 
         const likeIndex = targetMap.like.indexOf(userObjectId)
+
         if (likeIndex > -1) {
+            console.log("2")
+
             // Already liked, so remove like.
             targetMap.like.splice(likeIndex, 1)
         } else {
+            console.log("3")
+
             // Add like to list
             targetMap.like.push(userObjectId)
         }
@@ -451,7 +457,8 @@ likeMap = async (req, res) => {
             return res.status(500).end()
         }
 
-        return res.status(200)
+        console.log("SUCCESS")
+        return res.status(200).end()
     } catch (err) {
         console.error("mapapi-controller::likeMap")
         console.error(err)
@@ -467,7 +474,7 @@ dislikeMap = async (req, res) => {
             return res.status(400).end()
         }
 
-        const targetMap = MapMetadata.findById(id)
+        const targetMap = await MapMetadata.findById(id)
         if (!targetMap) {
             return res.status(404).end()
         }
@@ -528,6 +535,9 @@ postComment = async (req, res) => {
             map = await MapMetadata.findById(mapId)
             if (!map) {
                 return res.status(404).end()
+            }
+            if (!map.published) {
+                return res.status(401).end()
             }
         }
 
@@ -621,6 +631,44 @@ updateMapTag = async (req, res) => {
     }
 }
 
+updateMapGeoJson = async (req, res) => {
+    try {
+        // Id refers to map id
+        const { id, geoBuf } = req.body
+
+        if (!id || !ObjectId.isValid(id)) {
+            return res.status(400).end()
+        }
+
+        targetMap = MapMetadata.findById(id)
+        if (!targetMap) {
+            return res.status(404).end()
+        }
+
+        if (targetMap.userId.toString() !== res.locals.userId) {
+            return res.status(401).end()
+        }
+
+        targetGeoJson = GeoJsonSchema.findById(targetMap.geojsonId)
+        if (!targetGeoJson) {
+            return res.status(404).end()
+        }
+
+        targetGeoJson.geoBuf = geoBuf
+
+        const saved = await targetGeoJson.save()
+        if (!saved) {
+            return res.status(500).end()
+        }
+
+        return res.status(200).end()
+    } catch (err) {
+        console.error("mapapi-controller::updateMapGeoJson")
+        console.error(err)
+        return res.status(500).end()
+    }
+}
+
 module.exports = {
     getMapById,
     getUserMaps,
@@ -634,7 +682,7 @@ module.exports = {
     updateMapNameById,
     updateMapTag,
     updateMapPublishStatus,
-    // updateMapJson,
+    updateMapGeoJson,
     postComment,
     getCommentById,
     likeMap,

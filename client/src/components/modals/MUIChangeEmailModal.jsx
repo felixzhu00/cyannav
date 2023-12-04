@@ -41,8 +41,7 @@ export default function MUIChangeEmailModal(props) {
         } catch (error) {
             setErrorMessage(error.message);
         }
-
-    }
+    };
 
     const handleEmailChange = (event) => {
         setNewEmail(event.target.value);

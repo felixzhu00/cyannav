@@ -32,9 +32,10 @@ export default function MUICreateMapModal(props) {
 
     const [open, setOpen] = React.useState(props.open);
     const [title, setTitle] = React.useState('Untitled');
-    const [fileType, setFileType] = React.useState('');
-    const [template, setTemplate] = React.useState('');
+    const [fileType, setFileType] = React.useState('shapefiles');
+    const [template, setTemplate] = React.useState('heatmap');
     const [files, setFiles] = React.useState([]);
+    const [allowedFileTypes, setAllowedFileTypes] = React.useState(['.zip']);
 
     const handleClose = () => {
         setOpen(false)
@@ -43,6 +44,23 @@ export default function MUICreateMapModal(props) {
 
     const handleFileTypeChange = (event) => { // radio buttons 
         setFileType(event.target.value);
+        switch (event.target.value) {
+            case 'shapefiles':
+                setAllowedFileTypes(['.zip']);
+                break
+            case 'geojson':
+                setAllowedFileTypes(['.json']);
+                break;
+            case 'kml':
+                setAllowedFileTypes(['.kml']);
+                break;
+            case 'navjson':
+                setAllowedFileTypes(['.navjson']);
+                break;
+            default:
+                setAllowedFileTypes([]);
+                break;
+        }
     }
 
     const handleTemplateChange = (event) => { // drop down menu
@@ -50,7 +68,11 @@ export default function MUICreateMapModal(props) {
     };
 
     const handleFileChange = (files) => { // uploaded files
-        setFiles(files);
+        // Filter out files that do not match the allowed file types
+        const filteredFiles = files.filter(file => allowedFileTypes.some(type => file.name.endsWith(type)));
+
+        // Set the filtered files to state
+        setFiles(filteredFiles);
     };
 
     const handleCreateMap = async () => { // calls store function
@@ -89,7 +111,7 @@ export default function MUICreateMapModal(props) {
                         noValidate
                         autoComplete="off"
                     >
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>Map Title:
+                        <Box id="mapTitleBox" sx={{ display: 'flex', alignItems: 'center' }}>Map Title:
                             <TextField
                                 required
                                 placeholder="Untitled"
@@ -130,7 +152,7 @@ export default function MUICreateMapModal(props) {
                                         label="Template"
                                         onChange={handleTemplateChange}
                                     >
-                                        <MenuItem value={'heatmap'}>Heat Map</MenuItem>
+                                        <MenuItem id="heatmapOption" value={'heatmap'}>Heat Map</MenuItem>
                                         <MenuItem value={'distributiveflowmap'}>Distributive Flow Map</MenuItem>
                                         <MenuItem value={'pointmap'}>Point Map</MenuItem>
                                         <MenuItem value={'choroplethmap'}>Choropleth Map</MenuItem>
@@ -143,15 +165,16 @@ export default function MUICreateMapModal(props) {
                         <Box sx={{ mt: 2 }}>
                             <DropzoneArea
                                 onChange={handleFileChange}
-                                filesLimit={3}
-                                dropzoneText="Drag files here, or click below!"
+                                filesLimit={1}
+                                acceptedFiles={allowedFileTypes}
+                                dropzoneText={`Drag and drop a file here, or click to select one (${allowedFileTypes.join(', ')})`}
                                 showPreviewsInDropzone={true}
                             />
                         </Box>
 
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
                             <Button onClick={handleClose} variant="outlined" sx={{ color: "black", mr: '5px' }}>Cancel</Button>
-                            <Button id="createMapBtnFromMyMaps" onClick={handleCreateMap} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", ml: '5px' }}>Create</Button> {/* CHANGE THE ONCLICK! */}
+                            <Button id="createMapBtnFromMyMaps" onClick={handleCreateMap} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", ml: '5px' }}>Create</Button>
                         </Box>
                     </Box>
                 </Box>
