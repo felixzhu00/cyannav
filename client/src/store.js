@@ -28,7 +28,6 @@ export const GlobalStoreActionType = {
 
 function GlobalStoreContextProvider(props) {
     const { auth } = useContext(AuthContext);
-
     const [store, setStore] = useState({
         //access global state
         togglebrowseHome: true, //Nav Icon at home
@@ -53,11 +52,22 @@ function GlobalStoreContextProvider(props) {
 
     //Nav Global Handlers
     store.toggleBrowsePage = async (option) => {
-        return setStore({
-            ...store,
-            togglebrowseHome: option == "home" ? true : false
-        });
+        // Check if the user is logged in
+        if (auth.loggedIn || option !== "home") {
+            // Allow toggle if user is logged in or if the option is not "home"
+            return setStore({
+                ...store,
+                togglebrowseHome: option === "home"
+            });
+        } else {
+            // If the user is not logged in and trying to access "My Maps", redirect to "Marketplace"
+            return setStore({
+                ...store,
+                togglebrowseHome: false // false corresponds to "Marketplace"
+            });
+        }
     }
+
 
     store.updateMapTag = async (mapId, tags) => {
         return await api.updateMapTag(mapId, tags);
@@ -267,12 +277,15 @@ function GlobalStoreContextProvider(props) {
                 const valueA = new Date(a.dateCreated).getTime()
                 const valueB = new Date(b.dateCreated).getTime()
                 return order === "dec" ? valueA - valueB : valueB - valueA
-            } else if (key === "popularity") {
-                // Need UI implementation to check
+            } else if (key === "most-liked") {
                 //'like' and 'dislike' field
                 const valueA = a.like.length - a.dislike.length
                 const valueB = b.like.length - b.dislike.length
                 return order === "dec" ? valueA - valueB : valueB - valueA
+            } else if (key === "most-disliked") {
+                const valueA = a.dislike.length;
+                const valueB = b.dislike.length;
+                return order === "asc" ? valueB - valueA : valueA - valueB;
             }
             return 0 // Default to no sorting
         })
@@ -311,8 +324,8 @@ function GlobalStoreContextProvider(props) {
         const response = await api.getMapById(id);
         console.log(response);
         console.log(auth.user);
-        const userHasLiked = response.data.metadata.like.includes(auth.user.userId);
-        console.log(userHasLiked);
+        // const userHasLiked = response.data.metadata.like.includes(auth.user.userId);
+        // console.log(userHasLiked);
         if (response.status === 200) {
             setStore(prevStore => ({
                 ...prevStore,
