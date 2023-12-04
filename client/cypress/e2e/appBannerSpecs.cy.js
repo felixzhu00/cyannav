@@ -5,11 +5,11 @@ describe("app banner specs", () => {
     })
 
     beforeEach(() => {
-        cy.visit("localhost:3000")
+        cy.visit("")
     })
 
     it("should have /browsepage in the url", () => {
-        cy.visit("localhost:3000")
+        cy.visit("129.213.145.105")
         cy.url().should("include", "/browsepage")
     })
 

@@ -1,7 +1,6 @@
 describe("register page specs", () => {
-
     beforeEach(() => {
-        cy.visit("localhost:3000")
+        cy.visit("129.213.145.105")
         cy.get("#registerLink").click()
     })
 
@@ -11,11 +10,14 @@ describe("register page specs", () => {
         cy.get("#username").type("hi")
         cy.get("#verify-password").type("yes")
         cy.get("#registerBtn").click()
-        cy.get("#errMsg2").should("have.text", "Password fails security requirement.")
+        cy.get("#errMsg2").should(
+            "have.text",
+            "Password fails security requirement."
+        )
     })
 
-    it('should have /register in the url', () => {
-        cy.url().should('include', '/register')
+    it("should have /register in the url", () => {
+        cy.url().should("include", "/register")
     })
 
     it("checks that email is displayed", () => {

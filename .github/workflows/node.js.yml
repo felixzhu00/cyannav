@@ -46,7 +46,7 @@ jobs:
                   echo "Linting to be implemented"
 
     frontend-test:
-        needs: deploy-backend
+        needs: deploy-frontend
         runs-on: self-hosted
 
         steps:
@@ -75,7 +75,7 @@ jobs:
 
     build-frontend:
         if: always()
-        needs: frontend-test
+        needs: deploy-backend
         runs-on: self-hosted
 
         steps:
