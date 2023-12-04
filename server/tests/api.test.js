@@ -60,7 +60,7 @@ describe("getMapById function", () => {
             geojsonId: buffer,
             fieldDataId: buffer, //change when field data gets implemented
         })
-        const req = { body: { id: 1 } }
+        const req = { params: { id: 1 } }
         const res = {
             status: jest.fn().mockReturnThis(),
             json: jest.fn(),
@@ -155,6 +155,15 @@ describe("getGeoJsonById function", () => {
     it("correctly returns a geojson", async () => {
         GeoJsonSchema.findById = jest.fn().mockResolvedValueOnce({
             geoBuf: buffer,
+        })
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce({
+            _id: 1,
+            title: "test",
+            user: "rob",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+            fieldDataId: buffer, //change when field data gets implemented
         })
         const req = {
             params: {

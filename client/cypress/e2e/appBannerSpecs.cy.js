@@ -1,18 +1,3 @@
-<<<<<<< HEAD
-describe("app banner specs", () => {
-    before(() => {
-        cy.registerUser("autotest13", "autotest13", "11223344&&", "11223344&&")
-        cy.wait(2000)
-    })
-
-    beforeEach(() => {
-        cy.visit("")
-    })
-
-    it("should have /browsepage in the url", () => {
-        cy.visit("129.213.145.105")
-        cy.url().should("include", "/browsepage")
-=======
 describe('app banner specs', () => {
     beforeEach(() => {
         cy.signInUser("autotest55", "12345678&&")
@@ -20,7 +5,6 @@ describe('app banner specs', () => {
   
     it('should have /browsepage in the url', () => {
         cy.url().should('include', '/browsepage')
->>>>>>> 3af8385 (frontend done for now. check back when maps are visible upon login)
     })
 
     it("marketplace button routes to browse page", () => {
