@@ -9,6 +9,8 @@ RUN npm install
 
 COPY . .
 
+ENV NODE_ENV production
+
 EXPOSE 8000
 
 CMD ["node", "index.js"]
