@@ -8,7 +8,7 @@ var ObjectId = mongoose.Types.ObjectId
 
 getMapById = async (req, res) => {
     try {
-        const id  = req.params.id
+        const id = req.params.id
 
         if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
@@ -94,7 +94,7 @@ getGeoJsonById = async (req, res) => {
             return res.status(400).end()
         }
         console.log("hello")
-        
+
         const mapMetadata = await MapMetadata.findById(id);
 
         if (!mapMetadata) {
@@ -458,7 +458,9 @@ likeMap = async (req, res) => {
         }
 
         console.log("SUCCESS")
-        return res.status(200).end()
+        return res.status(200).json({
+            metadata: targetMap,
+        })
     } catch (err) {
         console.error("mapapi-controller::likeMap")
         console.error(err)
@@ -502,7 +504,9 @@ dislikeMap = async (req, res) => {
             return res.status(500).end()
         }
 
-        return res.status(200)
+        return res.status(200).json({
+            metadata: targetMap,
+        })
     } catch (err) {
         console.error("mapapi-controller::dislikeMap")
         console.error(err)

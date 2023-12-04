@@ -176,9 +176,6 @@ function MapViewingPage() {
      * Like/Dislikes constants and states
      */
 
-    console.log(store.currentMap.like.length);
-    const [likes, setLikes] = useState(store.currentMap.like.length);
-    const [dislikes, setDislikes] = useState(0);
     const [hasLiked, setHasLiked] = useState(false);
     const [hasDisliked, setHasDisliked] = useState(false);
     const [isPublished, setIsPublished] = useState(false);
@@ -240,32 +237,11 @@ function MapViewingPage() {
         // TODO: Need to implement to save to DB as well as retrieve from it
         await store.likeMap(store.currentMap._id);
 
-        // if (hasLiked) {
-        //     // store.likemap()
-        //     setLikes(likes - 1);
-        //     setHasLiked(false);
-        // } else {
-
-        // Like and remove dislike if it was disliked before
-
-        // }
     };
 
-    const handleDislike = () => { // handles dislikes
+    const handleDislike = async () => { // handles dislikes
         // TODO: Need to implement to save to DB as well as retrieve from it
-        if (hasDisliked) {
-            // If already disliked, undislike it
-            setDislikes(dislikes - 1);
-            setHasDisliked(false);
-        } else {
-            // Dislike and remove like if it was liked before
-            setDislikes(dislikes + 1);
-            setHasDisliked(true);
-            if (hasLiked) {
-                setLikes(likes - 1);
-                setHasLiked(false);
-            }
-        }
+        await store.dislikeMap(store.currentMap._id);
     };
 
     const topLeft = () => {
@@ -298,12 +274,12 @@ function MapViewingPage() {
                     <IconButton disabled={!isPublished} id="likeBtn" onClick={handleLike} sx={{ color: hasLiked ? 'black' : 'default' }}>
                         <ThumbUp />
                     </IconButton>
-                    <Typography sx={{ mx: 1 }}>{likes}</Typography> {/* Added margin for spacing */}
+                    <Typography sx={{ mx: 1 }}>{store.likes}</Typography> {/* Added margin for spacing */}
 
                     <IconButton disabled={!isPublished} id="dislikeBtn" onClick={handleDislike} sx={{ color: hasDisliked ? 'black' : 'default' }}>
                         <ThumbDown />
                     </IconButton>
-                    <Typography sx={{ mx: 1 }}>{dislikes}</Typography> {/* Added margin for spacing */}
+                    <Typography sx={{ mx: 1 }}>{store.dislikes}</Typography> {/* Added margin for spacing */}
                 </Box>
             </Box>
         );
@@ -465,9 +441,9 @@ function MapViewingPage() {
             if (selectedFeatureIndex === -1) {
                 return null;
             }
-        
+
             const selectedFeature = features[selectedFeatureIndex];
-        
+
             return (
                 <>
                     {/* Box for 'name' field */}
@@ -491,7 +467,7 @@ function MapViewingPage() {
                             {/* No delete icon for 'name' */}
                         </Box>
                     </Box>
-        
+
                     {/* Mapping through other fields */}
                     {Object.entries(selectedFeature.fields).map(([key, value]) => (
                         key !== 'name' && (
