@@ -145,7 +145,7 @@ function NavJSON({ data }) {
         // const center = bounds.getCenter();
         // const zoom = map.getBoundsZoom(bounds);
         // map.setView(center, zoom);
-        map.fitBounds(geo.getBounds());
+        // map.fitBounds(geo.getBounds());
 
 
 
