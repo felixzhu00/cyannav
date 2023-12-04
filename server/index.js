@@ -3,7 +3,7 @@ const express = require("express")
 const cors = require("cors")
 const dotenv = require("dotenv")
 const cookieParser = require("cookie-parser")
-
+const fileuploader = require("express-fileupload")
 dotenv.config() // Loads .env
 
 const hostname = process.env.SERVER_HOSTNAME
@@ -22,6 +22,7 @@ app.use(
 )
 app.use(express.json())
 app.use(cookieParser())
+app.use(fileuploader())
 
 const authRouter = require("./routes/auth-router")
 app.use("/auth", authRouter)
