@@ -623,7 +623,7 @@ module.exports = {
     createForkMapById,
     deleteMapById,
     updateMapNameById,
-    // updateMapTag,
+    updateMapTag,
     updateMapPublishStatus,
     // updateMapJson,
     postComment,
