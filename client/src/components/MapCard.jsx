@@ -29,7 +29,7 @@ export default function MapCard({ map }) {
         if (map.tags.length != 0) {
             setVisibleChips(map.tags);
         } else {
-            setNoTagMessage("No tags associated with map");
+            setNoTagMessage("No tags associated with map...");
         }
     };
 
@@ -179,7 +179,7 @@ export default function MapCard({ map }) {
                 </Box>
 
                 {map.tags.length === 0 && (
-                    <Typography variant='subtitle2'>
+                    <Typography variant='subtitle1'>
                         {noTagMessage}
                     </Typography>
                 )}

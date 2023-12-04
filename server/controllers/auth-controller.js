@@ -4,9 +4,39 @@ const User = require("../schemas/userProfileSchema")
 const bcrypt = require("bcrypt")
 const saltRounds = 10
 
-changeProfilePicture = async (req, res) => {
-    // TODO: Implementation on saving to db
-}
+updateProfilePic = async (req, res) => {
+    try {
+        const userId = auth.verifyUser(req);
+        if (!userId) {
+            return res.status(401).json({ errorMessage: "Unauthorized" });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ errorMessage: "User not found" });
+        }
+        console.log(req.files.file)
+        if (req.files.file) {
+            const { data, mimetype } = req.files.file;
+
+            // Check if the file is of a valid image type
+            if (!['image/jpeg', 'image/png'].includes(mimetype)) {
+                return res.status(400).json({ errorMessage: "Invalid file type" });
+            }
+
+            user.picture = data;
+            await user.save();
+            return res.status(200).json({ message: "Profile picture updated successfully" });
+        } else {
+            return res.status(400).json({ errorMessage: "No file uploaded" });
+        }
+    } catch (err) {
+        console.error("auth-controller::updateProfilePic");
+        console.error(err);
+        return res.status(500).end();
+    }
+};
+
 
 
 loggedIn = async (req, res) => {
@@ -35,7 +65,7 @@ loggedIn = async (req, res) => {
             user: {
                 username: loggedInUser.username,
                 email: loggedInUser.email,
-                picture: null, // TODO: figure out profile picture
+                picture: loggedInUser.picture, // TODO: figure out profile picture
                 userId: userId,
             },
         })
@@ -228,8 +258,8 @@ verifyCode = async (req, res) => {
 
 updatePasscode = async (req, res) => {
     try {
-        const { verificationCode, originalPassword, password, passwordVerify } =
-            req.body
+        //password variable is the value of the new password
+        const { originalPassword, password, passwordVerify, verificationCode } = req.body
 
         if (!verificationCode && !originalPassword) {
             return res.status(400).end()
@@ -254,8 +284,9 @@ updatePasscode = async (req, res) => {
             }
             userId = res.locals.userId
 
-            const targetUser = User.findById(userId)
-            const match = await bcrypt.compare(password, targetUser.password)
+            const targetUser = await User.findById(userId)
+            const match = await bcrypt.compare(originalPassword, targetUser.password)
+
             if (!match) {
                 return res
                     .status(401)
@@ -270,20 +301,21 @@ updatePasscode = async (req, res) => {
         }
 
         const hashed_password = await bcrypt.hash(password, saltRounds)
+
         if (!hashed_password) {
             return res.status(500).end()
         }
 
-        const success = User.findByIdAndUpdate(userId, {
+        const success = await User.findByIdAndUpdate(userId, {
             password: hashed_password,
         })
         if (!success) {
             return res.status(500).end()
         }
-        return res.status(200)
+        return res.status(200).end()
     } catch (err) {
-        console.err("auth-controller::updatePassword")
-        console.err(err)
+        console.error("auth-controller::updatePassword")
+        console.error(err)
 
         return res.status(500).end()
     }
@@ -408,4 +440,5 @@ module.exports = {
     updateUsername,
     updateEmail,
     deleteAccount,
+    updateProfilePic
 }
