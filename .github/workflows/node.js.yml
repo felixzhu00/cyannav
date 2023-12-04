@@ -46,7 +46,7 @@ jobs:
                   echo "Linting to be implemented"
 
     frontend-test:
-        needs: deploy-frontend
+        needs: backend-test
         runs-on: self-hosted
         if: always()
 
@@ -77,36 +77,11 @@ jobs:
                   cd server
                   npm test
 
-    build-frontend:
-        if: always()
-        needs: deploy-backend
+    deploy:
+        need: frontend-test
         runs-on: self-hosted
-
+        
         steps:
-            - name: Setup node environment
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "21.x"
-            - name: Build frontend
-              run: |
-                  cd client
-                  npm run build
-
-    deploy-backend:
-        needs: backend-test
-        runs-on: self-hosted
-
-        steps:
-            - name: Deploy backend server
-              run: |
-                  NODE_ENV=production pm2 start index.js --name deploy
-
-    deploy-frontend:
-        if: always()
-        needs: build-frontend
-        runs-on: self-hosted
-
-        steps:
-            - name: Deploy frontend server
-              run: |
-                  sudo service nginx restart
+            - name: Build docker container
+            run: |
+                docker-compose up -d --build
