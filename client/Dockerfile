@@ -8,12 +8,7 @@ RUN npm i --force
 
 COPY . .
 
-FROM cyannav-api as backend
-
-RUN npm test
-
 RUN npm run build
-RUN ls /app/build
 
 FROM nginx
 EXPOSE 80
