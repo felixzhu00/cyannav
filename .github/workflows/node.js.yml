@@ -58,7 +58,7 @@ jobs:
             - name: Frontend Cypress test
               run: |
                   cd server
-                  NODE_ENV=frontend_test pm2 start index.js --name frontend_test_backend_server -f
+                  NODE_ENV=frontend_test pm2 restart 0
                   cd ../client
                   npm test
 
