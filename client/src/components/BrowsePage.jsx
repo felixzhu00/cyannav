@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from "react";
-import { Typography, Grid, Box, InputBase, Menu, MenuItem, Paper, InputAdornment, Button, IconButton, ListItemIcon, FormControl, Select, Fab } from '@mui/material';
-import { Search, KeyboardArrowDown, Home, Store, Add } from '@mui/icons-material';
+import { Typography, Grid, Box, InputBase, MenuItem, Paper, Button, IconButton, FormControl, Select } from '@mui/material';
+import { Search } from '@mui/icons-material';
 import Pagination from '@mui/material/Pagination';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -42,6 +42,8 @@ function BrowsePage() {
   useEffect(() => {
     if (auth.user != null) {
       store.getMyMapCollection(auth.user.userId);
+    } else {
+      store.getMarketplaceCollection();
     }
   }, [auth.user]);
 
@@ -198,12 +200,19 @@ function BrowsePage() {
     <Box sx={{ p: 3, overflow: 'hidden', bgcolor: theme.palette.background.default }}>
       <CssBaseline />
 
-      <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{store.togglebrowseHome ? "My Maps" : "Marketplace"}</Typography>
+      <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{(store.togglebrowseHome && auth.loggedIn) ? "My Maps" : "Marketplace"}</Typography>
       <Box sx={{ mt: '10px' }}>
         {searchAndSort()}
       </Box>
 
-      <Button id="createMapOuterBtn" onClick={handleCreateMapModal} variant="contained" aria-label="add" sx={{ position: 'absolute', top: 85, right: 20 }}>Import Map</Button>
+      {auth.loggedIn && (<Button
+        id="createMapOuterBtn"
+        onClick={handleCreateMapModal}
+        variant="contained"
+        aria-label="add"
+        sx={{ position: 'absolute', top: 85, right: 20 }}>
+        Import Map
+      </Button>)}
 
       <Grid container spacing={2} sx={{ mt: 2 }}>
         {store.mapCollection &&

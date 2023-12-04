@@ -90,7 +90,6 @@ export default function MapCard({ map }) {
         }
         setAnchorEl(null);
     }
-
     const handleNavToMap = async () => {
         console.log(map)
         await store.setCurrentMap(map)
@@ -147,9 +146,10 @@ export default function MapCard({ map }) {
                             {newName}
                         </Typography>
                     )}
-                    <IconButton onClick={handleClick}>
+
+                    {auth.loggedIn && (<IconButton onClick={handleClick}>
                         <MoreVert />
-                    </IconButton>
+                    </IconButton>)}
                     <Menu
                         anchorEl={anchorEl}
                         open={open}

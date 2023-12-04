@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { MapContainer, GeoJSON } from "react-leaflet";
 import 'leaflet/dist/leaflet.css';
 import sha256 from 'crypto-js/sha256';
@@ -13,10 +13,12 @@ import MUICommentModal from './modals/MUICommentModal'
 import NavJSON from './NavJSON'
 import usgeojson from '../assets/custom.geo.json'
 import { GlobalStoreContext } from '../store'
+import AuthContext from '../auth'
 
 function MapViewingPage() {
     const theme = useTheme(); // Use the theme
     const { store } = useContext(GlobalStoreContext);
+    const { auth } = useContext(AuthContext);
     const { id } = useParams();
 
 
@@ -234,13 +236,11 @@ function MapViewingPage() {
     }
 
     const handleLike = async () => { // handles likes
-        // TODO: Need to implement to save to DB as well as retrieve from it
         await store.likeMap(store.currentMap._id);
 
     };
 
     const handleDislike = async () => { // handles dislikes
-        // TODO: Need to implement to save to DB as well as retrieve from it
         await store.dislikeMap(store.currentMap._id);
     };
 
@@ -271,12 +271,12 @@ function MapViewingPage() {
 
                 {/* Right-aligned Icons with like/dislike counts */}
                 <Box display="flex" alignItems="center"> {/* Ensure flex layout for this Box */}
-                    <IconButton disabled={!isPublished} id="likeBtn" onClick={handleLike} sx={{ color: hasLiked ? 'black' : 'default' }}>
+                    <IconButton disabled={!isPublished || !auth.loggedIn} id="likeBtn" onClick={handleLike} sx={{ color: hasLiked ? 'black' : 'default' }}>
                         <ThumbUp />
                     </IconButton>
                     <Typography sx={{ mx: 1 }}>{store.likes}</Typography> {/* Added margin for spacing */}
 
-                    <IconButton disabled={!isPublished} id="dislikeBtn" onClick={handleDislike} sx={{ color: hasDisliked ? 'black' : 'default' }}>
+                    <IconButton disabled={!isPublished || !auth.loggedIn} id="dislikeBtn" onClick={handleDislike} sx={{ color: hasDisliked ? 'black' : 'default' }}>
                         <ThumbDown />
                     </IconButton>
                     <Typography sx={{ mx: 1 }}>{store.dislikes}</Typography> {/* Added margin for spacing */}
@@ -308,8 +308,8 @@ function MapViewingPage() {
                         variant="fullWidth"
                         aria-label="edit-comment-tab-bar"
                     >
-                        <Tab disabled={isPublished} id="editTab" sx={{ '&.Mui-selected': { color: 'black' } }} onClick={handleEdit} value="1" label="Edit" />
-                        <Tab disabled={!isPublished} id="commentTab" sx={{ '&.Mui-selected': { color: 'black' } }} onClick={handleEdit} value="2" label="Comment" />
+                        <Tab id="editTab" sx={{ '&.Mui-selected': { color: 'black' } }} onClick={handleEdit} value="1" label="Edit" />
+                        <Tab id="commentTab" sx={{ '&.Mui-selected': { color: 'black' } }} onClick={handleEdit} value="2" label="Comment" />
                     </Tabs>
                 </Box>
             </Box>
@@ -355,7 +355,7 @@ function MapViewingPage() {
                     left: 20, // Adjust as needed
                     zIndex: 1000, // Ensure it's above the map
                 }}>
-                    <IconButton
+                    {auth.loggedIn && (<IconButton
                         id="undoBtn"
                         sx={{
                             backgroundColor: '#fff',
@@ -371,8 +371,8 @@ function MapViewingPage() {
                         onClick={() => handleUndo()}
                     >
                         <Undo />
-                    </IconButton>
-                    <IconButton
+                    </IconButton>)}
+                    {auth.loggedIn && (<IconButton
                         id="redoBtn"
                         sx={{
                             backgroundColor: '#fff',
@@ -387,7 +387,7 @@ function MapViewingPage() {
                         onClick={() => handleRedo()}
                     >
                         <Redo />
-                    </IconButton>
+                    </IconButton>)}
                 </Box>
             </Box>
         );
@@ -419,7 +419,7 @@ function MapViewingPage() {
                         </Paper>
                     ))}
                 </Box>
-                <Button
+                {auth.loggedIn && (<Button
                     variant="contained"
                     sx={{
                         mt: 'auto', // This ensures the margin is applied to the top, pushing the button to the bottom
@@ -430,7 +430,7 @@ function MapViewingPage() {
                     onClick={handleComments} // Replace with your own event handler
                 >
                     Add Comment
-                </Button>
+                </Button>)}
             </Box>
         );
     };
@@ -527,7 +527,7 @@ function MapViewingPage() {
                         marginBottom: '10px', // Adjust as needed
                     }}
                 >
-                    <Button
+                    {auth.loggedIn && (<Button
                         id="addFieldBtn"
                         variant="contained"
                         color="primary"
@@ -539,7 +539,7 @@ function MapViewingPage() {
                         }}
                     >
                         + Add Field
-                    </Button>
+                    </Button>)}
 
                     <Box
                         sx={{

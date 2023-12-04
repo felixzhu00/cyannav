@@ -43,6 +43,7 @@ function AppBanner() {
       };
     }
   }, [auth.user]);
+
   // Handle menu opening and closing
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -73,10 +74,17 @@ function AppBanner() {
 
   // Change the current display subpage
   const handleHome = () => {
-    store.toggleBrowsePage("home") //togglebrowseHome : true
-    navigate("/browsepage");
-    // Calls global store function
-  }
+    if (!auth.loggedIn) {
+      // Redirect to the Marketplace page if not logged in
+      store.toggleBrowsePage("store"); // Set the page to the marketplace
+      navigate("/browsepage"); // Assuming "/browsepage" is the route for the Marketplace
+    } else {
+      // Continue with normal operation if logged in
+      store.toggleBrowsePage("home"); // Set the page to My Maps
+      navigate("/browsepage"); // Assuming "/browsepage" is also the route for My Maps
+    }
+  };
+
   const handleStore = () => {
     store.toggleBrowsePage("store") //togglebrowseHome : false
     navigate("/browsepage");
@@ -118,7 +126,7 @@ function AppBanner() {
             >
               <MenuItem
                 onClick={handleHome}>
-                <IconButton id="myMapsBtn" sx={{ color: "black", mr: 1 }}>
+                <IconButton disabled={!auth.loggedIn} id="myMapsBtn" sx={{ color: "black", mr: 1 }}>
                   <Home />
                 </IconButton>
                 <Typography textAlign="center">My Maps</Typography>
@@ -158,6 +166,7 @@ function AppBanner() {
             }}
           >
             <IconButton
+              disabled={!auth.loggedIn}
               sx={{ color: "black" }}
               onClick={handleHome
               }
