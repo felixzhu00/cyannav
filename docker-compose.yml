@@ -31,14 +31,6 @@ services:
         networks:
             - mern-networks
 
-    api-test:
-        image: cyannav-api
-        command: dockerize
-            -wait tcp://mongo-db:27017 -timeout 10s
-            bash -c "npm test"
-        depends_on:
-            - database
-
 networks:
     mern-networks:
         driver: bridge
