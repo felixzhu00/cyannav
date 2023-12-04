@@ -42,7 +42,7 @@ jest.mock('../schemas/userProfileSchema');
 jest.mock('../schemas/Map/commentSchema');
 jest.mock('../schemas/Map/fieldDataSchema');
 jest.mock('../schemas/Map/geoJsonSchema');
-jest.mock('../schemas/Map/mapMetaDataSchema');
+jest.mock('../schemas/Map/mapMetadataSchema');
 
 afterEach(() => {
     jest.clearAllMocks();

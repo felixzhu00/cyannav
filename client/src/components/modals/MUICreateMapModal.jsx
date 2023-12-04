@@ -89,7 +89,7 @@ export default function MUICreateMapModal(props) {
                         noValidate
                         autoComplete="off"
                     >
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>Map Title:
+                        <Box id="mapTitleBox" sx={{ display: 'flex', alignItems: 'center' }}>Map Title:
                             <TextField
                                 required
                                 placeholder="Untitled"
@@ -130,7 +130,7 @@ export default function MUICreateMapModal(props) {
                                         label="Template"
                                         onChange={handleTemplateChange}
                                     >
-                                        <MenuItem value={'heatmap'}>Heat Map</MenuItem>
+                                        <MenuItem id="heatmapOption" value={'heatmap'}>Heat Map</MenuItem>
                                         <MenuItem value={'distributiveflowmap'}>Distributive Flow Map</MenuItem>
                                         <MenuItem value={'pointmap'}>Point Map</MenuItem>
                                         <MenuItem value={'choroplethmap'}>Choropleth Map</MenuItem>
