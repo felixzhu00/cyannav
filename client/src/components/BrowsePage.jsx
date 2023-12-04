@@ -188,8 +188,10 @@ function BrowsePage() {
             inputProps={{ 'aria-label': 'Sort By' }}
             sx={{ height: '50px' }}
           >
-            <MenuItem id="recentSortSelect" value="recent">Recent</MenuItem>
+            <MenuItem id="recentSortSelect" value="recent">Recently Created</MenuItem>
             <MenuItem id="nameSortSelect" value="alphabetical-order">Alphabetical Order</MenuItem>
+            <MenuItem id="mostLikedSortSelect" value="most-liked">Most Liked</MenuItem>
+            <MenuItem id="mostDislikedSortSelect" value="most-disliked">Most Disliked</MenuItem>
           </Select>
         </FormControl>
       </Box>

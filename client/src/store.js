@@ -277,11 +277,15 @@ function GlobalStoreContextProvider(props) {
                 const valueA = new Date(a.dateCreated).getTime()
                 const valueB = new Date(b.dateCreated).getTime()
                 return order === "dec" ? valueA - valueB : valueB - valueA
-            } else if (key === "popularity") {
+            } else if (key === "most-liked") {
                 //'like' and 'dislike' field
                 const valueA = a.like.length - a.dislike.length
                 const valueB = b.like.length - b.dislike.length
                 return order === "dec" ? valueA - valueB : valueB - valueA
+            } else if (key === "most-disliked") {
+                const valueA = a.dislike.length;
+                const valueB = b.dislike.length;
+                return order === "asc" ? valueB - valueA : valueA - valueB;
             }
             return 0 // Default to no sorting
         })

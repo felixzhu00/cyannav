@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from "react";
-import { Box, Card, CardMedia, CardContent, Typography, IconButton, Menu, MenuItem, useMediaQuery, useTheme, TextField, Chip, Stack, Tooltip, ListItem } from '@mui/material';
-import { MoreVert, Publish } from '@mui/icons-material';
+import { Box, Card, CardMedia, CardContent, Typography, IconButton, Menu, MenuItem, useMediaQuery, useTheme, TextField, Chip, Stack, Tooltip, Divider } from '@mui/material';
+import { MoreVert, Publish, ThumbUp, ThumbDown } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import usgeojsonpng from "../assets/usgeojson.png"
 import { GlobalStoreContext } from '../store'
@@ -22,7 +22,6 @@ export default function MapCard({ map }) {
     // States for managing chips
     const [visibleChips, setVisibleChips] = useState([]);
     const [noTagMessage, setNoTagMessage] = useState("");
-
 
     // Define the maximum length for a chip label
     const MAX_CHIP_LABEL_LENGTH = 10;
@@ -91,7 +90,6 @@ export default function MapCard({ map }) {
         setAnchorEl(null);
     }
     const handleNavToMap = async () => {
-        console.log(map)
         await store.setCurrentMap(map)
         navigate(`/mapview/${map._id}`);
     }
@@ -106,6 +104,43 @@ export default function MapCard({ map }) {
                         title="mapImage"
                     />
                 </Link>
+
+                {/* Likes and Dislikes Display with Icons and Vertical Divider */}
+                <Box sx={{
+                    position: 'absolute',
+                    bottom: '10px',
+                    left: '10px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                    padding: '5px',
+                    borderRadius: '10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px'
+                }}>
+                    <ThumbUp sx={{ color: 'black' }} />
+                    <Typography
+                        sx={{
+                            fontSize: '1rem',
+                            color: 'black'
+                        }}
+                    >
+                        {map.like.length}
+                    </Typography>
+
+                    {/* Vertical Divider */}
+                    <Divider orientation="vertical" flexItem sx={{ bgcolor: 'black' }} />
+
+                    <ThumbDown sx={{ color: 'black' }} />
+                    <Typography
+                        sx={{
+                            fontSize: '1rem',
+                            color: 'black'
+                        }}
+                    >
+                        {map.dislike.length}
+                    </Typography>
+                </Box>
+
                 {isPublished && (
                     <Publish sx={{
                         position: 'absolute',
