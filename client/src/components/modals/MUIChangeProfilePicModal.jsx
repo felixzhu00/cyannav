@@ -44,7 +44,7 @@ function MUIChangeProfilePicModal({ open, onClose, onSave }) {
                     <DropzoneArea
                         onChange={handleFileChange}
                         filesLimit={1}
-                        dropzoneText="Drag and drop an image file here or click"
+                        dropzoneText="Drag and drop an image file here or click. (.jpeg or .png)"
                         acceptedFiles={['image/jpeg', 'image/png']}
                         maxFileSize={500000}
                     />
