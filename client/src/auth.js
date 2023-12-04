@@ -1,5 +1,4 @@
 import React, { createContext, useEffect, useState } from "react";
-// import { useHistory } from 'react-router-dom'
 import api from './store-api'
 
 
@@ -214,8 +213,9 @@ function AuthContextProvider(props) {
 
     auth.updateProfilePic = async function (data) {
         const response = await api.updateProfilePic(data);
+        console.log(response);
         if (response.status === 200) {
-            return
+            auth.getLoggedIn();
         } else {
             throw new Error(response.data.errorMessage);
         }

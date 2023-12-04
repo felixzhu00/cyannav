@@ -406,29 +406,35 @@ updateMapPublishStatus = async (req, res) => {
 likeMap = async (req, res) => {
     try {
         const { id } = req.body
-
         if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
-        const targetMap = MapMetadata.findById(id)
+        const targetMap = await MapMetadata.findById(id)
         if (!targetMap) {
             return res.status(404).end()
         }
 
         const userObjectId = new ObjectId(res.locals.userId)
-
+        console.log(userObjectId)
         // Remove existing dislike
+
         const dislikeIndex = targetMap.dislike.indexOf(userObjectId)
+
         if (dislikeIndex > -1) {
             targetMap.dislike.splice(dislikeIndex, 1)
         }
 
         const likeIndex = targetMap.like.indexOf(userObjectId)
+
         if (likeIndex > -1) {
+            console.log("2")
+
             // Already liked, so remove like.
             targetMap.like.splice(likeIndex, 1)
         } else {
+            console.log("3")
+
             // Add like to list
             targetMap.like.push(userObjectId)
         }
@@ -438,7 +444,8 @@ likeMap = async (req, res) => {
             return res.status(500).end()
         }
 
-        return res.status(200)
+        console.log("SUCCESS")
+        return res.status(200).end()
     } catch (err) {
         console.error("mapapi-controller::likeMap")
         console.error(err)
@@ -454,7 +461,7 @@ dislikeMap = async (req, res) => {
             return res.status(400).end()
         }
 
-        const targetMap = MapMetadata.findById(id)
+        const targetMap = await MapMetadata.findById(id)
         if (!targetMap) {
             return res.status(404).end()
         }
