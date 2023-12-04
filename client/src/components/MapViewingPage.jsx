@@ -11,6 +11,7 @@ import MUIAddFieldModal from './modals/MUIAddFieldModal'
 import MUICommentModal from './modals/MUICommentModal'
 
 import hardcodegeojson from '../assets/South Korea.geo.json'
+import usgeojson from '../assets/custom.geo.json'
 import { GlobalStoreContext } from '../store'
 
 function MapViewingPage() {
@@ -230,7 +231,7 @@ function MapViewingPage() {
 
         return (
             <MapContainer center={[50, 50]} zoom={2} style={{ height: '100%', width: '100%' }}>
-                <GeoJSON key={sha256(hardcodegeojson)} data={hardcodegeojson} onEachFeature={popupLabel} />
+                <GeoJSON key={sha256(usgeojson)} data={usgeojson} onEachFeature={popupLabel} />
             </MapContainer>
 
         )

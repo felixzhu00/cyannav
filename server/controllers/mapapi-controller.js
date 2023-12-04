@@ -149,7 +149,7 @@ createNewMap = async (req, res) => {
             type !== "distributiveflowmap" &&
             type !== "pointmap" &&
             type !== "3drectangle" &&
-            type !== "chroplethmap"
+            type !== "choroplethmap"
         ) {
             return res.status(400).json({
                 errorMessage: "Invalid map type.",
@@ -308,7 +308,6 @@ createForkMapById = async (req, res) => {
 deleteMapById = async (req, res) => {
     try {
         const id = req.params.id
-
         if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
@@ -589,7 +588,6 @@ getCommentById = async (req, res) => {
 updateMapTag = async (req, res) => {
     try {
         const { id, newTags } = req.body
-
         if (!id || !ObjectId.isValid(id) || !newTags) {
             return res.status(400).end()
         }
@@ -602,6 +600,7 @@ updateMapTag = async (req, res) => {
         targetMap.tags = newTags
         const saved = await targetMap.save()
         if (!saved) {
+            console.log("rest")
             return res.status(500).end()
         }
         return res.status(200).end()

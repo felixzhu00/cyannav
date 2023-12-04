@@ -9,7 +9,11 @@ import CloseIcon from '@mui/icons-material/Close';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import { GlobalStoreContext } from '../../store';
 import { useTheme } from '@emotion/react';
+import { useContext, useEffect } from 'react';
+import AuthContext from '../../auth'
+
 
 const style = {
     position: 'absolute',
@@ -20,30 +24,45 @@ const style = {
     bgcolor: 'background.paper',
     boxShadow: 24,
     p: 4,
-    maxHeight: '300px'
+    maxHeight: '400px'
 };
 
-export default function TagModal(props) {
+export default function MUIAddTagModal(props) {
     const theme = useTheme();
+    const { store } = useContext(GlobalStoreContext);
+    const { auth } = useContext(AuthContext);
     const [open, setOpen] = React.useState(props.open);
     const [tags, setTags] = React.useState([]);
     const [inputValue, setInputValue] = React.useState('');
     const inputRef = React.useRef(null); // Create a ref for the input field
+    const currentMapId = store.currentModalMapId;
+
+    useEffect(() => {
+        console.log('test');
+        const filteredMap = store.mapCollection.filter(map => map._id === currentMapId);
+        setTags(filteredMap[0].tags)
+    }, []);
 
     const handleClose = () => {
         setOpen(false)
         props.onClose()
     };
     const handleAddTag = () => {
-        if (inputValue.trim() !== '') {
+        if (inputValue.trim() !== '' && !tags.includes(inputValue)) {
             setTags([...tags, inputValue]);
-            setInputValue('');
-            inputRef.current.focus(); // Focus the input field after adding a tag
         }
+        setInputValue('');
+        inputRef.current.focus();
     };
     const handleRemoveTag = (indexToRemove) => {
         setTags(tags.filter((_, index) => index !== indexToRemove));
     };
+
+    const handleSave = async () => {
+        await store.updateMapTag(currentMapId, tags);
+        await store.getMyMapCollection(auth.user.userId);
+        props.onClose()
+    }
 
     return (
         <Modal
@@ -73,13 +92,11 @@ export default function TagModal(props) {
                             inputRef={inputRef} // Apply the ref to the TextField
                             autoFocus // Automatically focus when the modal opens
                         />
-                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+                        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
                             <Button onClick={handleAddTag} sx={{ bgcolor: theme.palette.primary.main, color: "black" }} variant="contained">
                                 Add Tag
                             </Button>
-                            <Button onClick={handleClose} sx={{ color: "black" }} variant="outlined">
-                                Cancel
-                            </Button>
+
                         </Box>
                     </Box>
                     <Box sx={{ flex: 1, overflow: 'auto', maxHeight: '175px' }}>
@@ -100,6 +117,14 @@ export default function TagModal(props) {
                             ))}
                         </List>
                     </Box>
+                </Box>
+                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+                    <Button onClick={handleSave} variant="contained" color="primary" sx={{ width: '90px', mr: '10px' }}>
+                        Save
+                    </Button>
+                    <Button onClick={handleClose} sx={{ color: "black" }} variant="outlined">
+                        Cancel
+                    </Button>
                 </Box>
             </Box>
         </Modal >

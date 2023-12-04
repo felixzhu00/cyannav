@@ -15,9 +15,6 @@ function BrowsePage() {
   const { auth } = useContext(AuthContext);
   const theme = useTheme();
   const isMediumOrSmaller = useMediaQuery(theme.breakpoints.down('md'));
-  const [anchorElSort, setAnchorElSort] = useState(null);
-  const [anchorElOption, setAnchorElOption] = useState(null);
-
 
   //Search Sort options
   const [searchBy, setSearchBy] = useState('mapName'); // 'mapName' or 'username'
@@ -39,6 +36,7 @@ function BrowsePage() {
   // // Rerender the whole componenet when MapCollection is updated
   // useEffect(() => {
   // }, [store.mapCollection]);
+  // This useEffect runs when mapCollection changes
 
   // Runs only when there is an user
   useEffect(() => {
