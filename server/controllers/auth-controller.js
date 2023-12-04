@@ -118,7 +118,7 @@ login = async (req, res) => {
                 httpOnly: true, // TODO: HTTPS: change this later when HTTPS is introduced.
                 secure: false,
                 // withCredentials: true,
-                sameSite: false,
+                sameSite: true,
             })
             .status(200)
             .json({
@@ -210,7 +210,7 @@ register = async (req, res) => {
             .cookie("access_token", token, {
                 httpOnly: true, // TODO: change this later when HTTPS is introduced.
                 secure: false,
-                sameSite: false,
+                sameSite: true,
             })
             .status(200)
             .json({
@@ -234,7 +234,7 @@ logout = async (req, res) => {
         httpOnly: true,
         expires: new Date(0),
         secure: true,
-        sameSite: false,
+        sameSite: true,
     })
         .status(200)
         .send()
