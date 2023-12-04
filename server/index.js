@@ -36,6 +36,8 @@ const db = require("./db")
 db.on("error", console.error.bind(console, "MongoDB connection failed"))
 
 // Run server
-app.listen(port, () => console.log(`Server running on port ${port}`))
+if (process.env.NODE_ENV !== "test") {
+    app.listen(port, () => console.log(`Server running on port ${port}`))
+}
 
 module.exports = app
