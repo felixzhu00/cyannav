@@ -7,6 +7,9 @@ import IconButton from '@mui/material/IconButton';
 import { Close } from '@mui/icons-material';
 import { TextField } from '@mui/material';
 import { useTheme } from '@emotion/react';
+import AuthContext from '../../auth.js';
+import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
 
 
 const style = {
@@ -14,7 +17,7 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 400,
+    width: 500,
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
@@ -23,9 +26,37 @@ const style = {
 
 export default function MUIDeleteAccountModal() {
     const theme = useTheme();
+    const navigate = useNavigate();
+    const { auth } = useContext(AuthContext);
 
     const [open, setOpen] = React.useState(true);
     const handleClose = () => setOpen(false);
+
+    const [errorMessage, setErrorMessage] = React.useState('');
+
+    const handleDelete = async (event) => {
+        event.preventDefault();
+        const formElement = document.getElementById('deleteAccountForm');
+        const data = new FormData(formElement);
+        const input = {
+            username: data.get('username'),
+            email: data.get('email'),
+            password: data.get('password')
+        }
+        if (input.username != '' || input.email != '' || input.password != '') {
+            try {
+                await auth.deleteAccount(input.username, input.email, input.password);
+                handleClose();
+                await auth.logoutUser();
+                navigate('/login')
+            } catch (error) {
+                console.log(error.message);
+                setErrorMessage(error.message);
+            }
+        } else {
+            setErrorMessage('All fields are required!');
+        }
+    }
 
     return (
         <div>
@@ -49,6 +80,7 @@ export default function MUIDeleteAccountModal() {
                     </Typography>
                     <Box
                         component="form"
+                        id="deleteAccountForm"
                         sx={{
                             '& .MuiTextField-root': { m: 1, width: '95%' },
                             mt: 2,
@@ -58,6 +90,7 @@ export default function MUIDeleteAccountModal() {
                     >
                         <TextField
                             margin="normal"
+                            onChange={() => setErrorMessage('')}
                             required
                             fullWidth
                             name="username"
@@ -67,6 +100,7 @@ export default function MUIDeleteAccountModal() {
                         />
                         <TextField
                             margin="normal"
+                            onChange={() => setErrorMessage('')}
                             required
                             fullWidth
                             name="email"
@@ -76,6 +110,7 @@ export default function MUIDeleteAccountModal() {
                         />
                         <TextField
                             margin="normal"
+                            onChange={() => setErrorMessage('')}
                             required
                             fullWidth
                             name="password"
@@ -83,9 +118,14 @@ export default function MUIDeleteAccountModal() {
                             type="password"
                             id="password"
                         />
+                        {errorMessage && (
+                            <Typography color="error" variant='subtitle2' sx={{ mt: 1, ml: 1 }}>
+                                {errorMessage}
+                            </Typography>
+                        )}
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
                             <Button
-                                onClick={handleClose}
+                                onClick={handleDelete}
                                 variant="contained"
                                 sx={{
                                     backgroundColor: "red",

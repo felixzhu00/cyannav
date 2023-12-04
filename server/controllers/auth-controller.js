@@ -4,6 +4,11 @@ const User = require("../schemas/userProfileSchema")
 const bcrypt = require("bcrypt")
 const saltRounds = 10
 
+changeProfilePicture = async (req, res) => {
+    // TODO: Implementation on saving to db
+}
+
+
 loggedIn = async (req, res) => {
     try {
         var userId = auth.verifyUser(req)

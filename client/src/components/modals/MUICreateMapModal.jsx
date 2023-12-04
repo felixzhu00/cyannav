@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
-import { Close, PropaneSharp } from '@mui/icons-material';
+import { Close } from '@mui/icons-material';
 import { FormControl, RadioGroup, Radio, FormControlLabel, FormGroup, Select, MenuItem, InputLabel, TextField } from '@mui/material';
 import { DropzoneArea } from 'react-mui-dropzone'
 import { useEffect, useState } from 'react';
@@ -12,6 +12,7 @@ import { useTheme } from '@emotion/react';
 import { GlobalStoreContext } from '../../store'
 import { useContext } from 'react';
 import AuthContext from "../../auth.js";
+
 const style = {
     position: 'absolute',
     top: '50%',
@@ -55,7 +56,7 @@ export default function MUICreateMapModal(props) {
     const handleCreateMap = async () => { // calls store function
         console.log(title, fileType, template, files)
         await store.createMap(title, fileType, template, files);
-        
+
         // closes modal
         setOpen(false)
         props.onClose()
@@ -88,12 +89,12 @@ export default function MUICreateMapModal(props) {
                         noValidate
                         autoComplete="off"
                     >
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>Map Title:
+                        <Box id="mapTitleBox" sx={{ display: 'flex', alignItems: 'center' }}>Map Title:
                             <TextField
                                 required
                                 placeholder="Untitled"
                                 onChange={(e) => setTitle(e.target.value)}
-                                sx={{ ml: 2 }}
+                                sx={{ ml: 2, width: "75%" }}
                             />
                         </Box>
 
@@ -129,7 +130,7 @@ export default function MUICreateMapModal(props) {
                                         label="Template"
                                         onChange={handleTemplateChange}
                                     >
-                                        <MenuItem value={'heatmap'}>Heat Map</MenuItem>
+                                        <MenuItem id="heatmapOption" value={'heatmap'}>Heat Map</MenuItem>
                                         <MenuItem value={'distributiveflowmap'}>Distributive Flow Map</MenuItem>
                                         <MenuItem value={'pointmap'}>Point Map</MenuItem>
                                         <MenuItem value={'choroplethmap'}>Choropleth Map</MenuItem>

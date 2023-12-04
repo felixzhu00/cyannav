@@ -93,9 +93,9 @@ export const updateMapNameById = (id, title) =>
         .then(handleResponse)
         .catch(handleError)
 
-export const updateMapTag = (id, tag) =>
+export const updateMapTag = (id, newTags) =>
     api
-        .put(`/maptag/${id}`, { tag })
+        .post(`/api/updatemaptag`, { id, newTags })
         .then(handleResponse)
         .catch(handleError)
 
@@ -117,12 +117,10 @@ export const getLoggedIn = () => {
         .get("/auth/loggedIn")
         .then((response) => {
             // Log the successful response
-            console.log("Response:", response)
             return handleResponse(response)
         })
         .catch((error) => {
             // Log the error
-            console.error("Error:", error)
             return handleError(error)
         })
 }
@@ -176,9 +174,9 @@ export const updateEmail = (loginToken, newEmail) =>
         .post("/auth/updateEmail", { loginToken, newEmail })
         .then(handleResponse)
         .catch(handleError)
-export const deleteAccount = (loginToken) =>
+export const deleteAccount = (username, email, password) =>
     api
-        .post("/auth/deleteAccount", { loginToken })
+        .post("/auth/deleteAccount", { username, email, password })
         .then(handleResponse)
         .catch(handleError)
 
