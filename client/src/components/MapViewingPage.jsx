@@ -4,18 +4,22 @@ import 'leaflet/dist/leaflet.css';
 import sha256 from 'crypto-js/sha256';
 import { Typography, Box, Menu, MenuItem, Paper, Button, IconButton, TextField, Tabs, Tab, useTheme } from '@mui/material';
 import { Undo, Redo, Delete, KeyboardArrowDown, ThumbUp, ThumbDown } from '@mui/icons-material';
+import { useParams } from 'react-router-dom';
 
 import MUIExportMapModal from './modals/MUIExportMapModal'
 import MUIPublishMapModal from './modals/MUIPublishMapModal'
 import MUIAddFieldModal from './modals/MUIAddFieldModal'
 import MUICommentModal from './modals/MUICommentModal'
-
+import NavJSON from './NavJSON'
 import usgeojson from '../assets/custom.geo.json'
 import { GlobalStoreContext } from '../store'
 
 function MapViewingPage() {
     const theme = useTheme(); // Use the theme
     const { store } = useContext(GlobalStoreContext);
+    const { id } = useParams();
+
+
     const [value, setValue] = useState('1');
     const [fields, setFields] = useState([
         { id: 1, text: 'Temperature', value: '' },
@@ -32,9 +36,125 @@ function MapViewingPage() {
     const [selectedChoropleth, setSelectedChoropleth] = useState('');
     const [anchorElChoropleth, setAnchorElChoropleth] = useState(null);
 
+    // const [geoJSON, setGeoJSON] = useState("")
+    const [features, setFeatures] = useState([]);
+    const [selectedFeatureIndex, setSelectedFeatureIndex] = useState(-1);
+
     /**
      * Commenting constants and states
      */
+
+    //Runs on initial load
+    useEffect(() => {
+        if (id != null) {
+            store.getMapById(id);
+        }
+    }, [id]);
+
+    useEffect(() => {
+        if (store.currentMap != null) {
+            setIsPublished(store.currentMap.published);
+        }
+    }, [store.currentMap]);
+
+    useEffect(() => {
+        if (store.geojson == null) {
+            store.getGeojson(id);
+        }
+    }, [store.geojson, id]);
+
+    // Creates state feature to be edited
+    useEffect(() => {
+        if (store.geojson && store.geojson.features) {
+            const updatedFeatures = store.geojson.features.map(feature => ({
+                ...feature,
+                fields: {
+                    name: feature.properties.admin,
+                },
+            }));
+            setFeatures(updatedFeatures);
+        }
+    }, [store.geojson]);
+
+    // Used for Indexing currentArea Feature in geojson array
+    useEffect(() => {
+        if (store && features.length !== 0) {
+            const index = findFeatureIndexByName(features, store.currentArea);
+            console.log(index)
+            setSelectedFeatureIndex(index);
+        }
+    }, [features, store.currentArea]);
+
+    // Temp way for now to add field, need a better way
+    useEffect(() => {
+        if (store && store.fieldString) {
+            const key = store.fieldString;
+            addField(key, "");
+        }
+    }, [store.fieldString]);
+
+
+    // Find feature index by name
+    const findFeatureIndexByName = (features, featureName) => {
+        return features.findIndex(feature => feature.fields.name === featureName);
+    };
+
+
+    // Handler to add a new field to the selected feature
+    const addField = (key, value) => {
+        setFeatures(prevFeatures => {
+            const updatedFeatures = prevFeatures.map(feature => ({
+                ...feature,
+                fields: {
+                    ...feature.fields,
+                    [key]: value,
+                },
+            }));
+            return updatedFeatures;
+        });
+        store.setGeoJsonFeatures(features);
+    };
+
+    // Handler to remove a field from every feature
+    const removeField = (key) => {
+        setFeatures(prevFeatures => {
+            const updatedFeatures = prevFeatures.map(feature => {
+                const updatedFields = { ...feature.fields };
+                delete updatedFields[key];
+                return {
+                    ...feature,
+                    fields: updatedFields,
+                };
+            });
+            return updatedFeatures;
+        });
+        store.setGeoJsonFeatures(features);
+    };
+
+    // Handler to change the value of a field in the selected feature
+    const changeFieldValue = (key, newValue) => {
+        setFeatures(prevFeatures => {
+            if (selectedFeatureIndex === -1) {
+                // Feature not found, do nothing or handle accordingly
+                return prevFeatures;
+            }
+
+            const updatedFeatures = [...prevFeatures];
+            const updatedFeature = {
+                ...updatedFeatures[selectedFeatureIndex],
+                fields: {
+                    ...updatedFeatures[selectedFeatureIndex].fields,
+                    [key]: newValue,
+                },
+            };
+            updatedFeatures[selectedFeatureIndex] = updatedFeature;
+            return updatedFeatures;
+        });
+        store.setGeoJsonFeatures(features);
+    };
+
+
+
     const [comments, setComments] = useState([]); // Used to store comments
     const addComment = (newCommentText) => {
         const newComment = {
@@ -61,18 +181,20 @@ function MapViewingPage() {
     const [dislikes, setDislikes] = useState(0);
     const [hasLiked, setHasLiked] = useState(false);
     const [hasDisliked, setHasDisliked] = useState(false);
-    const [isPublished, setIsPublished] = useState(store.currentMap.published);
+    const [isPublished, setIsPublished] = useState(false);
     /**
      * Handler functions
      */
+    //update
     const handleInputChange = (id, value) => { // field numerical values
+        console.log(id, value)
         const updatedFields = fields.map((field) =>
             field.id === id ? { ...field, value } : field
         );
         setFields(updatedFields);
     };
 
-
+    //delete
     const handleDeleteField = (id) => { // when user deletes a field
         const updatedFields = fields.filter((field) => field.id !== id);
         setFields(updatedFields);
@@ -250,7 +372,7 @@ function MapViewingPage() {
                     justifyContent: 'space-between',
                 }}
             >
-                {leaflet()}
+                {store.geojson && <NavJSON data={store.geojson} />}
                 <Box sx={{
                     position: 'absolute', // Absolutely position the button container
                     bottom: 20, // Adjust as needed
@@ -338,6 +460,69 @@ function MapViewingPage() {
     };
 
     const editBar = () => {
+
+        const fieldEdit = () => {
+            if (selectedFeatureIndex === -1) {
+                return null;
+            }
+        
+            const selectedFeature = features[selectedFeatureIndex];
+        
+            return (
+                <>
+                    {/* Box for 'name' field */}
+                    <Box
+                        key={'name'}
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            marginBottom: '10px',
+                        }}
+                    >
+                        <Box sx={{ alignSelf: 'center', marginRight: '10px' }}>
+                            <Typography>Name:</Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', flexDirection: 'row', alignSelf: 'flex-end' }}>
+                            <TextField
+                                value={selectedFeature.fields.name}
+                                onChange={(e) => changeFieldValue('name', e.target.value)}
+                            />
+                            {/* No delete icon for 'name' */}
+                        </Box>
+                    </Box>
+        
+                    {/* Mapping through other fields */}
+                    {Object.entries(selectedFeature.fields).map(([key, value]) => (
+                        key !== 'name' && (
+                            <Box
+                                key={key}
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    marginBottom: '10px',
+                                }}
+                            >
+                                <Box sx={{ alignSelf: 'center', marginRight: '10px' }}>
+                                    <Typography>{key}:</Typography>
+                                </Box>
+                                <Box sx={{ display: 'flex', flexDirection: 'row', alignSelf: 'flex-end' }}>
+                                    <TextField
+                                        value={value}
+                                        onChange={(e) => changeFieldValue(key, e.target.value)}
+                                    />
+                                    <IconButton onClick={() => removeField(key)}>
+                                        <Delete />
+                                    </IconButton>
+                                </Box>
+                            </Box>
+                        )
+                    ))}
+                </>
+            );
+        };
+
         return (
             <Box
                 gridArea={'editBar'}
@@ -353,42 +538,10 @@ function MapViewingPage() {
                     bgcolor: theme.palette.background.paper,
                 }}
             >
-                <Box>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            textAlign: 'center',
-                        }}
-                    >
-                        <Typography variant='h6'>Chosen Map Type:</Typography>
-                        <Typography sx={{ marginBottom: "20px" }}>{maptype}</Typography>
-                    </Box>
-                    {fields.map((field) => (
-                        <Box
-                            key={field.id}
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                marginBottom: '10px',
-                            }}
-                        >
-                            <Box sx={{ alignSelf: 'center', marginRight: '10px' }}><Typography>{field.text}:</Typography></Box>
-                            <Box sx={{ display: 'flex', flexDirection: 'row', alignSelf: 'flex-end' }}>
-                                <TextField
-                                    value={field.value}
-                                    onChange={(e) => handleInputChange(field.id, e.target.value)}
-                                />
-                                <IconButton onClick={() => handleDeleteField(field.id)}>
-                                    <Delete />
-                                </IconButton>
-                            </Box>
-                        </Box>
-                    ))}
-                </Box>
+                {store.currentArea == null ?
+                    <Typography variant='h6'>Choose an area to edit</Typography> :
+                    <Box>{fieldEdit()}</Box>
+                }
 
                 <Box
                     sx={{
@@ -406,7 +559,7 @@ function MapViewingPage() {
                         sx={{
                             marginBottom: '10px',
                             color: 'black',
-                            bgcolor: theme.palette.secondary.main
+                            bgcolor: theme.palette.secondary.main,
                         }}
                     >
                         + Add Field
@@ -418,16 +571,17 @@ function MapViewingPage() {
                             alignItems: 'center',
                         }}
                     >
-                        <Typography sx={{ m: "10px" }}>{maptype} by:</Typography>
+                        <Typography sx={{ m: '10px' }}>{maptype} by:</Typography>
                         <Box sx={{ textAlign: 'right' }}>
                             <Button
                                 onClick={handleChoroplethClick}
                                 variant="contained"
                                 sx={{
-                                    color: "black",
+                                    color: 'black',
                                     width: '150px',
-                                    bgcolor: theme.palette.secondary.main
-                                }}>
+                                    bgcolor: theme.palette.secondary.main,
+                                }}
+                            >
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                                     <span>{selectedChoropleth}</span>
                                     <KeyboardArrowDown />

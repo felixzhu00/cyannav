@@ -39,6 +39,14 @@ function GlobalStoreContextProvider(props) {
 
         mapCollection: null, // What to display on mymap and browsepage
         currentModal: null,
+        //Map Viewing
+        geojson: null,
+        currentArea: null,
+
+        //Add Field Modal
+        fieldString: null
+
+
     })
 
     //Nav Global Handlers
@@ -54,9 +62,35 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.createMap = async (title, fileType, mapTemplate, files) => {
-        var buffer = geobuf.encode(files, new Pbf())
-        return await api.createNewMap(title, mapTemplate, buffer);
+        // console.log(files)
+
+        // var buffer = geobuf.encode(files, new Pbf())
+        // return await api.createNewMap(title, mapTemplate, buffer);
+
+        const file = files[0]; // Assuming files is an array with the File object
+
+        // Create a FileReader
+        const reader = new FileReader();
+
+        // Define the event handler for when the file read is complete
+        reader.onloadend = async function (event) {
+            if (event.target.readyState === FileReader.DONE) {
+                // event.target.result contains the content of the file
+                const geojson = JSON.parse(event.target.result);
+
+                // Encode the GeoJSON with geobuf
+                const buffer = geobuf.encode(geojson, new Pbf());
+
+                const response = await api.createNewMap(title, mapTemplate, buffer);
+
+                return response
+            }
+        };
+
+        // Read the content of the file as text
+        reader.readAsText(file);
     }
+
 
     store.getMyMapCollection = async (userId) => {
         if (!userId) return;  // Add this line
@@ -106,17 +140,61 @@ function GlobalStoreContextProvider(props) {
         await api.updateMapPublishStatus(mapId);
     }
 
-    // store.getGeojson = async (geojsonId) => {
-    //     const response = await api.getGeoJsonById(geojsonId);
-    //     console.log(response.data.geoBuf);
-    //     console.log(response.status);
-    //     if (response.status == 200) {
+    store.getGeojson = async (geojsonId) => {
+        const response = await api.getGeoJsonById(geojsonId);
+        if (response.status == 200) {
 
-    //         var geojson = geobuf.decode(new Pbf(response.data.geoBuf.arrayBuffer()));
-    //         console.log(geojson);
-    //         // return geojson;
-    //     }
-    // }
+            // var geojson = geobuf.decode(new Pbf(response.data.geoBuf.arrayBuffer()));
+            // console.log(geojson);
+            // return geojson;
+
+            // const uint8Array = new Uint8Array(response.data.geoBuf.data);
+
+            // Use the Uint8Array directly in the Pbf constructor
+            const pbf = new Pbf(response.data.geoBuf.data);
+
+            // Decode the GeoJSON
+            const geojson = geobuf.decode(pbf);
+
+
+            setStore(prevStore => ({
+                ...prevStore,
+                geojson: geojson,
+            }));
+
+            return geojson;
+        }
+    }
+
+    store.setCurrentArea = async (value) => {
+        setStore(prevStore => ({
+            ...prevStore,
+            currentArea: value,
+        }));
+    }
+
+    store.setField = async (value) => {
+        setStore(prevStore => ({
+            ...prevStore,
+            fieldString: value,
+        }));
+        
+    }
+
+    store.setGeoJsonFeatures = async (newFeatures) => {
+        setStore((prevStore) => {
+          const updatedGeojson = {
+            ...prevStore.geojson,
+            features: newFeatures,
+          };
+      
+          
+          return {
+            ...prevStore,
+            geojson: updatedGeojson,
+          };
+        });
+      };
 
     //Map Card Global Handlers
     store.searchForMapBy = async (filter, string) => {
@@ -195,18 +273,28 @@ function GlobalStoreContextProvider(props) {
 
 
     store.setCurrentModal = (option, id) => {
-        return setStore({
-            ...store,
+
+        setStore(prevStore => ({
+            ...prevStore,
             currentModal: option,
             currentModalMapId: id,
-        });
+        }));
+
     }
 
-    store.setCurrentMap = (id) => {
+    store.setCurrentMap = (mapMeta) => {
         return setStore({
             ...store,
-            currentMap: id
+            currentMap: mapMeta
         })
+    }
+
+    store.getMapById = async (id) => {
+        const response = await api.getMapById(id)
+        setStore(prevStore => ({
+            ...prevStore,
+            currentMap: response.data.metadata,
+        }));
     }
 
 
