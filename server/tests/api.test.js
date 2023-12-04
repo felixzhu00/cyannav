@@ -1,21 +1,21 @@
 // Environmental vairables for testing.
 
 //all tests temporarily moved to this file. will move them back in build 5
-process.env.SERVER_PORT = 8002
+process.env.SERVER_PORT = undefined
 process.env.SERVER_ADDRESS = "localhost"
 process.env.JWT_SECRET = "testing"
 
-const fs = require('fs');
-const path = require('path');
-const geobuf = require('geobuf')
-const Pbf = require('pbf')
+const fs = require("fs")
+const path = require("path")
+const geobuf = require("geobuf")
+const Pbf = require("pbf")
 const app = require("../index.js")
 const request = require("supertest")
-const filePath = path.join(__dirname, 'testMap.geojson');
-const testMap = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+const filePath = path.join(__dirname, "testMap.geojson")
+const testMap = JSON.parse(fs.readFileSync(filePath, "utf8"))
 const buffer = geobuf.encode(testMap, new Pbf())
 
-const { 
+const {
     getMapById,
     getUserMaps,
     getAllPublishedMaps,
@@ -29,51 +29,48 @@ const {
     // updateMapTag,
     updateMapPublishStatus,
     // updateMapJson,
-} = require('../controllers/mapapi-controller.js')
+} = require("../controllers/mapapi-controller.js")
 
-const MapMetaData = require('../schemas/Map/mapMetadataSchema')
-const GeoJsonSchema = require('../schemas/Map/geoJsonSchema')
-const MapFields = require('../schemas/Map/fieldDataSchema.js')
+const MapMetaData = require("../schemas/Map/mapMetadataSchema")
+const GeoJsonSchema = require("../schemas/Map/geoJsonSchema")
+const MapFields = require("../schemas/Map/fieldDataSchema.js")
 
-jest.mock('../schemas/mapGraphicSchema');
-jest.mock('../schemas/tagSchema');
-jest.mock('../schemas/userProfileSchema');
+jest.mock("../schemas/mapGraphicSchema")
+jest.mock("../schemas/tagSchema")
+jest.mock("../schemas/userProfileSchema")
 
-jest.mock('../schemas/Map/commentSchema');
-jest.mock('../schemas/Map/fieldDataSchema');
-jest.mock('../schemas/Map/geoJsonSchema');
-jest.mock('../schemas/Map/mapMetadataSchema');
+jest.mock("../schemas/Map/commentSchema")
+jest.mock("../schemas/Map/fieldDataSchema")
+jest.mock("../schemas/Map/geoJsonSchema")
+jest.mock("../schemas/Map/mapMetadataSchema")
 
 afterEach(() => {
-    jest.clearAllMocks();
-  });  
+    jest.clearAllMocks()
+})
 
 /* Map API Tests*/
 describe("getMapById function", () => {
     it("correctly returns a map", async () => {
-        MapMetaData.findOne = jest.fn().mockResolvedValueOnce(
-            {
-                _id: 1,
-                title: "test",
-                user: "rob",
-                mapType: "pointmap",
-                published: true,
-                geojsonId: buffer,
-                fieldDataId: buffer, //change when field data gets implemented
-            }
-        )
-        const req = {body: { id: 1 }}
+        MapMetaData.findOne = jest.fn().mockResolvedValueOnce({
+            _id: 1,
+            title: "test",
+            user: "rob",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+            fieldDataId: buffer, //change when field data gets implemented
+        })
+        const req = { body: { id: 1 } }
         const res = {
             status: jest.fn().mockReturnThis(),
             json: jest.fn(),
             end: jest.fn(),
-        };
+        }
         await getMapById(req, res)
 
-        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.status).toHaveBeenCalledWith(200)
         expect(res.json).toHaveBeenCalledWith({
-            metadata: 
-            {
+            metadata: {
                 _id: 1,
                 title: "test",
                 user: "rob",
@@ -81,41 +78,40 @@ describe("getMapById function", () => {
                 published: true,
                 geojsonId: buffer,
                 fieldDataId: buffer, //change when field data gets implemented
-            }
+            },
         })
     })
 })
 
 describe("getUserMaps function", () => {
     it("correctly returns a user's map", async () => {
-        MapMetaData.find = jest.fn().mockResolvedValueOnce(
-            {
-                _id: 1,
-                title: "test",
-                user: "rob",
-                mapType: "pointmap",
-                published: true,
-                geojsonId: buffer,
-                fieldDataId: buffer, //change when field data gets implemented
-            }
-        )
-        const req = {params: {
-            id: 1
-        }}
+        MapMetaData.find = jest.fn().mockResolvedValueOnce({
+            _id: 1,
+            title: "test",
+            user: "rob",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+            fieldDataId: buffer, //change when field data gets implemented
+        })
+        const req = {
+            params: {
+                id: 1,
+            },
+        }
         const res = {
             locals: {
-                userId: 2
+                userId: 2,
             },
             status: jest.fn().mockReturnThis(),
             json: jest.fn(),
             end: jest.fn(),
-        };
+        }
         await getUserMaps(req, res)
 
-        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.status).toHaveBeenCalledWith(200)
         expect(res.json).toHaveBeenCalledWith({
-            userMaps: 
-            {
+            userMaps: {
                 _id: 1,
                 title: "test",
                 user: "rob",
@@ -123,7 +119,7 @@ describe("getUserMaps function", () => {
                 published: true,
                 geojsonId: buffer,
                 fieldDataId: buffer, //change when field data gets implemented
-            }
+            },
         })
     })
 })
@@ -134,76 +130,74 @@ describe("getAllPublishedMaps function", () => {
             populate: jest.fn().mockResolvedValueOnce([
                 {
                     _id: 1,
-                    title: 'test',
-                    user: 'rob',
-                    mapType: 'pointmap',
+                    title: "test",
+                    user: "rob",
+                    mapType: "pointmap",
                     published: true,
                     geojsonId: buffer,
                     fieldDataId: buffer,
-                }
+                },
             ]),
-        });
+        })
         const req = {}
         const res = {
             status: jest.fn().mockReturnThis(),
             json: jest.fn(),
             end: jest.fn(),
-        };
+        }
         await getAllPublishedMaps(req, res)
 
-        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.status).toHaveBeenCalledWith(200)
     })
 })
 
 describe("getGeoJsonById function", () => {
     it("correctly returns a geojson", async () => {
-        GeoJsonSchema.findById = jest.fn().mockResolvedValueOnce(
-            {
-               geoBuf: buffer
-            }
-        )
-        const req = {params: {
-            id: 1
-        }}
+        GeoJsonSchema.findById = jest.fn().mockResolvedValueOnce({
+            geoBuf: buffer,
+        })
+        const req = {
+            params: {
+                id: 1,
+            },
+        }
         const res = {
             status: jest.fn().mockReturnThis(),
             json: jest.fn(),
             end: jest.fn(),
-        };
+        }
         await getGeoJsonById(req, res)
 
-        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.status).toHaveBeenCalledWith(200)
         expect(res.json).toHaveBeenCalledWith({
-                geoBuf: buffer
-            }
-        )
+            geoBuf: buffer,
+        })
     })
 })
 
 describe("getMapFieldsById function", () => {
     it("correctly returns mapFields", async () => {
-        MapFields.findById = jest.fn().mockResolvedValueOnce(
-            {
-               geoBuf: buffer
-            }
-        )
-        const req = {body: {
-            id: 1
-        }}
+        MapFields.findById = jest.fn().mockResolvedValueOnce({
+            geoBuf: buffer,
+        })
+        const req = {
+            body: {
+                id: 1,
+            },
+        }
         const res = {
             status: jest.fn().mockReturnThis(),
             json: jest.fn(),
             end: jest.fn(),
-        };
+        }
         await getMapFieldsById(req, res)
 
-        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.status).toHaveBeenCalledWith(200)
         expect(res.json).toHaveBeenCalledWith({
             mapFields: {
-                geoBuf: buffer
-            }
-        }
-        )
+                geoBuf: buffer,
+            },
+        })
     })
 })
 
@@ -254,91 +248,84 @@ describe("getMapFieldsById function", () => {
 
 describe("deleteMapById function", () => {
     it("correctly deletes a map", async () => {
-        MapMetaData.findById = jest.fn().mockResolvedValueOnce(
-            {
-                _id: 1,
-                title: "test",
-                user: "rob",
-                mapType: "pointmap",
-                published: true,
-                geojsonId: buffer,
-                fieldDataId: buffer, //change when field data gets implemented
-            }
-        )
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce({
+            _id: 1,
+            title: "test",
+            user: "rob",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+            fieldDataId: buffer, //change when field data gets implemented
+        })
         MapMetaData.findByIdAndDelete = jest.fn().mockResolvedValueOnce(true)
-        const req = {params: { id: 1 }}
+        const req = { params: { id: 1 } }
         const res = {
             locals: {
-                userId: "rob"
+                userId: "rob",
             },
             status: jest.fn().mockReturnThis(),
             json: jest.fn(),
             end: jest.fn(),
-        };
+        }
         await deleteMapById(req, res)
 
-        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.status).toHaveBeenCalledWith(200)
     })
 })
 
 describe("updateMapNameById function", () => {
     it("correctly updates a mapname", async () => {
-        MapMetaData.findById = jest.fn().mockResolvedValueOnce(
-            {
-                _id: 1,
-                title: "test",
-                user: "rob",
-                mapType: "pointmap",
-                published: true,
-                geojsonId: buffer,
-                fieldDataId: buffer, //change when field data gets implemented
-            }
-        )
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce({
+            _id: 1,
+            title: "test",
+            user: "rob",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+            fieldDataId: buffer, //change when field data gets implemented
+        })
         MapMetaData.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(true)
-        const req = {body: { id: 1, title: "hello" }}
+        const req = { body: { id: 1, title: "hello" } }
         const res = {
             locals: {
-                userId: "rob"
+                userId: "rob",
             },
             status: jest.fn().mockReturnThis(),
             json: jest.fn(),
             end: jest.fn(),
-        };
+        }
         await updateMapNameById(req, res)
 
-        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.status).toHaveBeenCalledWith(200)
     })
 })
 
 describe("updateMapPublishStatus function", () => {
     it("correctly updates a map publish status", async () => {
-        MapMetaData.findById = jest.fn().mockResolvedValueOnce(
-            {
-                _id: 1,
-                title: "test",
-                user: "rob",
-                mapType: "pointmap",
-                published: true,
-                geojsonId: buffer,
-                fieldDataId: buffer, //change when field data gets implemented
-            }
-        )
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce({
+            _id: 1,
+            title: "test",
+            user: "rob",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+            fieldDataId: buffer, //change when field data gets implemented
+        })
         MapMetaData.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(true)
-        const req = {body: { id: 1 }}
+        const req = { body: { id: 1 } }
         const res = {
             locals: {
-                userId: "rob"
+                userId: "rob",
             },
             status: jest.fn().mockReturnThis(),
             json: jest.fn(),
             end: jest.fn(),
-        };
+        }
         await updateMapPublishStatus(req, res)
 
-        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.status).toHaveBeenCalledWith(200)
     })
 })
-
 
 describe("mapmetadata/:id", () => {
     it("returns 400 if no id", async () => {
@@ -346,7 +333,9 @@ describe("mapmetadata/:id", () => {
         expect(res.statusCode).toEqual(400)
     })
     it("returns 400 if id does not match map", async () => {
-        const res = await request(app).get("/api/mapmetadata/:id").send({ id: 0 })
+        const res = await request(app)
+            .get("/api/mapmetadata/:id")
+            .send({ id: 0 })
         expect(res.statusCode).toEqual(400)
     })
 })
@@ -357,7 +346,9 @@ describe("mapbyuser/:id", () => {
         expect(res.statusCode).toEqual(400)
     })
     it("returns code 400 given a userId", async () => {
-        const res = await request(app).get("/api/mapbyuser/:id").send({ userId: "cyan boy" })
+        const res = await request(app)
+            .get("/api/mapbyuser/:id")
+            .send({ userId: "cyan boy" })
         expect(res.statusCode).toEqual(400)
     })
 })
@@ -374,10 +365,12 @@ describe("mapgeojson/:id", () => {
         const res = await request(app).get("/api/mapgeojson/:id").send({})
         expect(res.statusCode).toEqual(400)
     })
-    it('returns code 400 if no map matches id given', async () => {
-        const res = await request(app).get('/api/mapgeojson/:id').send({id: "100298"});
-        expect(res.statusCode).toEqual(400);
-    });
+    it("returns code 400 if no map matches id given", async () => {
+        const res = await request(app)
+            .get("/api/mapgeojson/:id")
+            .send({ id: "100298" })
+        expect(res.statusCode).toEqual(400)
+    })
     //write test for if id is associated with map
 })
 
@@ -398,10 +391,12 @@ describe("newMap", () => {
             .send({ title: "US states", type: "map", json: " " })
         expect(res.statusCode).toEqual(400)
     })
-    it('returns code 400 since json is empty string', async () => {
-        const res = await request(app).post('/api/newmap').send({ title: "US states", type: "heatmap", json: " " });
-        expect(res.statusCode).toEqual(400);
-    });
+    it("returns code 400 since json is empty string", async () => {
+        const res = await request(app)
+            .post("/api/newmap")
+            .send({ title: "US states", type: "heatmap", json: " " })
+        expect(res.statusCode).toEqual(400)
+    })
 })
 
 describe("duplicatemap", () => {
@@ -410,17 +405,19 @@ describe("duplicatemap", () => {
         expect(res.statusCode).toEqual(400)
     })
     it("returns code 400 for now", async () => {
-        const res = await request(app).post("/api/duplicatemap").send({ id: "1006298" })
+        const res = await request(app)
+            .post("/api/duplicatemap")
+            .send({ id: "1006298" })
         expect(res.statusCode).toEqual(400)
     })
     //add another tets for if there is map which matches the id sent
 })
 
 describe("forkMap", () => {
-    it('returns code 400 if no id is sent', async () => {
-        const res = await request(app).post('/api/forkmap').send({});
-        expect(res.statusCode).toEqual(400);
-    });
+    it("returns code 400 if no id is sent", async () => {
+        const res = await request(app).post("/api/forkmap").send({})
+        expect(res.statusCode).toEqual(400)
+    })
     // it("returns code 401 if no map matches the id sent", async () => {
     //     const res = await request(app).post("/api/forkmap").send({ id: 10062909 })
     //     expect(res.statusCode).toEqual(401)
@@ -433,10 +430,12 @@ describe("deletemap/:id", () => {
         const res = await request(app).delete("/api/deletemap/:id").send({})
         expect(res.statusCode).toEqual(400)
     })
-    it('returns code 400 if no map matches the id sent', async () => {
-        const res = await request(app).delete('/api/deletemap/:id').send({id: 100629});
-        expect(res.statusCode).toEqual(400);
-    });
+    it("returns code 400 if no map matches the id sent", async () => {
+        const res = await request(app)
+            .delete("/api/deletemap/:id")
+            .send({ id: 100629 })
+        expect(res.statusCode).toEqual(400)
+    })
 })
 
 describe("loggedIn", () => {
@@ -551,45 +550,51 @@ describe("deleteAccount", () => {
     })
 })
 
-describe('updatePass', () => {
-    it('returns 400 if no id', async () => {
-        const res = await request(app).post('/auth/updatePass').send({});
-        expect(res.statusCode).toEqual(400);
-    });
-    it('returns 400 if id does not match map', async () => {
-        const res = await request(app).post('/auth/updatePass').send({id: 0});
-        expect(res.statusCode).toEqual(400);
-    });
-});
+describe("updatePass", () => {
+    it("returns 400 if no id", async () => {
+        const res = await request(app).post("/auth/updatePass").send({})
+        expect(res.statusCode).toEqual(400)
+    })
+    it("returns 400 if id does not match map", async () => {
+        const res = await request(app).post("/auth/updatePass").send({ id: 0 })
+        expect(res.statusCode).toEqual(400)
+    })
+})
 
-describe('mapname', () => {
-    it('returns code 400 since no id is being passed', async () => {
-        const res = await request(app).post('/api/mapname').send({ type: "map" });
-        expect(res.statusCode).toEqual(400);
+describe("mapname", () => {
+    it("returns code 400 since no id is being passed", async () => {
+        const res = await request(app)
+            .post("/api/mapname")
+            .send({ type: "map" })
+        expect(res.statusCode).toEqual(400)
         //add more tests sending different info to the endpoint
-    });
-});
+    })
+})
 
-describe('maptag', () => {
-    it('returns code 201 if map added to db, otherwise 404', async () => {
-        const res = await request(app).post('/api/maptag').send({ type: "map" });
+describe("maptag", () => {
+    it("returns code 201 if map added to db, otherwise 404", async () => {
+        const res = await request(app).post("/api/maptag").send({ type: "map" })
 
-        expect(res.statusCode).toEqual(404);
-    });
-});
+        expect(res.statusCode).toEqual(404)
+    })
+})
 
-describe('mapstatus', () => {
-    it('returns code 201 if map added to db, otherwise 404', async () => {
-        const res = await request(app).post('/api/mapstatus').send({ type: "map" });
+describe("mapstatus", () => {
+    it("returns code 201 if map added to db, otherwise 404", async () => {
+        const res = await request(app)
+            .post("/api/mapstatus")
+            .send({ type: "map" })
 
-        expect(res.statusCode).toEqual(404);
-    });
-});
+        expect(res.statusCode).toEqual(404)
+    })
+})
 
-describe('mapjson', () => {
-    it('returns code 201 if map added to db, otherwise 404', async () => {
-        const res = await request(app).post('/api/mapjson').send({ type: "map" });
+describe("mapjson", () => {
+    it("returns code 201 if map added to db, otherwise 404", async () => {
+        const res = await request(app)
+            .post("/api/mapjson")
+            .send({ type: "map" })
 
-        expect(res.statusCode).toEqual(404);
-    });
-});
+        expect(res.statusCode).toEqual(404)
+    })
+})
