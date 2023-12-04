@@ -1,0 +1,44 @@
+services:
+    client:
+        build: ./client
+        image: cyannav-client
+        container_name: client
+        ports:
+            - "80:80"
+        depends_on:
+            - server
+        networks:
+            - mern-networks
+
+    server:
+        build: ./server
+        image: cyannav-api
+        container_name: api-server
+        ports:
+            - "8000:8000"
+        restart: always
+        depends_on:
+            - database
+        networks:
+            - mern-networks
+
+    database:
+        image: mongo
+        container_name: mongo-db
+        ports:
+            - "27017:27017"
+        restart: always
+        networks:
+            - mern-networks
+
+    api-test:
+        image: cyannav-api
+        command: dockerize
+            -wait tcp://mongo-db:27017 -timeout 10s
+            bash -c "npm test"
+        depends_on:
+            - database
+
+networks:
+    mern-networks:
+        driver: bridge
