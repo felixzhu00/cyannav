@@ -101,4 +101,10 @@ router.post(
 
 router.post("/getcommentbyid", mapMetadataSchemaController.getCommentById)
 
+router.post(
+    "/updategeojson",
+    auth.verify,
+    mapMetadataSchemaController.updateMapGeoJson
+)
+
 module.exports = router

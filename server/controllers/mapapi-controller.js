@@ -612,6 +612,44 @@ updateMapTag = async (req, res) => {
     }
 }
 
+updateMapGeoJson = async (req, res) => {
+    try {
+        // Id refers to map id
+        const { id, geoBuf } = req.body
+
+        if (!id || !ObjectId.isValid(id)) {
+            return res.status(400).end()
+        }
+
+        targetMap = MapMetadata.findById(id)
+        if (!targetMap) {
+            return res.status(404).end()
+        }
+
+        if (targetMap.userId.toString() !== res.locals.userId) {
+            return res.status(401).end()
+        }
+
+        targetGeoJson = GeoJsonSchema.findById(targetMap.geojsonId)
+        if (!targetGeoJson) {
+            return res.status(404).end()
+        }
+
+        targetGeoJson.geoBuf = geoBuf
+
+        const saved = await targetGeoJson.save()
+        if (!saved) {
+            return res.status(500).end()
+        }
+
+        return res.status(200).end()
+    } catch (err) {
+        console.error("mapapi-controller::updateMapGeoJson")
+        console.error(err)
+        return res.status(500).end()
+    }
+}
+
 module.exports = {
     getMapById,
     getUserMaps,
@@ -625,7 +663,7 @@ module.exports = {
     updateMapNameById,
     updateMapTag,
     updateMapPublishStatus,
-    // updateMapJson,
+    updateMapGeoJson,
     postComment,
     getCommentById,
     likeMap,
