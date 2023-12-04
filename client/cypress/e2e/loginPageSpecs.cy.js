@@ -1,6 +1,6 @@
 describe("login page specs", () => {
     beforeEach(() => {
-        cy.visit("129.213.145.105")
+        cy.visit("localhost:3000")
     })
 
     it("ensures error message is displayed when bad info is entered", () => {

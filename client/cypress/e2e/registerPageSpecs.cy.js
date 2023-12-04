@@ -1,6 +1,6 @@
 describe("register page specs", () => {
     beforeEach(() => {
-        cy.visit("129.213.145.105")
+        cy.visit("localhost:3000")
         cy.get("#registerLink").click()
     })
 

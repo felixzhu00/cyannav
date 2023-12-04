@@ -1,9 +1,9 @@
 import axios from "axios"
 
 axios.defaults.withCredentials = true
-var baseURL = "http://localhost:8000"
+var baseURL = "http://localhost:5000"
 if (process.env.NODE_ENV == "production") {
-    baseURL = "http://129.213.145.105:8000"
+    baseURL = "http://cyannav.tech:8000"
 }
 const api = axios.create({
     baseURL: baseURL,
@@ -40,28 +40,16 @@ const handleError = (error) => {
 
 // Map-related functions
 export const getMapById = (id) =>
-    api
-        .get(`/api/mapmetadata/${id}`)
-        .then(handleResponse)
-        .catch(handleError)
+    api.get(`/api/mapmetadata/${id}`).then(handleResponse).catch(handleError)
 
 export const getUserMaps = (id) =>
-    api
-        .get(`/api/mapbyuser/${id}`)
-        .then(handleResponse)
-        .catch(handleError)
+    api.get(`/api/mapbyuser/${id}`).then(handleResponse).catch(handleError)
 
 export const getAllMaps = () =>
-    api
-        .get("/api/allpublishedmap")
-        .then(handleResponse)
-        .catch(handleError)
+    api.get("/api/allpublishedmap").then(handleResponse).catch(handleError)
 
 export const getGeoJsonById = (id) =>
-    api
-        .get(`/api/mapgeojson/${id}`)
-        .then(handleResponse)
-        .catch(handleError)
+    api.get(`/api/mapgeojson/${id}`).then(handleResponse).catch(handleError)
 
 export const createNewMap = (title, type, GeoJsonSchemabuf) =>
     api
@@ -76,26 +64,14 @@ export const createDuplicateMapById = (id) =>
         .catch(handleError)
 
 export const createForkMapById = (id) =>
-    api
-        .post("/api/forkmap", { id })
-        .then(handleResponse)
-        .catch(handleError)
+    api.post("/api/forkmap", { id }).then(handleResponse).catch(handleError)
 
 export const deleteMapById = (id) =>
-    api
-        .delete(`/api/deletemap/${id}`)
-        .then(handleResponse)
-        .catch(handleError)
+    api.delete(`/api/deletemap/${id}`).then(handleResponse).catch(handleError)
 export const likeMap = (id) =>
-    api
-        .post(`api/likemap`, { id })
-        .then(handleResponse)
-        .catch(handleError)
+    api.post(`api/likemap`, { id }).then(handleResponse).catch(handleError)
 export const dislikeMap = (id) =>
-    api
-        .post(`api/dislikeMap`, { id })
-        .then(handleResponse)
-        .catch(handleError)
+    api.post(`api/dislikeMap`, { id }).then(handleResponse).catch(handleError)
 export const updateMapNameById = (id, title) =>
     api
         .post(`/api/mapname`, { id, title })
@@ -109,16 +85,10 @@ export const updateMapTag = (id, newTags) =>
         .catch(handleError)
 
 export const updateMapPublishStatus = (id) =>
-    api
-        .post("/api/publishmap", { id })
-        .then(handleResponse)
-        .catch(handleError)
+    api.post("/api/publishmap", { id }).then(handleResponse).catch(handleError)
 
 export const updateMapJson = (id, json) =>
-    api
-        .put(`/mapjson/${id}`, { json })
-        .then(handleResponse)
-        .catch(handleError)
+    api.put(`/mapjson/${id}`, { json }).then(handleResponse).catch(handleError)
 
 // Auth-related functions
 export const getLoggedIn = () => {
@@ -139,20 +109,14 @@ export const loginUser = (email, password) =>
         .then(handleResponse)
         .catch(handleError)
 export const logoutUser = () =>
-    api
-        .post("/auth/logout")
-        .then(handleResponse)
-        .catch(handleError)
+    api.post("/auth/logout").then(handleResponse).catch(handleError)
 export const registerUser = (email, username, password, passwordVerify) =>
     api
         .post("/auth/register", { email, username, password, passwordVerify })
         .then(handleResponse)
         .catch(handleError)
 export const requestReset = (email) =>
-    api
-        .post("/auth/reset", { email })
-        .then(handleResponse)
-        .catch(handleError)
+    api.post("/auth/reset", { email }).then(handleResponse).catch(handleError)
 export const updatePasscode = (
     originalPassword,
     password,
@@ -194,8 +158,6 @@ export const updateProfilePic = (data) =>
         .then(handleResponse)
         .catch(handleError)
 
-
-
 const apis = {
     getMapById,
     getUserMaps,
@@ -221,7 +183,7 @@ const apis = {
     updateUsername,
     updateEmail,
     deleteAccount,
-    updateProfilePic
+    updateProfilePic,
 }
 
 export default apis

@@ -29,12 +29,12 @@ jobs:
             - name: Create environment for backend
               run: |
                   cd server
-                  rm .env
-                  touch .env
-                  echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> .env
-                  echo SERVER_HOSTNAME=${{ vars.SERVER_HOSTNAME }} >>.env
-                  echo SERVER_PORT=${{ vars.SERVER_PORT }} >> .env
-                  echo JWT_EXPIRATION_TIME=${{ vars.JWT_EXPIRATION_TIME }} >> .env
+                  touch .env.production
+                  echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> .env.production
+                  echo CORS_ORIGIN=${{ vars.CORS_ORIGIN }} >>.env.production
+                  echo SERVER_PORT=${{ vars.SERVER_PORT }} >> .env.production
+                  echo JWT_EXPIRATION_TIME=${{ vars.JWT_EXPIRATION_TIME }} >> .env.production
+                  echo DATABASE_ADDR=${{ vars.DATABASE_ADDR }} >> .env.production
 
     lint:
         needs: setup
@@ -57,8 +57,11 @@ jobs:
                   node-version: "21.x"
             - name: Frontend Cypress test
               run: |
+                  cd server
+                  NODE_ENV=frontend_test pm2 start index.js --name frontend_test_backend_server
                   cd client
                   npm test
+                  pm2 stop frontend_test_backend_server
 
     backend-test:
         needs: setup
@@ -96,7 +99,7 @@ jobs:
         steps:
             - name: Deploy backend server
               run: |
-                  pm2 restart 0
+                  NODE_ENV=production pm2 start index.js --name deploy
 
     deploy-frontend:
         if: always()
