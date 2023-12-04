@@ -33,14 +33,16 @@
 //   });
 
 Cypress.Commands.add('signInUser', (email, password) => {
-    cy.visit("129.213.145.105")
-    cy.get('#email').type(email)
-    cy.get('#password').type(password)
-    cy.get("#signInBtn").click()
+    cy.session([email, password], () => {
+        cy.visit("localhost:3000")
+        cy.get('#email').clear().type(email)
+        cy.get('#password').clear().type(password)
+        cy.get("#signInBtn").click()
+    })
 });
 
 Cypress.Commands.add('registerUser', (email, username, password, passwordVerify) => {
-    cy.visit("129.213.145.105")
+    cy.visit("localhost:3000")
     cy.get("#registerLink").click()
     cy.get('#email').type(email)
     cy.get('#username').type(username)

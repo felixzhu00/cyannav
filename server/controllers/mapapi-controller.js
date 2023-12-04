@@ -149,7 +149,7 @@ createNewMap = async (req, res) => {
             type !== "distributiveflowmap" &&
             type !== "pointmap" &&
             type !== "3drectangle" &&
-            type !== "chroplethmap"
+            type !== "choroplethmap"
         ) {
             return res.status(400).json({
                 errorMessage: "Invalid map type.",
