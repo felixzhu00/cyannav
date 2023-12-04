@@ -68,6 +68,7 @@ router.post(
     auth.verify,
     mapMetadataSchemaController.updateMapNameById
 )
+
 //Handles updating a map's tags request
 router.post(
     "/updatemaptag",
@@ -99,5 +100,11 @@ router.post(
 // )
 
 router.post("/getcommentbyid", mapMetadataSchemaController.getCommentById)
+
+router.post(
+    "/updategeojson",
+    auth.verify,
+    mapMetadataSchemaController.updateMapGeoJson
+)
 
 module.exports = router

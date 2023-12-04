@@ -233,7 +233,9 @@ logout = async (req, res) => {
         expires: new Date(0),
         secure: true,
         sameSite: "none",
-    }).send()
+    })
+        .status(200)
+        .send()
 }
 
 // TODO: To be implemented once email service is setup.
@@ -330,9 +332,7 @@ updateUsername = async (req, res) => {
 
         var existingUser = await User.findOne({ username: newUsername })
         if (existingUser) {
-            return res.status(401).json({
-                errorMessage: "Username not unique.",
-            })
+            return res.status(401).end()
         }
 
         var targetUser = await User.findOneAndUpdate(
@@ -361,8 +361,8 @@ updateEmail = async (req, res) => {
             return res.status(400).end()
         }
 
-        var existingUser = await User.findOne({ username: newEmail })
-        if (existingUser) {
+        var existingUser = await User.countDocuments({ username: newEmail })
+        if (existingUser > 0) {
             return res.status(401).json({
                 errorMessage: "Email not unique.",
             })
