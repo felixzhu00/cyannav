@@ -8,13 +8,15 @@ var ObjectId = mongoose.Types.ObjectId
 
 getMapById = async (req, res) => {
     try {
-        const { id } = req.body
+        const id  = req.params.id
+        console.log(id)
 
         if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
 
         const targetMap = await MapMetadata.findOne({ _id: id })
+        console.log(targetMap)
         if (!targetMap) {
             return res.status(404).end()
         }
@@ -86,12 +88,23 @@ getAllPublishedMaps = async (req, res) => {
 getGeoJsonById = async (req, res) => {
     try {
         const id = req.params.id
+        console.log(id)
 
         if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
+        console.log("hello")
+        
+        const mapMetadata = await MapMetadata.findById(id);
 
-        const geojson = await GeoJsonSchema.findById(id)
+        if (!mapMetadata) {
+            return res.status(404).end();
+        }
+
+        const geojsonId = mapMetadata.geojsonId;
+
+        const geojson = await GeoJsonSchema.findById(geojsonId)
+        console.log(geojson)
 
         if (!geojson) {
             return res.status(404).end()
