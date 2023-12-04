@@ -78,10 +78,10 @@ jobs:
                   npm test
 
     deploy:
-        need: frontend-test
+        needs: frontend-test
         runs-on: self-hosted
         
         steps:
             - name: Build docker container
-            run: |
+              run: |
                 docker-compose up -d --build
