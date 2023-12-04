@@ -86,34 +86,35 @@ export default function MapCard({ map }) {
     store.renameMap(map._id, newName);
   };
 
-  const handleKebab = async (option) => {
-    switch (option) {
-      case "addTag":
-        await store.setCurrentModal("AddTagModal", map._id);
-        break;
-      case "publish":
-        await store.setCurrentModal("PublishMapModal", map._id);
-        break;
-      case "duplicate":
-        await store.duplicateMap(map._id);
-        await store.getMyMapCollection(auth.user.userId);
-        break;
-      case "fork":
-        //forks map
-
-        break;
-      case "delete":
-        await store.setCurrentModal("DeleteMapModal", map._id);
-        break;
-      default:
-        console.log(`${option} is incorrect`);
+    const handleKebab = async (option) => {
+        switch (option) {
+            case "addTag":
+                await store.setCurrentModal("AddTagModal", map._id)
+                break;
+            case "publish":
+                await store.setCurrentModal("PublishMapModal", map._id)
+                break;
+            case "duplicate":
+                await store.duplicateMap(map._id);
+                await store.getMyMapCollection(auth.user.userId);
+                break;
+            case "fork":
+                await store.forkMap(map._id);
+                break;
+            case "delete":
+                await store.setCurrentModal("DeleteMapModal", map._id)
+                break;
+            default:
+                console.log(`${option} is incorrect`);
+        }
+        setAnchorEl(null);
     }
-    setAnchorEl(null);
-  };
-  const handleNavToMap = async () => {
-    await store.setCurrentMap(map);
-    navigate(`/mapview/${map._id}`);
-  };
+
+    const handleNavToMap = async () => {
+        console.log(map)
+        await store.setCurrentMap(map)
+        navigate(`/mapview/${map._id}`);
+    }
 
   return (
     <Card sx={{ maxWidth: isSmallScreen ? 300 : "relative", height: "100%" }}>

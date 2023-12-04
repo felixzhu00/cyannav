@@ -140,6 +140,10 @@ function GlobalStoreContextProvider(props) {
         await api.createDuplicateMapById(mapId);
     }
 
+    store.forkMap = async (mapId) => {
+        await api.createForkMapById(mapId);
+    }
+
     store.likeMap = async (id) => {
         const response = await api.likeMap(id);
         console.log(response);
