@@ -55,10 +55,17 @@ jobs:
               uses: actions/setup-node@v4
               with:
                   node-version: "21.x"
+            - name: start backend localhost
+              run: |
+                  cd server
+                  node index.js &
+                  sleep 10
             - name: Frontend Cypress test
               run: |
                   cd client
                   npm test
+            - name: Stop Backend Server
+              run: pkill -f "node index.js"
 
     backend-test:
         needs: setup
