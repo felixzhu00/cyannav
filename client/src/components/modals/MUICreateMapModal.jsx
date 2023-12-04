@@ -126,13 +126,14 @@ export default function MUICreateMapModal(props) {
                                 <Typography sx={{ mr: 2 }}>Select map file type:</Typography>
                                 <FormControl sx={{ m: 1 }}>
                                     <RadioGroup
+                                        id="mapFileType"
                                         row
                                         name="map-file-type"
                                         defaultValue={'shapefiles'}
                                         onChange={handleFileTypeChange}
                                     >
                                         <FormControlLabel value="shapefiles" control={<Radio />} label="Shapefiles" />
-                                        <FormControlLabel value="geojson" control={<Radio />} label="GeoJSON" />
+                                        <FormControlLabel id="geojsonOption" value="geojson" control={<Radio />} label="GeoJSON" />
                                         <FormControlLabel value="kml" control={<Radio />} label="KML" />
                                         <FormControlLabel value="navjson" control={<Radio />} label="NavJSON" />
                                     </RadioGroup>
@@ -162,8 +163,9 @@ export default function MUICreateMapModal(props) {
                             </Box>
                         </FormGroup>
 
-                        <Box sx={{ mt: 2 }}>
+                        <Box id="dropzoneArea" sx={{ mt: 2 }}>
                             <DropzoneArea
+                                id="dropzoneArea2"
                                 onChange={handleFileChange}
                                 filesLimit={1}
                                 acceptedFiles={allowedFileTypes}

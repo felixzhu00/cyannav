@@ -3,21 +3,27 @@ describe("map viewing specs", () => {
     //     cy.signInUser("autotest55", "12345678&&")
     //     cy.get("#createMapOuterBtn").click()
     //     cy.get("#mapTitleBox").type("testing")
+    //     cy.get("#geojsonOption").click()
     //     cy.get("#template-select").parent().click()
     //     cy.get("#heatmapOption").click()
+    //     cy.fixture('testMap.json', null).as('testmap')
+    //     cy.get("#dropzoneArea").click()
+    //     cy.get("#dropzoneArea2")
+    //     .selectFile("@testmap")
     //     cy.get("#createMapBtnFromMyMaps")
     //     .should("have.text", "Create")
     //     .click();
     //     cy.reload()
     // })
-    it('filler', ()=> {
-        cy.visit("localhost:3000")
-    })
 
     // beforeEach(() => {
     //     cy.signInUser("autotest55", "12345678&&")
     //     cy.get("#mapImage").first().click()
     // })
+
+    it("filler", ()=> {
+        cy.visit("localhost:3000")
+    })
 
     // it("export map button", () => {
     //     cy.contains("button", "Export").click()
