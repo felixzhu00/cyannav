@@ -86,7 +86,16 @@ export const deleteMapById = (id) =>
         .delete(`/api/deletemap/${id}`)
         .then(handleResponse)
         .catch(handleError)
-
+export const likeMap = (id) =>
+    api
+        .post(`api/likemap`, { id })
+        .then(handleResponse)
+        .catch(handleError)
+export const dislikelikeMap = (id) =>
+    api
+        .post(`api/dislikelikeMap`, { id })
+        .then(handleResponse)
+        .catch(handleError)
 export const updateMapNameById = (id, title) =>
     api
         .post(`/api/mapname`, { id, title })
@@ -186,6 +195,7 @@ const apis = {
     createDuplicateMapById,
     createForkMapById,
     deleteMapById,
+    likeMap,
     updateMapNameById,
     updateMapTag,
     updateMapPublishStatus,
