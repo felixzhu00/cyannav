@@ -48,6 +48,7 @@ jobs:
     frontend-test:
         needs: deploy-frontend
         runs-on: self-hosted
+        if: always()
 
         steps:
             - name: Setup node environment
