@@ -91,9 +91,9 @@ export const likeMap = (id) =>
         .post(`api/likemap`, { id })
         .then(handleResponse)
         .catch(handleError)
-export const dislikelikeMap = (id) =>
+export const dislikeMap = (id) =>
     api
-        .post(`api/dislikelikeMap`, { id })
+        .post(`api/dislikeMap`, { id })
         .then(handleResponse)
         .catch(handleError)
 export const updateMapNameById = (id, title) =>
@@ -206,6 +206,7 @@ const apis = {
     createForkMapById,
     deleteMapById,
     likeMap,
+    dislikeMap,
     updateMapNameById,
     updateMapTag,
     updateMapPublishStatus,

@@ -44,9 +44,11 @@ function GlobalStoreContextProvider(props) {
         currentArea: null,
 
         //Add Field Modal
-        fieldString: null
+        fieldString: null,
 
-
+        // Map likes and dislikes
+        likes: 0,
+        dislikes: 0
     })
 
     //Nav Global Handlers
@@ -132,7 +134,23 @@ function GlobalStoreContextProvider(props) {
         const response = await api.likeMap(id);
         console.log(response);
         if (response.status === 200) {
-            store.setCurrentMap(id)
+            setStore(prevStore => ({
+                ...prevStore,
+                likes: response.data.metadata.like.length,
+                dislikes: response.data.metadata.dislike.length,
+            }));
+        }
+    }
+
+    store.dislikeMap = async (id) => {
+        const response = await api.dislikeMap(id);
+        console.log(response);
+        if (response.status === 200) {
+            setStore(prevStore => ({
+                ...prevStore,
+                likes: response.data.metadata.like.length,
+                dislikes: response.data.metadata.dislike.length,
+            }));
         }
     }
 
@@ -178,23 +196,23 @@ function GlobalStoreContextProvider(props) {
             ...prevStore,
             fieldString: value,
         }));
-        
+
     }
 
     store.setGeoJsonFeatures = async (newFeatures) => {
         setStore((prevStore) => {
-          const updatedGeojson = {
-            ...prevStore.geojson,
-            features: newFeatures,
-          };
-      
-          
-          return {
-            ...prevStore,
-            geojson: updatedGeojson,
-          };
+            const updatedGeojson = {
+                ...prevStore.geojson,
+                features: newFeatures,
+            };
+
+
+            return {
+                ...prevStore,
+                geojson: updatedGeojson,
+            };
         });
-      };
+    };
 
     //Map Card Global Handlers
     store.searchForMapBy = async (filter, string) => {
@@ -290,11 +308,19 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.getMapById = async (id) => {
-        const response = await api.getMapById(id)
-        setStore(prevStore => ({
-            ...prevStore,
-            currentMap: response.data.metadata,
-        }));
+        const response = await api.getMapById(id);
+        console.log(response);
+        console.log(auth.user);
+        const userHasLiked = response.data.metadata.like.includes(auth.user.userId);
+        console.log(userHasLiked);
+        if (response.status === 200) {
+            setStore(prevStore => ({
+                ...prevStore,
+                currentMap: response.data.metadata,
+                likes: response.data.metadata.like.length,
+                dislikes: response.data.metadata.dislike.length,
+            }));
+        }
     }
 
 

@@ -51,8 +51,6 @@ function AppBanner() {
     setAnchorElNav(null);
   };
   const handleOpenUserMenu = (event) => {
-    console.log(auth.user)
-
     setAnchorElUser(event.currentTarget);
   };
   const handleCloseUserMenu = () => {
