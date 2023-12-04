@@ -33,7 +33,7 @@ describe("my maps specs", () => {
       cy.get("#outerSortByMenuBtn")
       .click()
       cy.get("#recentSortSelect")
-      .should("have.text", "Recent")
+      .should("have.text", "Recently Created")
       .click();
     })
   
