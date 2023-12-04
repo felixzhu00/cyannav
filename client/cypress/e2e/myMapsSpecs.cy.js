@@ -1,18 +1,18 @@
 describe("my maps specs", () => {
     beforeEach(() => {
-      cy.signInUser("autotest5", "11223344&&")
+      cy.signInUser("autotest55", "12345678&&")
     })
 
     it('should have /browsepage in the url', () => {
       cy.url().should('include', '/browsepage')
   })
-    // it('import map button ', () => {
-    //     cy.get("#createMapOuterBtn")
-    //     .click()
-    //     cy.get("#createMapBtnFromMyMaps")
-    //     .should("have.text", "Create")
-    //     .click();
-    //   })
+    it('import map button ', () => {
+        cy.get("#createMapOuterBtn")
+        .click()
+        cy.get("#createMapBtnFromMyMaps")
+        .should("have.text", "Create")
+        .click();
+      })
 
     // it('map info button displays correct dropdown options', () => {
     //     cy.get("#moreInfoMapIcon")
