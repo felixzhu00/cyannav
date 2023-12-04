@@ -6,38 +6,40 @@ const saltRounds = 10
 
 updateProfilePic = async (req, res) => {
     try {
-        const userId = auth.verifyUser(req);
+        const userId = auth.verifyUser(req)
         if (!userId) {
-            return res.status(401).json({ errorMessage: "Unauthorized" });
+            return res.status(401).json({ errorMessage: "Unauthorized" })
         }
 
-        const user = await User.findById(userId);
+        const user = await User.findById(userId)
         if (!user) {
-            return res.status(404).json({ errorMessage: "User not found" });
+            return res.status(404).json({ errorMessage: "User not found" })
         }
         console.log(req.files.file)
         if (req.files.file) {
-            const { data, mimetype } = req.files.file;
+            const { data, mimetype } = req.files.file
 
             // Check if the file is of a valid image type
-            if (!['image/jpeg', 'image/png'].includes(mimetype)) {
-                return res.status(400).json({ errorMessage: "Invalid file type" });
+            if (!["image/jpeg", "image/png"].includes(mimetype)) {
+                return res
+                    .status(400)
+                    .json({ errorMessage: "Invalid file type" })
             }
 
-            user.picture = data;
-            await user.save();
-            return res.status(200).json({ message: "Profile picture updated successfully" });
+            user.picture = data
+            await user.save()
+            return res
+                .status(200)
+                .json({ message: "Profile picture updated successfully" })
         } else {
-            return res.status(400).json({ errorMessage: "No file uploaded" });
+            return res.status(400).json({ errorMessage: "No file uploaded" })
         }
     } catch (err) {
-        console.error("auth-controller::updateProfilePic");
-        console.error(err);
-        return res.status(500).end();
+        console.error("auth-controller::updateProfilePic")
+        console.error(err)
+        return res.status(500).end()
     }
-};
-
-
+}
 
 loggedIn = async (req, res) => {
     try {
@@ -116,7 +118,7 @@ login = async (req, res) => {
                 httpOnly: true, // TODO: HTTPS: change this later when HTTPS is introduced.
                 secure: false,
                 // withCredentials: true,
-                sameSite: true,
+                sameSite: false,
             })
             .status(200)
             .json({
@@ -208,7 +210,7 @@ register = async (req, res) => {
             .cookie("access_token", token, {
                 httpOnly: true, // TODO: change this later when HTTPS is introduced.
                 secure: false,
-                sameSite: true,
+                sameSite: false,
             })
             .status(200)
             .json({
@@ -232,7 +234,7 @@ logout = async (req, res) => {
         httpOnly: true,
         expires: new Date(0),
         secure: true,
-        sameSite: "none",
+        sameSite: false,
     })
         .status(200)
         .send()
@@ -259,7 +261,8 @@ verifyCode = async (req, res) => {
 updatePasscode = async (req, res) => {
     try {
         //password variable is the value of the new password
-        const { originalPassword, password, passwordVerify, verificationCode } = req.body
+        const { originalPassword, password, passwordVerify, verificationCode } =
+            req.body
 
         if (!verificationCode && !originalPassword) {
             return res.status(400).end()
@@ -285,7 +288,10 @@ updatePasscode = async (req, res) => {
             userId = res.locals.userId
 
             const targetUser = await User.findById(userId)
-            const match = await bcrypt.compare(originalPassword, targetUser.password)
+            const match = await bcrypt.compare(
+                originalPassword,
+                targetUser.password
+            )
 
             if (!match) {
                 return res
@@ -440,5 +446,5 @@ module.exports = {
     updateUsername,
     updateEmail,
     deleteAccount,
-    updateProfilePic
+    updateProfilePic,
 }
