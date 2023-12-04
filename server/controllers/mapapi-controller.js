@@ -9,11 +9,11 @@ var ObjectId = mongoose.Types.ObjectId
 getMapById = async (req, res) => {
     try {
         const id  = req.params.id
-        console.log(id)
 
         if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
+        console.log(id)
 
         const targetMap = await MapMetadata.findOne({ _id: id })
         console.log(targetMap)
