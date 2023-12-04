@@ -11,7 +11,7 @@ describe('marketplace specs', () => {
 
     it("sort by recent button displays correctly", () => {
         cy.get("#outerSortByMenuBtn").click()
-        cy.get("#recentSortSelect").should("have.text", "Recent").click()
+        cy.get("#recentSortSelect").should("have.text", "Recently Created").click()
     })
 
     it("sort by name button displays correctly", () => {
