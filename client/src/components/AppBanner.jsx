@@ -11,9 +11,6 @@ import AuthContext from '../auth'
 function AppBanner() {
   const location = useLocation();
   const { pathname } = location;
-
-
-
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
   // Route to different pages
@@ -23,6 +20,28 @@ function AppBanner() {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
 
+  const [profilePicUrl, setProfilePicUrl] = useState(null);
+  useEffect(() => {
+    // Convert buffer from auth.user.picture to a Blob
+    if (auth.user && auth.user.picture) {
+      const arrayBuffer = new Uint8Array(auth.user.picture.data).buffer;
+      let blobType = 'image/jpeg'; // Default to JPEG
+
+      // Check if the buffer is a PNG by checking the first byte
+      if (auth.user.picture.data[0] === 137) {
+        blobType = 'image/png';
+      }
+
+      const blob = new Blob([arrayBuffer], { type: blobType });
+      const imageUrl = URL.createObjectURL(blob);
+      setProfilePicUrl(imageUrl);
+
+      // Clean up the object URL on unmount
+      return () => {
+        URL.revokeObjectURL(imageUrl);
+      };
+    }
+  }, [auth.user]);
   // Handle menu opening and closing
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -121,7 +140,6 @@ function AppBanner() {
             id="logoBtn"
             onClick={() => {
               handleIconClick()
-              /* navigate('/browsepage') */
             }}
             sx={{ mr: "16px" }}
           >
@@ -143,7 +161,6 @@ function AppBanner() {
             <IconButton
               sx={{ color: "black" }}
               onClick={handleHome
-                // () => {navigate('/home')}
               }
             >
               <Home sx={{ fontSize: "30px" }} />
@@ -152,7 +169,6 @@ function AppBanner() {
               id="marketplaceBtn"
               sx={{ color: "black" }}
               onClick={handleStore
-                // () => {navigate('/store')}
               }
             >
               <Store sx={{ fontSize: "30px" }} />
@@ -183,7 +199,7 @@ function AppBanner() {
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Tooltip title="Open settings">
                 <IconButton id="settingsDropdown" onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="User Avatar" src={logo} />
+                  <Avatar alt="User Avatar" src={profilePicUrl} />
                 </IconButton>
               </Tooltip>
               <Menu

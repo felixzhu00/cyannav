@@ -144,19 +144,9 @@ export const requestReset = (email) =>
         .post("/auth/reset", { email })
         .then(handleResponse)
         .catch(handleError)
-export const updatePasscode = (
-    email,
-    password,
-    passwordVerify,
-    verificationCode
-) =>
+export const updatePasscode = (email, password, passwordVerify, verificationCode) =>
     api
-        .post("/auth/updatePass", {
-            email,
-            password,
-            passwordVerify,
-            verificationCode,
-        })
+        .post("/auth/updatePass", { email, password, passwordVerify, verificationCode })
         .then(handleResponse)
         .catch(handleError)
 export const verifyCode = (code) =>
@@ -179,6 +169,13 @@ export const deleteAccount = (username, email, password) =>
         .post("/auth/deleteAccount", { username, email, password })
         .then(handleResponse)
         .catch(handleError)
+export const updateProfilePic = (data) =>
+    api
+        .post("/auth/updateProfilePic", data)
+        .then(handleResponse)
+        .catch(handleError)
+
+
 
 const apis = {
     getMapById,
@@ -203,6 +200,7 @@ const apis = {
     updateUsername,
     updateEmail,
     deleteAccount,
+    updateProfilePic
 }
 
 export default apis

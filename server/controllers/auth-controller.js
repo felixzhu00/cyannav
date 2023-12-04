@@ -4,9 +4,39 @@ const User = require("../schemas/userProfileSchema")
 const bcrypt = require("bcrypt")
 const saltRounds = 10
 
-changeProfilePicture = async (req, res) => {
-    // TODO: Implementation on saving to db
-}
+updateProfilePic = async (req, res) => {
+    try {
+        const userId = auth.verifyUser(req);
+        if (!userId) {
+            return res.status(401).json({ errorMessage: "Unauthorized" });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ errorMessage: "User not found" });
+        }
+        console.log(req.files.file)
+        if (req.files.file) {
+            const { data, mimetype } = req.files.file;
+
+            // Check if the file is of a valid image type
+            if (!['image/jpeg', 'image/png'].includes(mimetype)) {
+                return res.status(400).json({ errorMessage: "Invalid file type" });
+            }
+
+            user.picture = data;
+            await user.save();
+            return res.status(200).json({ message: "Profile picture updated successfully" });
+        } else {
+            return res.status(400).json({ errorMessage: "No file uploaded" });
+        }
+    } catch (err) {
+        console.error("auth-controller::updateProfilePic");
+        console.error(err);
+        return res.status(500).end();
+    }
+};
+
 
 
 loggedIn = async (req, res) => {
@@ -35,7 +65,7 @@ loggedIn = async (req, res) => {
             user: {
                 username: loggedInUser.username,
                 email: loggedInUser.email,
-                picture: null, // TODO: figure out profile picture
+                picture: loggedInUser.picture, // TODO: figure out profile picture
                 userId: userId,
             },
         })
@@ -408,4 +438,5 @@ module.exports = {
     updateUsername,
     updateEmail,
     deleteAccount,
+    updateProfilePic
 }

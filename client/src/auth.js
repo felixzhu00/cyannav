@@ -92,7 +92,6 @@ function AuthContextProvider(props) {
     auth.getLoggedIn = async function () {
         const response = await api.getLoggedIn();
         if (response.status === 200) {
-            console.log(response.data.user)
             authReducer({
                 type: AuthActionType.GET_LOGGED_IN,
                 payload: {
@@ -202,6 +201,14 @@ function AuthContextProvider(props) {
         }
     }
 
+    auth.updateProfilePic = async function (data) {
+        const response = await api.updateProfilePic(data);
+        if (response.status === 200) {
+            return
+        } else {
+            throw new Error(response.data.errorMessage);
+        }
+    }
 
 
     return (
