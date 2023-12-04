@@ -3,10 +3,10 @@ import axios from "axios"
 axios.defaults.withCredentials = true
 var baseURL = "http://localhost:5000"
 if (process.env.NODE_ENV == "production") {
-    baseURL = "http://129.213.145.105:8000"
+    baseURL = ""
 }
 const api = axios.create({
-    baseURL: "",
+    baseURL: baseURL,
 })
 
 const handleResponse = (response) => {
