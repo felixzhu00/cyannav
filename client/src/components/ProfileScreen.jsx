@@ -39,6 +39,8 @@ export default function ProfileScreen() {
             return () => {
                 URL.revokeObjectURL(imageUrl);
             };
+        } else {
+            setProfilePicUrl(LoginLogo)
         }
     }, [auth.user]);
 
@@ -79,7 +81,6 @@ export default function ProfileScreen() {
                             borderColor: 'primary.main'
                         }}
                         src={profilePicUrl}
-                        alt={"Profile Picture"}
                     />
                     <Box
                         className="overlay"

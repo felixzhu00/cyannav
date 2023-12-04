@@ -4,6 +4,7 @@ import { AppBar, Box, Toolbar, IconButton, Typography, Menu, Container, Avatar, 
 import { Menu as MenuIcon, Home, Store } from "@mui/icons-material"; // Corrected the import for MenuIcon
 import { useTheme } from "@mui/material/styles";
 import logo from "../assets/cyannav_logo.svg";
+import LoginLogo from "../assets/cyannav_logo_wo_name.png"
 import { GlobalStoreContext } from '../store'
 import AuthContext from '../auth'
 
@@ -20,7 +21,7 @@ function AppBanner() {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
 
-  const [profilePicUrl, setProfilePicUrl] = useState(null);
+  const [profilePicUrl, setProfilePicUrl] = useState(LoginLogo);
   useEffect(() => {
     // Convert buffer from auth.user.picture to a Blob
     if (auth.user && auth.user.picture) {
