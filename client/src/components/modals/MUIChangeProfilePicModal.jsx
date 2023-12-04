@@ -1,21 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Modal, Box, Button, Typography } from '@mui/material';
 import { DropzoneArea } from 'react-mui-dropzone';
 import { useTheme } from '@emotion/react';
+import AuthContext from '../../auth'
 
 function MUIChangeProfilePicModal({ open, onClose, onSave }) {
     const theme = useTheme();
-    const [selectedFiles, setSelectedFiles] = useState([]);
+    const { auth } = useContext(AuthContext);
+    const [selectedFiles, setSelectedFiles] = useState(null);
 
     const handleFileChange = (files) => {
         setSelectedFiles(files);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (selectedFiles && selectedFiles.length > 0) {
-            let newUrl = URL.createObjectURL(selectedFiles[0]);
-            onSave(newUrl);
+            const data = new FormData();
+            data.append("file", selectedFiles[0])
+            auth.updateProfilePic(data);
         }
+        // onSave(selectedFiles[0])
         onClose();
     };
 
@@ -41,7 +45,8 @@ function MUIChangeProfilePicModal({ open, onClose, onSave }) {
                         onChange={handleFileChange}
                         filesLimit={1}
                         dropzoneText="Drag and drop an image file here or click"
-                        acceptedFiles={['image/*']}
+                        acceptedFiles={['image/jpeg', 'image/png']}
+                        maxFileSize={500000}
                     />
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
