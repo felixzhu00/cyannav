@@ -6,8 +6,11 @@ import Modal from '@mui/material/Modal';
 import IconButton from '@mui/material/IconButton';
 import { Close } from '@mui/icons-material';
 import { TextField } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useContext,useEffect, useState } from 'react';
 import { useTheme } from '@mui/material';
+import { GlobalStoreContext } from '../../store' 
+
+
 
 const style = {
     position: 'absolute',
@@ -22,12 +25,29 @@ const style = {
 };
 
 export default function MUIAddFieldModal(props) {
+    const { store } = useContext(GlobalStoreContext);
     const theme = useTheme();
     const [open, setOpen] = useState(props.open);
+    const [fieldName, setFieldName] = useState('');
+
     const handleClose = () => {
         setOpen(false)
         props.onClose()
     };
+
+    const handleAdd = async () => {
+        // console.log(store)
+        if(fieldName != ""){
+            await store.setField(fieldName)
+            handleClose()
+            console.log("field set")
+        }else{
+            //error message in UI
+            console.log("empty field")
+        }
+
+        
+    }
 
     return (
         <div>
@@ -64,10 +84,12 @@ export default function MUIAddFieldModal(props) {
                             label="Field"
                             defaultValue=""
                             fullWidth
+                            value={fieldName}
+                            onChange={(e) => setFieldName(e.target.value)}
                         />
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
                             <Button
-                                onClick={handleClose}
+                                onClick={handleAdd}
                                 variant="contained"
                                 sx={{
                                     bgcolor: theme.palette.primary.main,
