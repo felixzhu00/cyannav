@@ -3,13 +3,15 @@ import shp from "shpjs";
 // import omnivore from "@mapbox/leaflet-omnivore";
 // const tj = require('togeojson'); // Import the togeojson library
 
-import { useRef, useEffect, useState } from "react";
-
+import { useRef, useEffect, useState, useContext } from "react";
+import { GlobalStoreContext } from '../store'
 function NavJSON({ data }) {
-
+    const { store } = useContext(GlobalStoreContext);
 
     const [currentArea, setcurrentArea] = useState(null)
     const [geolayer, setGeo] = useState(null);
+
+
 
     const onEachFeature = (country, layer) => {
         const name = country.properties.admin;
@@ -63,7 +65,7 @@ function NavJSON({ data }) {
                 dashArray: '3',
                 fillOpacity: 0.7
             });
-
+            store.setCurrentArea(null)
             return null;
         } else {
             // Set the selected style
@@ -74,9 +76,11 @@ function NavJSON({ data }) {
                 fillOpacity: 0.7
             });
             layer.bringToFront();
+            store.setCurrentArea(selectedArea)
+
         }
 
-        setcurrentArea(selectedArea)
+
     };
 
     const getColor = (d, min, max) => {
@@ -115,6 +119,7 @@ function NavJSON({ data }) {
 
     useEffect(() => {
         //Map Container
+        console.log("leaf", data)
         const map = L.map('map').setView([0, 0], 2);
 
         // TileLayer
@@ -136,10 +141,25 @@ function NavJSON({ data }) {
 
 
         // Set the view of the map(Zoom and center)
-        const bounds = geo.getBounds();
-        const center = bounds.getCenter();
-        const zoom = map.getBoundsZoom(bounds);
-        map.setView(center, zoom);
+        // const bounds = geo.getBounds();
+        // const center = bounds.getCenter();
+        // const zoom = map.getBoundsZoom(bounds);
+        // map.setView(center, zoom);
+        map.fitBounds(geo.getBounds());
+
+
+
+
+        // // const bounds = L.latLngBounds()
+        // // bounds.extend(geo.getBounds())
+        // // bounds.extend(OpenStreetMap_DE.getBounds())
+
+        // var bounds1 = OpenStreetMap_DE.getBounds();
+        // var bounds2 = feature_warnings.getBounds();
+
+        // map.fitBounds(bounds1.extend(bound2));
+
+
 
 
         setGeo(geo);
@@ -151,6 +171,8 @@ function NavJSON({ data }) {
         };
 
     }, [data]);
+
+
 
     return <div id="map" style={{ height: "100vh" }}></div>;
 }
