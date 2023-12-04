@@ -3,7 +3,7 @@ import axios from "axios"
 axios.defaults.withCredentials = true
 var baseURL = "http://localhost:5000"
 if (process.env.NODE_ENV == "production") {
-    baseURL = ""
+    baseURL = "http://cyannav.tech"
 }
 const api = axios.create({
     baseURL: baseURL,
