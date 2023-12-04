@@ -4,6 +4,7 @@ const cors = require("cors")
 const dotenv = require("dotenv")
 const cookieParser = require("cookie-parser")
 
+
 dotenv.config() // Loads .env
 
 const hostname = process.env.SERVER_HOSTNAME
@@ -13,15 +14,18 @@ const clientPort = process.env.CLIENT_PORT ? process.env.CLIENT_PORT : ""
 const app = express()
 
 // MIDDLE WARE
-app.use(express.urlencoded({ extend: true }))
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(
     cors({
         origin: [`http://${hostname}${clientPort}`], // TODO: change to https for production later
         credentials: true,
     })
 )
-app.use(express.json())
+app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser())
+
+// increase size limit
+
 
 const authRouter = require("./routes/auth-router")
 app.use("/auth", authRouter)
