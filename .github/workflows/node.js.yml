@@ -99,6 +99,7 @@ jobs:
         steps:
             - name: Deploy backend server
               run: |
+                  cd server
                   NODE_ENV=production pm2 start index.js --name deploy
 
     deploy-frontend:
