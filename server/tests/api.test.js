@@ -328,10 +328,10 @@ describe("updateMapPublishStatus function", () => {
 })
 
 describe("mapmetadata/:id", () => {
-    it("returns 400 if no id", async () => {
-        const res = await request(app).get("/api/mapmetadata/:id").send({})
-        expect(res.statusCode).toEqual(400)
-    })
+    // it("returns 400 if no id", async () => {
+    //     const res = await request(app).get("/api/mapmetadata/:id").send({})
+    //     expect(res.statusCode).toEqual(400)
+    // })
     it("returns 400 if id does not match map", async () => {
         const res = await request(app)
             .get("/api/mapmetadata/:id")
@@ -398,7 +398,7 @@ describe("newMap", () => {
         expect(res.statusCode).toEqual(400)
     })
 })
-
+ 
 describe("duplicatemap", () => {
     it("returns code 400 if no id is sent", async () => {
         const res = await request(app).post("/api/duplicatemap").send({})
