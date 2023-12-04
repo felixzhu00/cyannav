@@ -544,9 +544,9 @@ describe("updateEmail", () => {
 })
 
 describe("deleteAccount", () => {
-    it("returns 401 for now since no users exist yet", async () => {
+    it("returns 400 for now since no users exist yet", async () => {
         const res = await request(app).post("/auth/deleteAccount").send({})
-        expect(res.statusCode).toEqual(401)
+        expect(res.statusCode).toEqual(400)
     })
 })
 
