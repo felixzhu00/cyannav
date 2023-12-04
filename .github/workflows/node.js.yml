@@ -59,7 +59,7 @@ jobs:
               run: |
                   cd server
                   NODE_ENV=frontend_test pm2 start index.js --name frontend_test_backend_server
-                  cd client
+                  cd ../client
                   npm test
                   pm2 stop frontend_test_backend_server
 
@@ -78,6 +78,7 @@ jobs:
                   npm test
 
     deploy:
+        if: always()
         needs: frontend-test
         runs-on: self-hosted
         
