@@ -23,22 +23,25 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-// before(() => {
-//     cy.registerUser("autotest2", "autotest2", "11223344##", "11223344##")
-//     cy.wait(2000)
-//     cy.get("#settingsDropdown").click()
-//     cy.get("#settingsDropdownOption").first().click()
-//     cy.get("#logoutBtn").click()
-//     cy.url().should('include', '/login')
-//   });
+before(() => {
+    cy.registerUser("autotest55", "autotest55", "12345678&&", "12345678&&")
+    cy.wait(2000)
+    cy.get("#settingsDropdown").click()
+    cy.get("#settingsDropdownOption").first().click()
+    cy.get("#logoutBtn").click()
+    cy.url().should('include', '/login')
+    cy.visit('localhost:3000/browsepage')
+  });
 
 Cypress.Commands.add('signInUser', (email, password) => {
     cy.session([email, password], () => {
-        cy.visit("localhost:3000")
-        cy.get('#email').clear().type(email)
-        cy.get('#password').clear().type(password)
+        cy.visit('localhost:3000')
+        cy.get('#email').type(email)
+        cy.get('#password').type(password)
         cy.get("#signInBtn").click()
+        cy.url().should('contain', '/browsepage')
     })
+    cy.visit('localhost:3000/browsepage')
 });
 
 Cypress.Commands.add('registerUser', (email, username, password, passwordVerify) => {

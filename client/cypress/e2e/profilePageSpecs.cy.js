@@ -1,13 +1,13 @@
 describe('profile page specs', () => {
     beforeEach(() => {
-        cy.signInUser("autotest5", "11223344&&")
-        // cy.get("#settingsDropdown").click()
-        // cy.get("#settingsDropdownOption").first().click()
+        cy.signInUser("autotest55", "12345678&&")
+        cy.get("#settingsDropdown").click()
+        cy.get("#settingsDropdownOption").first().click()
     })
 
-    // it('should have /profile in the url', () => {
-    //     cy.url().should('include', '/profile')
-    // })
+    it('should have /profile in the url', () => {
+        cy.url().should('include', '/profile')
+    })
 
     it('displays the change email modal when corresponding button is clicked', () => {
         cy.get("#emailEditBtn").click()
