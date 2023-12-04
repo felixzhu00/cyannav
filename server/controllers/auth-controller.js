@@ -256,8 +256,8 @@ verifyCode = async (req, res) => {
 
 updatePasscode = async (req, res) => {
     try {
-        const { verificationCode, originalPassword, password, passwordVerify } =
-            req.body
+        //password variable is the value of the new password
+        const { originalPassword, password, passwordVerify, verificationCode } = req.body
 
         if (!verificationCode && !originalPassword) {
             return res.status(400).end()
@@ -282,8 +282,9 @@ updatePasscode = async (req, res) => {
             }
             userId = res.locals.userId
 
-            const targetUser = User.findById(userId)
-            const match = await bcrypt.compare(password, targetUser.password)
+            const targetUser = await User.findById(userId)
+            const match = await bcrypt.compare(originalPassword, targetUser.password)
+
             if (!match) {
                 return res
                     .status(401)
@@ -298,20 +299,21 @@ updatePasscode = async (req, res) => {
         }
 
         const hashed_password = await bcrypt.hash(password, saltRounds)
+
         if (!hashed_password) {
             return res.status(500).end()
         }
 
-        const success = User.findByIdAndUpdate(userId, {
+        const success = await User.findByIdAndUpdate(userId, {
             password: hashed_password,
         })
         if (!success) {
             return res.status(500).end()
         }
-        return res.status(200)
+        return res.status(200).end()
     } catch (err) {
-        console.err("auth-controller::updatePassword")
-        console.err(err)
+        console.error("auth-controller::updatePassword")
+        console.error(err)
 
         return res.status(500).end()
     }

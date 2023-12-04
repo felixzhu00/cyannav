@@ -144,9 +144,19 @@ export const requestReset = (email) =>
         .post("/auth/reset", { email })
         .then(handleResponse)
         .catch(handleError)
-export const updatePasscode = (email, password, passwordVerify, verificationCode) =>
+export const updatePasscode = (
+    originalPassword,
+    password,
+    passwordVerify,
+    verificationCode
+) =>
     api
-        .post("/auth/updatePass", { email, password, passwordVerify, verificationCode })
+        .post("/auth/updatePass", {
+            originalPassword,
+            password,
+            passwordVerify,
+            verificationCode,
+        })
         .then(handleResponse)
         .catch(handleError)
 export const verifyCode = (code) =>
