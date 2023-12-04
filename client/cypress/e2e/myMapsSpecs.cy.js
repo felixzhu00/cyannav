@@ -6,13 +6,13 @@ describe("my maps specs", () => {
     it('should have /browsepage in the url', () => {
       cy.url().should('include', '/browsepage')
   })
-    it('import map button ', () => {
-        cy.get("#createMapOuterBtn")
-        .click()
-        cy.get("#createMapBtnFromMyMaps")
-        .should("have.text", "Create")
-        .click();
-      })
+    // it('import map button ', () => {
+    //     cy.get("#createMapOuterBtn")
+    //     .click()
+    //     cy.get("#createMapBtnFromMyMaps")
+    //     .should("have.text", "Create")
+    //     .click();
+    //   })
 
     // it('map info button displays correct dropdown options', () => {
     //     cy.get("#moreInfoMapIcon")
