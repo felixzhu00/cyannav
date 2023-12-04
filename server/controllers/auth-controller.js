@@ -233,7 +233,7 @@ logout = async (req, res) => {
     res.cookie("access_token", "", {
         httpOnly: true,
         expires: new Date(0),
-        secure: true,
+        secure: false,
         sameSite: true,
     })
         .status(200)
