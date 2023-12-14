@@ -10,7 +10,6 @@ import MUIAddFieldModal from "./modals/MUIAddFieldModal";
 import MUICommentModal from "./modals/MUICommentModal";
 
 import NavJSON from "./NavJSON";
-import usgeojson from "../assets/custom.geo.json";
 import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
 
@@ -43,6 +42,8 @@ function MapViewingPage() {
 
   useEffect(() => {
     if (store.geojson && store.geojson.features && features.length == 0) {
+      console.log(store.geojson)
+
       const updatedFeatures = store.geojson.features.map((feature) => {
         const originalFields = { ...feature.fields };
         if (originalFields.name === undefined) {
@@ -54,11 +55,15 @@ function MapViewingPage() {
         };
       });
       setFeatures(updatedFeatures);
-      store.setByFeature(store.geojson.features[0].fields._byFeature) // Set Global byFeature
-      store.setMapZoom(store.geojson.features[0].fields._mapZoom)
-      store.setMapCenter(store.geojson.features[0].fields._mapCenter)
+      
+      //Sets the exisitng map by feature if it exist
+      if(store.geojson.features[0].fields && store.geojson.features[0].fields._byFeature){
+        const currentFeature = store.geojson.features[0].fields._byFeature
+        if(store.geojson.features[0].fields.hasOwnProperty(currentFeature)){
+          store.setByFeature(store.geojson.features[0].fields._byFeature)
+        }
+      }
       console.log("rerender1")
-
     }
     console.log("rerender", store.geojson)
   }, [store.geojson]);
@@ -134,6 +139,11 @@ function MapViewingPage() {
 
       return updatedFeatures;
     });
+
+    //reset byFeature
+    if(store.byFeature == key){
+      store.setByFeature(null)
+    }
   };
 
   // Handler to change the value of a field in the selected feature

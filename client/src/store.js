@@ -41,7 +41,7 @@ function GlobalStoreContextProvider(props) {
         //Map Viewing
         geojson: null,
         currentArea: -1,
-
+        byFeature: null, 
 
         //Add Field Modal
         fieldString: null,
