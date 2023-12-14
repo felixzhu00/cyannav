@@ -40,7 +40,8 @@ function GlobalStoreContextProvider(props) {
         currentModal: null,
         //Map Viewing
         geojson: null,
-        currentArea: null,
+        currentArea: -1,
+        byFeature: null, 
 
         //Add Field Modal
         fieldString: null,
@@ -49,6 +50,13 @@ function GlobalStoreContextProvider(props) {
         likes: 0,
         dislikes: 0
     })
+
+    useEffect(() => {
+        if (store && store.geojson !== null && store.currentMap) {
+            store.updateMapGeoJson()
+        }
+    }, [store.geojson]);
+
 
     //Nav Global Handlers
     store.toggleBrowsePage = async (option) => {
@@ -74,11 +82,6 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.createMap = async (title, fileType, mapTemplate, files) => {
-        // console.log(files)
-
-        // var buffer = geobuf.encode(files, new Pbf())
-        // return await api.createNewMap(title, mapTemplate, buffer);
-
         const file = files[0]; // Assuming files is an array with the File object
 
         // Create a FileReader
@@ -175,13 +178,6 @@ function GlobalStoreContextProvider(props) {
     store.getGeojson = async (geojsonId) => {
         const response = await api.getGeoJsonById(geojsonId);
         if (response.status == 200) {
-
-            // var geojson = geobuf.decode(new Pbf(response.data.geoBuf.arrayBuffer()));
-            // console.log(geojson);
-            // return geojson;
-
-            // const uint8Array = new Uint8Array(response.data.geoBuf.data);
-
             // Use the Uint8Array directly in the Pbf constructor
             const pbf = new Pbf(response.data.geoBuf.data);
 
@@ -198,12 +194,16 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
-    store.setCurrentArea = async (value) => {
-        setStore(prevStore => ({
-            ...prevStore,
-            currentArea: value,
-        }));
-    }
+    store.setCurrentArea = (value) => {
+        setStore(prevStore => {
+            const updatedStore = {
+                ...prevStore,
+                currentArea: value,
+            };
+
+            return updatedStore;
+        });
+    };
 
     store.setField = async (value) => {
         setStore(prevStore => ({
@@ -326,10 +326,6 @@ function GlobalStoreContextProvider(props) {
 
     store.getMapById = async (id) => {
         const response = await api.getMapById(id);
-        console.log(response);
-        console.log(auth.user);
-        // const userHasLiked = response.data.metadata.like.includes(auth.user.userId);
-        // console.log(userHasLiked);
         if (response.status === 200) {
             setStore(prevStore => ({
                 ...prevStore,
@@ -339,6 +335,23 @@ function GlobalStoreContextProvider(props) {
             }));
         }
     }
+
+    
+    store.updateMapGeoJson = async () => {
+        const buffer = geobuf.encode(store.geojson, new Pbf());
+        const response = await api.updateMapGeoJson(store.currentMap._id, buffer)
+        console.log(response)
+    }
+
+
+    store.setByFeature = async (byFeatureOption) => {
+        setStore((prevStore) => {
+            return {
+                ...prevStore,
+                byFeature: byFeatureOption,
+            };
+        });
+    };
 
 
 

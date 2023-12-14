@@ -13,10 +13,8 @@ getMapById = async (req, res) => {
         if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
-        console.log(id)
 
         const targetMap = await MapMetadata.findOne({ _id: id })
-        console.log(targetMap)
         if (!targetMap) {
             return res.status(404).end()
         }
@@ -88,12 +86,10 @@ getAllPublishedMaps = async (req, res) => {
 getGeoJsonById = async (req, res) => {
     try {
         const id = req.params.id
-        console.log(id)
 
         if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
-        console.log("hello")
 
         const mapMetadata = await MapMetadata.findById(id);
 
@@ -104,13 +100,11 @@ getGeoJsonById = async (req, res) => {
         const geojsonId = mapMetadata.geojsonId;
 
         const geojson = await GeoJsonSchema.findById(geojsonId)
-        console.log(geojson)
 
         if (!geojson) {
             return res.status(404).end()
         }
 
-        console.log(geojson.geoBuf)
         return res.status(200).json({
             geoBuf: geojson.geoBuf, // TODO: (later) figure out geobuf
         })
@@ -350,8 +344,6 @@ deleteMapById = async (req, res) => {
 updateMapNameById = async (req, res) => {
     try {
         const { id, title } = req.body
-        console.log(id)
-        console.log(title)
         if (!id || !ObjectId.isValid(id) || !title) {
             return res.status(400).end()
         }
@@ -384,7 +376,6 @@ updateMapNameById = async (req, res) => {
 updateMapPublishStatus = async (req, res) => {
     try {
         const { id } = req.body
-        console.log(id)
 
         if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
@@ -429,7 +420,6 @@ likeMap = async (req, res) => {
         }
 
         const userObjectId = new ObjectId(res.locals.userId)
-        console.log(userObjectId)
         // Remove existing dislike
 
         const dislikeIndex = targetMap.dislike.indexOf(userObjectId)
@@ -637,40 +627,43 @@ updateMapTag = async (req, res) => {
 
 updateMapGeoJson = async (req, res) => {
     try {
-        // Id refers to map id
-        const { id, geoBuf } = req.body
+        const { id, geoBuf } = req.body; // Extract the id from the URL parameter
+  
+        let bufferArray = Object.values(geoBuf)
+        let buffer = Buffer.from(bufferArray)
 
         if (!id || !ObjectId.isValid(id)) {
-            return res.status(400).end()
+           return res.status(400).end();
         }
-
-        targetMap = MapMetadata.findById(id)
+  
+        const targetMap = await MapMetadata.findById(id);
+  
         if (!targetMap) {
-            return res.status(404).end()
+           return res.status(404).end();
         }
-
-        if (targetMap.userId.toString() !== res.locals.userId) {
-            return res.status(401).end()
+  
+        if (targetMap.user.toString() !== res.locals.userId) {
+           return res.status(401).end();
         }
+        const targetGeoJson = await GeoJsonSchema.findById(targetMap.geojsonId);
 
-        targetGeoJson = GeoJsonSchema.findById(targetMap.geojsonId)
         if (!targetGeoJson) {
-            return res.status(404).end()
+           return res.status(404).end();
         }
-
-        targetGeoJson.geoBuf = geoBuf
-
-        const saved = await targetGeoJson.save()
+  
+        targetGeoJson.geoBuf = buffer;
+  
+        const saved = await targetGeoJson.save();
+  
         if (!saved) {
-            return res.status(500).end()
+           return res.status(500).end();
         }
-
-        return res.status(200).end()
-    } catch (err) {
-        console.error("mapapi-controller::updateMapGeoJson")
-        console.error(err)
-        return res.status(500).end()
-    }
+  
+        return res.status(200).end();
+     } catch (err) {
+        console.error("mapapi-controller::updateMapGeoJson", err);
+        return res.status(500).end();
+     }
 }
 
 module.exports = {

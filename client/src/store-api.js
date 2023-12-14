@@ -87,8 +87,8 @@ export const updateMapTag = (id, newTags) =>
 export const updateMapPublishStatus = (id) =>
     api.post("/api/publishmap", { id }).then(handleResponse).catch(handleError)
 
-export const updateMapJson = (id, json) =>
-    api.put(`/mapjson/${id}`, { json }).then(handleResponse).catch(handleError)
+export const updateMapGeoJson = (id, geoBuf) =>
+    api.post(`/api/updategeojson`, { id, geoBuf }).then(handleResponse).catch(handleError)
 
 // Auth-related functions
 export const getLoggedIn = () => {
@@ -172,7 +172,7 @@ const apis = {
     updateMapNameById,
     updateMapTag,
     updateMapPublishStatus,
-    updateMapJson,
+    updateMapGeoJson,
     getLoggedIn,
     loginUser,
     logoutUser,
