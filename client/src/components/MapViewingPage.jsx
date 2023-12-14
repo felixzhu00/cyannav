@@ -1,124 +1,110 @@
 import React, { useState, useEffect, useContext } from "react";
-import { MapContainer, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import sha256 from "crypto-js/sha256";
-import {
-  Typography,
-  Box,
-  Menu,
-  MenuItem,
-  Paper,
-  Button,
-  IconButton,
-  TextField,
-  Tabs,
-  Tab,
-  useTheme,
-} from "@mui/material";
-import {
-  Undo,
-  Redo,
-  Delete,
-  KeyboardArrowDown,
-  ThumbUp,
-  ThumbDown,
-} from "@mui/icons-material";
+import { Typography, Box, Menu, MenuItem, Paper, Button, IconButton, TextField, Tabs, Tab, useTheme } from "@mui/material";
+import { Undo, Redo, Delete, KeyboardArrowDown, ThumbUp, ThumbDown } from "@mui/icons-material";
 import { useParams } from "react-router-dom";
 
 import MUIExportMapModal from "./modals/MUIExportMapModal";
 import MUIPublishMapModal from "./modals/MUIPublishMapModal";
 import MUIAddFieldModal from "./modals/MUIAddFieldModal";
 import MUICommentModal from "./modals/MUICommentModal";
+
 import NavJSON from "./NavJSON";
 import usgeojson from "../assets/custom.geo.json";
 import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
 
 function MapViewingPage() {
-  const theme = useTheme(); // Use the theme
+  const theme = useTheme();
   const { store } = useContext(GlobalStoreContext);
   const { auth } = useContext(AuthContext);
   const { id } = useParams();
 
+
   const [value, setValue] = useState("1");
-  const [fields, setFields] = useState([
-    { id: 1, text: "Temperature", value: "" },
-    { id: 2, text: "Population", value: "" },
-    { id: 3, text: "GDP", value: "" },
-  ]);
+
   const [currentModel, setCurrentModel] = useState("");
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-  const [maptype, setMapType] = useState("Choropleth Map");
 
-  const [choroplethOptions, setChoroplethOptions] = useState(
-    fields.map((field) => field.text)
-  );
-  const [selectedChoropleth, setSelectedChoropleth] = useState("");
   const [anchorElChoropleth, setAnchorElChoropleth] = useState(null);
 
-  // const [geoJSON, setGeoJSON] = useState("")
   const [features, setFeatures] = useState([]);
-  const [selectedFeatureIndex, setSelectedFeatureIndex] = useState(-1);
-
-  /**
-   * Commenting constants and states
-   */
 
   //Runs on initial load
   useEffect(() => {
-    if (id != null) {
+    if (id != null && store.geojson == null) {
+      console.log("trigger1")
       store.getMapById(id);
+      store.getGeojson(id);
     }
   }, [id]);
 
   useEffect(() => {
-    if (store.currentMap != null) {
-      setIsPublished(store.currentMap.published);
-    }
-  }, [store.currentMap]);
-
-  useEffect(() => {
-    if (store.geojson == null) {
-      store.getGeojson(id);
-    }
-  }, [store.geojson, id]);
-
-  // Creates state feature to be edited
-  useEffect(() => {
-    if (store.geojson && store.geojson.features) {
-      const updatedFeatures = store.geojson.features.map((feature) => ({
-        ...feature,
-        fields: {
-          name: feature.properties.admin,
-        },
-      }));
+    if (store.geojson && store.geojson.features && features.length == 0) {
+      const updatedFeatures = store.geojson.features.map((feature) => {
+        const originalFields = { ...feature.fields };
+        if (originalFields.name === undefined) {
+          originalFields.name = feature.properties.admin;
+        }
+        return {
+          ...feature,
+          fields: originalFields,
+        };
+      });
       setFeatures(updatedFeatures);
+      store.setByFeature(store.geojson.features[0].fields._byFeature) // Set Global byFeature
+      store.setMapZoom(store.geojson.features[0].fields._mapZoom)
+      store.setMapCenter(store.geojson.features[0].fields._mapCenter)
+      console.log("rerender1")
+
     }
+    console.log("rerender", store.geojson)
   }, [store.geojson]);
 
-  // Used for Indexing currentArea Feature in geojson array
+  // // Used for Indexing currentArea Feature in geojson array
+  // useEffect(() => {
+  //   console.log("current",store.currentArea)
+  // }, [store.currentArea]);
+  useEffect(() => {
+    if (store.byFeature !== null) {
+      addField("_byFeature", store.byFeature)
+    }
+  }, [store.byFeature]);
+
+  useEffect(() => {
+    if (store.byFeature !== null) {
+      addField("_mapCenter", store.mapCenter)
+      console.log("rerender3")
+    }
+  }, [store.mapCenter]);
+
+  useEffect(() => {
+    if (store.byFeature !== null) {
+      addField("_mapZoom", store.mapZoom)
+      console.log("rerender2")
+    }
+  }, [store.mapZoom]);
+
+
+
   useEffect(() => {
     if (store && features.length !== 0) {
-      const index = findFeatureIndexByName(features, store.currentArea);
-      console.log(index);
-      setSelectedFeatureIndex(index);
+      store.setGeoJsonFeatures(features)
     }
-  }, [features, store.currentArea]);
+  }, [features]);
+
+
 
   // Temp way for now to add field, need a better way
   useEffect(() => {
     if (store && store.fieldString) {
       const key = store.fieldString;
       addField(key, "");
+      console.log("trigger5")
     }
   }, [store.fieldString]);
-
-  // Find feature index by name
-  const findFeatureIndexByName = (features, featureName) => {
-    return features.findIndex((feature) => feature.fields.name === featureName);
-  };
 
   // Handler to add a new field to the selected feature
   const addField = (key, value) => {
@@ -132,10 +118,9 @@ function MapViewingPage() {
       }));
       return updatedFeatures;
     });
-    store.setGeoJsonFeatures(features);
+    // await store.setGeoJsonFeatures(features);
   };
 
-  // Handler to remove a field from every feature
   const removeField = (key) => {
     setFeatures((prevFeatures) => {
       const updatedFeatures = prevFeatures.map((feature) => {
@@ -146,31 +131,30 @@ function MapViewingPage() {
           fields: updatedFields,
         };
       });
+
       return updatedFeatures;
     });
-    store.setGeoJsonFeatures(features);
   };
 
   // Handler to change the value of a field in the selected feature
-  const changeFieldValue = (key, newValue) => {
+  const changeFieldValue = async (key, newValue) => {
     setFeatures((prevFeatures) => {
-      if (selectedFeatureIndex === -1) {
+      if (store.currentArea === -1) {
         // Feature not found, do nothing or handle accordingly
         return prevFeatures;
       }
 
       const updatedFeatures = [...prevFeatures];
       const updatedFeature = {
-        ...updatedFeatures[selectedFeatureIndex],
+        ...updatedFeatures[store.currentArea],
         fields: {
-          ...updatedFeatures[selectedFeatureIndex].fields,
+          ...updatedFeatures[store.currentArea].fields,
           [key]: newValue,
         },
       };
-      updatedFeatures[selectedFeatureIndex] = updatedFeature;
+      updatedFeatures[store.currentArea] = updatedFeature;
       return updatedFeatures;
     });
-    store.setGeoJsonFeatures(features);
   };
 
   const [comments, setComments] = useState([]); // Used to store comments
@@ -191,6 +175,13 @@ function MapViewingPage() {
     maxWidth: "90%",
   };
 
+
+
+  function isNumeric(str) {
+    if (typeof str != "string") return false // we only process strings!  
+    return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+      !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
+  }
   /**
    * Like/Dislikes constants and states
    */
@@ -198,38 +189,18 @@ function MapViewingPage() {
   const [hasLiked, setHasLiked] = useState(false);
   const [hasDisliked, setHasDisliked] = useState(false);
   const [isPublished, setIsPublished] = useState(false);
-  /**
-   * Handler functions
-   */
-  //update
-  const handleInputChange = (id, value) => {
-    // field numerical values
-    console.log(id, value);
-    const updatedFields = fields.map((field) =>
-      field.id === id ? { ...field, value } : field
-    );
-    setFields(updatedFields);
-  };
 
-  //delete
-  const handleDeleteField = (id) => {
-    // when user deletes a field
-    const updatedFields = fields.filter((field) => field.id !== id);
-    setFields(updatedFields);
-    setChoroplethOptions(updatedFields.map((field) => field.text));
-  };
+
 
   const handleChoroplethClick = (event) => {
     setAnchorElChoropleth(event.currentTarget);
   };
 
-  const handleChoroplethClose = () => {
-    setAnchorElChoropleth(null);
-  };
 
-  const handleChoroplethSelect = (option) => {
-    setSelectedChoropleth(option);
-    handleChoroplethClose();
+
+  const handleSelectedByFeature = (option) => {
+    store.setByFeature(option)
+    setAnchorElChoropleth(null);
   };
 
   const handleExport = () => {
@@ -379,30 +350,6 @@ function MapViewingPage() {
     );
   };
 
-  const leaflet = () => {
-    const popupLabel = (country, layer) => {
-      const name = country.properties.admin;
-      layer.bindPopup(name);
-
-      // This adds a tooltip directly on screen
-      // Probably needs CSS to make it look batter.
-      // layer.bindTooltip(name, {permanent: true, direction: "center", className: "my-labels"});
-    };
-
-    return (
-      <MapContainer
-        center={[50, 50]}
-        zoom={2}
-        style={{ height: "100%", width: "100%" }}
-      >
-        <GeoJSON
-          key={sha256(usgeojson)}
-          data={usgeojson}
-          onEachFeature={popupLabel}
-        />
-      </MapContainer>
-    );
-  };
 
   const mapView = () => {
     return (
@@ -521,15 +468,15 @@ function MapViewingPage() {
 
   const editBar = () => {
     const fieldEdit = () => {
-      if (selectedFeatureIndex === -1) {
+      if (store.currentArea === -1) {
         return null;
       }
 
-      const selectedFeature = features[selectedFeatureIndex];
+      const selectedFeature = features[store.currentArea];
+
 
       return (
         <>
-          {/* Box for 'name' field */}
           <Box
             key={"name"}
             sx={{
@@ -560,7 +507,7 @@ function MapViewingPage() {
           {/* Mapping through other fields */}
           {Object.entries(selectedFeature.fields).map(
             ([key, value]) =>
-              key !== "name" && (
+              key !== "name" && key !== "_byFeature" && key !== "_mapZoom" && key !== "_mapCenter" && (
                 <Box
                   key={key}
                   sx={{
@@ -610,89 +557,101 @@ function MapViewingPage() {
           bgcolor: theme.palette.background.paper,
         }}
       >
-        {store.currentArea == null ? (
+        {store.currentArea == -1 ? (
           <Typography variant="h6">Choose an area to edit</Typography>
-        ) : (
-          <Box>{fieldEdit()}</Box>
-        )}
-
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            marginBottom: "10px", // Adjust as needed
-          }}
-        >
-          {auth.loggedIn && (
-            <Button
-              id="addFieldBtn"
-              variant="contained"
-              color="primary"
-              onClick={handleAddField}
-              sx={{
-                marginBottom: "10px",
-                color: "black",
-                bgcolor: theme.palette.secondary.main,
-              }}
-            >
-              + Add Field
-            </Button>
-          )}
-
-          <Box
+        ) : (<>
+          <Box>{fieldEdit()}</Box><Box
             sx={{
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
+              marginBottom: "10px", // Adjust as needed
             }}
           >
-            <Typography sx={{ m: "10px" }}>{maptype} by:</Typography>
-            <Box sx={{ textAlign: "right" }}>
+            {auth.loggedIn && (
               <Button
-                onClick={handleChoroplethClick}
+                id="addFieldBtn"
                 variant="contained"
+                color="primary"
+                onClick={handleAddField}
                 sx={{
+                  marginBottom: "10px",
                   color: "black",
-                  width: "150px",
                   bgcolor: theme.palette.secondary.main,
                 }}
               >
-                <Box
+                + Add Field
+              </Button>
+            )}
+
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <Typography sx={{ m: "10px" }}>{store.currentMap && store.currentMap.mapType} by:</Typography>
+              <Box sx={{ textAlign: "right" }}>
+                <Button
+                  onClick={handleChoroplethClick}
+                  variant="contained"
                   sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    width: "100%",
+                    color: "black",
+                    width: "150px",
+                    bgcolor: theme.palette.secondary.main,
                   }}
                 >
-                  <span>{selectedChoropleth}</span>
-                  <KeyboardArrowDown />
-                </Box>
-              </Button>
-              <Menu
-                anchorEl={anchorElChoropleth}
-                open={Boolean(anchorElChoropleth)}
-                onClose={handleChoroplethClose}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "left",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "left",
-                }}
-              >
-                {choroplethOptions.map((option) => (
-                  <MenuItem
-                    key={option}
-                    onClick={() => handleChoroplethSelect(option)}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      width: "100%",
+                    }}
                   >
-                    {option}
-                  </MenuItem>
-                ))}
-              </Menu>
+                    <span>{store.byFeature && store.byFeature}</span>
+                    <KeyboardArrowDown />
+                  </Box>
+                </Button>
+                <Menu
+                  anchorEl={anchorElChoropleth}
+                  open={Boolean(anchorElChoropleth)}
+                  onClose={() => { setAnchorElChoropleth(null) }}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "left",
+                  }}
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "left",
+                  }}
+                >
+                  {
+                    store.geojson &&
+                    store.geojson.features &&
+                    store.currentArea !== null &&
+                    store.geojson.features[store.currentArea] &&
+                    store.geojson.features[store.currentArea].fields &&
+                    Object.entries(store.geojson.features[store.currentArea].fields).map(
+                      ([key, value]) => {
+                        if (isNumeric(value) && key != "_byFeature") {
+                          return (
+                            <MenuItem key={key} onClick={() => handleSelectedByFeature(key)}>
+                              {key}
+                            </MenuItem>
+                          );
+                        }
+                        return null;
+                      }
+                    )
+                  }
+                </Menu>
+              </Box>
             </Box>
           </Box>
-        </Box>
+        </>
+        )}
+
+
       </Box>
     );
   };
@@ -760,3 +719,10 @@ function MapViewingPage() {
 }
 
 export default MapViewingPage;
+
+
+// useEffect(() => {
+//   if (store.geojson == null) {
+//     store.getGeojson(id);
+//   }
+// }, [store.geojson, id]);
