@@ -3,6 +3,9 @@ import shp from "shpjs";
 // import omnivore from "@mapbox/leaflet-omnivore";
 // const tj = require('togeojson'); // Import the togeojson library
 
+import { interpolateRgb } from 'd3-interpolate';
+
+
 import { useRef, useEffect, useState, useContext } from "react";
 import { GlobalStoreContext } from '../store'
 function NavJSON({ data }) {
@@ -83,21 +86,11 @@ function NavJSON({ data }) {
 
     };
 
-    const getColor = (d, min, max) => {
-        const percentage = (d - min) / (max - min); // Calculate the percentage value between min and max
-        return interpolateColor('#FFEDA0', '#800026', percentage); // Interpolate color between '#FFEDA0' and '#800026'
-    }
+    const getColor = (d, min, max, color1 = '#FFEDA0', color2 = '#800026') => {
+        const percentage = (parseInt(d, 10) - min) / (max - min);
+        return interpolateRgb(color1, color2)(percentage);
+    };
 
-
-    const interpolateColor = (color1, color2, percentage) => {
-        // Parse colors as hex values
-        const hex1 = parseInt(color1.slice(1), 16);
-        const hex2 = parseInt(color2.slice(1), 16);
-
-        // Calculate interpolated color
-        return ('#' + Math.round(hex1 + percentage * (hex2 - hex1)).toString(16));
-
-    }
 
     const findMinMaxGDP = (data) => {
         let min = Number.MAX_VALUE;
