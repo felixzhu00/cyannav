@@ -14,6 +14,8 @@ import {
 } from "@mui/material"
 import { useTheme } from "@emotion/react"
 import domtoimage from "dom-to-image"
+import { useState, useContext } from "react"
+import { GlobalStoreContext } from "../../store"
 
 const style = {
     position: "absolute",
@@ -29,6 +31,8 @@ const style = {
 
 export default function MUIExportMapModal(props) {
     const theme = useTheme()
+    const [fileType, setFileType] = useState("jpeg")
+    const { store } = useContext(GlobalStoreContext)
 
     const [open, setOpen] = React.useState(props.open)
     const handleClose = () => {
@@ -36,28 +40,64 @@ export default function MUIExportMapModal(props) {
         props.onClose()
     }
 
-    const handleExport = (e) => {
-        console.log("This ran!!!")
-        console.log(e)
-
+    const handleExport = (event) => {
         const mapElement = document.getElementById("map")
 
-        // await new Promise((resolve) => tileLayer.on("load", () => resolve()));
+        switch (fileType) {
+            case "jpeg":
+                domtoimage
+                    .toJpeg(mapElement) // Creates image
+                    .then(function (dataURL) {
+                        // Temporary link to created image
+                        const tempLink = document.createElement("a")
+                        tempLink.href = dataURL
+                        tempLink.download = `${store.currentMap.title}.jpeg`
+                        // Click on behalf of user
+                        tempLink.click()
+                    })
+                    .catch(function (err) {
+                        alert("JPEG export failed") // Simple alert for edge case
+                    })
+                break
+            case "png":
+                domtoimage
+                    .toPng(mapElement) // Creates image
+                    .then(function (dataURL) {
+                        // Temporary link to created image
+                        const tempLink = document.createElement("a")
+                        tempLink.href = dataURL
+                        tempLink.download = `${store.currentMap.title}.png`
+                        // Click on behalf of user
+                        tempLink.click()
+                    })
+                    .catch(function (err) {
+                        alert("PNG export failed") // Simple alert for edge case
+                    })
+                break
+            case "navjson":
+                const navjson = {
+                    title: store.currentMap.title,
+                    mapType: store.currentMap.mapType,
+                    tags: store.currentMap.tags,
+                    geojson: store.geojson,
+                }
+                // Convert to json text document
+                const navJsonStr =
+                    "data:text/json;charset=utf-8," +
+                    encodeURIComponent(JSON.stringify(navjson))
 
-        domtoimage
-            .toPng(mapElement)
-            .then(function (dataURL) {
-                // var base64 = dataURL.split("base64,")[1]
-                // var parseFile = new Parse.File(name, { base64: base64 })
-
+                // Temp link to download form
                 const tempLink = document.createElement("a")
-                tempLink.href = dataURL
-                tempLink.download = "prettypicture.png"
+                tempLink.href = navJsonStr
+                tempLink.download = `${store.currentMap.title}.navjson`
+                // Click temp link
                 tempLink.click()
-            })
-            .catch(function (err) {
-                console.log("THIS FAILE D WHAHSHASHDH")
-            })
+                break
+        }
+    }
+
+    const handleTypeChange = (e) => {
+        setFileType(e.target.value)
     }
 
     return (
@@ -104,6 +144,7 @@ export default function MUIExportMapModal(props) {
                                 <RadioGroup
                                     name="map-file-type"
                                     defaultValue="jpeg"
+                                    onChange={handleTypeChange}
                                     sx={{ ml: 2 }}
                                 >
                                     <FormControlLabel
