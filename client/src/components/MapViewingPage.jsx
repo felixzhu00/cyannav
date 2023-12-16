@@ -507,7 +507,7 @@ function MapViewingPage() {
               }}
             >
               <TextField
-                value={selectedFeature.fields.name}
+                value={selectedFeature && selectedFeature.fields && selectedFeature.fields.name}
                 onChange={(e) => changeFieldValue("name", e.target.value)}
               />
               {/* No delete icon for 'name' */}
@@ -515,7 +515,7 @@ function MapViewingPage() {
           </Box>
 
           {/* Mapping through other fields */}
-          {Object.entries(selectedFeature.fields).map(
+          {selectedFeature && selectedFeature.fields && Object.entries(selectedFeature.fields).map(
             ([key, value]) =>
               key !== "name" && key !== "_byFeature" && key !== "_mapZoom" && key !== "_mapCenter" && (
                 <Box

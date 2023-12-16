@@ -20,13 +20,17 @@ function NavJSON({ data, center, zoom }) {
 
         layer.bindPopup(name);
 
+
+
+        // Possible map templates : 'heatmap', 'distributiveflowmap', 'pointmap', 'choroplethmap', '3drectangle'
+        
         // Calculate the range of value
         const { min, max } = findMinMax(data);
 
 
         layer.setStyle(
             {
-                fillColor: store.byFeature == null ? 'red' : getColor(country.fields[store.byFeature], min, max),
+                fillColor: store.byFeature == null ? 'blue' : getColor(country.fields[store.byFeature], min, max),
                 weight: 2,
                 opacity: 1,
                 color: 'white',
@@ -34,6 +38,7 @@ function NavJSON({ data, center, zoom }) {
                 fillOpacity: 0.7
             }
         )
+
 
         layer.on({
             click: toggleSelection,
@@ -121,7 +126,6 @@ function NavJSON({ data, center, zoom }) {
             }
         });
 
-
         return { min, max };
     }
 
@@ -144,7 +148,7 @@ function NavJSON({ data, center, zoom }) {
 
     useEffect(() => {
         // Initialize the Leaflet map and store its reference in the map ref
-        const mapInstance = L.map('map');
+        const mapInstance = L.map('map').setView([0, 0], 2);
         map.current = mapInstance;
 
         // Create and add the tile layer
@@ -152,14 +156,21 @@ function NavJSON({ data, center, zoom }) {
             maxZoom: 18,
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(mapInstance);
-        
-        console.log("data",data)
+
         // Create and add the GeoJSON layer
         const geo = L.geoJson(data, {
             onEachFeature: onEachFeature,
         }).addTo(mapInstance);
 
         geolayer.current = geo;
+
+        const setIntial = map.current.getZoom() == 2 && map.current.getCenter().lat == 0 && map.current.getCenter().lng == 0
+
+        if (map.current && map.current.getBoundsZoom && geolayer.current && setIntial) {
+            // Set the view of the map to fit the GeoJSON bounds
+            const geoBounds = geolayer.current.getBounds();
+            map.current.setView(geoBounds.getCenter(), map.current.getBoundsZoom(geoBounds) + 1);
+        }
 
         // Cleanup function to remove the map and associated layers when the component is unmounted
         return () => {
@@ -169,15 +180,11 @@ function NavJSON({ data, center, zoom }) {
 
     // Use another useEffect to set the view after the initial render
     useEffect(() => {
-        if (map.current && map.current.getBoundsZoom && geolayer.current) {
-            // Set the view of the map to fit the GeoJSON bounds
-            const geoBounds = geolayer.current.getBounds();
-            map.current.setView(geoBounds.getCenter(), map.current.getBoundsZoom(geoBounds));
-        }
+
         setupGeoJSONLayer(data);
     }, [data]);
 
- 
+
     return <div id="map" style={{ height: "100vh" }}></div>;
 }
 
