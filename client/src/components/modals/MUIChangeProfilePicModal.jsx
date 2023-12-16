@@ -1,35 +1,48 @@
-import React, { useState, useContext } from 'react';
-import { Modal, Box, Button, Typography } from '@mui/material';
-import { DropzoneArea } from 'react-mui-dropzone';
-import { useTheme } from '@emotion/react';
-import AuthContext from '../../auth'
+import React, { useState, useContext } from "react";
+import { Modal, Box, Button, Typography } from "@mui/material";
+import { useDropzone } from "react-dropzone";
+import { useTheme } from "@emotion/react";
+import AuthContext from "../../auth";
 
 function MUIChangeProfilePicModal({ open, onClose, onSave }) {
     const theme = useTheme();
     const { auth } = useContext(AuthContext);
-    const [selectedFiles, setSelectedFiles] = useState(null);
+    const [file, setFile] = useState(null);
 
-    const handleFileChange = (files) => {
-        setSelectedFiles(files);
+    const onDrop = (acceptedFiles) => {
+        if (acceptedFiles.length > 0) {
+            setFile(acceptedFiles[0]);
+        }
     };
 
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop,
+        accept: {
+            "image/png": [".png"],
+            "image/jpeg": [".jpg", ".jpeg"],
+        },
+        maxFiles: 1,
+        maxSize: 500000,
+        multiple: false,
+    });
+
     const handleSave = async () => {
-        if (selectedFiles && selectedFiles.length > 0) {
+        if (file) {
             const data = new FormData();
-            data.append("file", selectedFiles[0])
+            data.append("file", file);
             auth.updateProfilePic(data);
+            onSave(file);
         }
-        // onSave(selectedFiles[0])
         onClose();
     };
 
     const style = {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
         width: 600,
-        bgcolor: 'background.paper',
+        bgcolor: "background.paper",
         boxShadow: 24,
         p: 4,
     };
@@ -40,18 +53,47 @@ function MUIChangeProfilePicModal({ open, onClose, onSave }) {
                 <Typography id="changePictureText" variant="h6" component="h2">
                     Change Profile Picture
                 </Typography>
-                <Box sx={{ mt: 2, mb: 2 }}>
-                    <DropzoneArea
-                        onChange={handleFileChange}
-                        filesLimit={1}
-                        dropzoneText="Drag and drop an image file here or click. (.jpeg or .png)"
-                        acceptedFiles={['image/jpeg', 'image/png']}
-                        maxFileSize={500000}
-                    />
+                <Box
+                    {...getRootProps({
+                        sx: {
+                            mt: 2,
+                            mb: 2,
+                            border: "1px dashed grey",
+                            padding: "20px",
+                            textAlign: "center",
+                        },
+                    })}
+                >
+                    <input {...getInputProps()} />
+                    {isDragActive ? (
+                        <p>Drop the image file here...</p>
+                    ) : (
+                        <p>
+                            Drag and drop an image file here or click. (.jpeg or
+                            .png)
+                        </p>
+                    )}
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <Button variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", width: "90px", mr: 1 }} onClick={handleSave}>Save</Button>
-                    <Button variant="outlined" sx={{ color: "black" }} onClick={onClose}>Cancel</Button>
+                <Box sx={{ display: "flex", justifyContent: "center" }}>
+                    <Button
+                        variant="contained"
+                        sx={{
+                            bgcolor: theme.palette.primary.main,
+                            color: "black",
+                            width: "90px",
+                            mr: 1,
+                        }}
+                        onClick={handleSave}
+                    >
+                        Save
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        sx={{ color: "black" }}
+                        onClick={onClose}
+                    >
+                        Cancel
+                    </Button>
                 </Box>
             </Box>
         </Modal>
