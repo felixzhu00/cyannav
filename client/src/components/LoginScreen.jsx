@@ -21,12 +21,17 @@ export default function LoginScreen(props) {
     const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
+
+
+
         if (auth.user == null) {
             console.log(auth.error)
             setErrorMessage(auth.error)
         } else {
+            if(auth.loggedIn){
+                navigate('/browsepage');
+            }
             console.log(auth.user, auth.loggedIn)
-            navigate('/browsepage');
         }
     }, [auth]);
 
