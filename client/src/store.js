@@ -79,9 +79,9 @@ function GlobalStoreContextProvider(props) {
         return await api.updateMapTag(mapId, tags);
     };
 
-    store.createMap = async (title, fileType, mapTemplate, files) => {
-        const file = files[0]; // Assuming files is an array with the File object
-
+    store.createMap = async (title, fileType, mapTemplate, file) => {
+        const mapFile = file;
+        console.log(mapFile);
         // Create a FileReader
         const reader = new FileReader();
 
@@ -105,7 +105,7 @@ function GlobalStoreContextProvider(props) {
         };
 
         // Read the content of the file as text
-        reader.readAsText(file);
+        reader.readAsText(mapFile);
     };
 
     store.getMyMapCollection = async (userId) => {
