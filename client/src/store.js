@@ -356,7 +356,7 @@ function GlobalStoreContextProvider(props) {
         // await new Promise((resolve) => tileLayer.on("load", () => resolve()));
 
         domtoimage
-            .toPng({ width, height })
+            .toPng(mapElement)
             .then(function (dataURL) {
                 // var base64 = dataURL.split("base64,")[1]
                 // var parseFile = new Parse.File(name, { base64: base64 })
