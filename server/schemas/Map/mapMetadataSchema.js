@@ -2,12 +2,10 @@ const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 
 const mapMetadataSchema = new Schema({
-    title: [
-        {
-            type: String,
-            required: [true, "No title has been provided"],
-        },
-    ],
+    title: {
+        type: String,
+        required: [true, "No title has been provided"],
+    },
     user: [
         {
             type: Schema.Types.ObjectID,
