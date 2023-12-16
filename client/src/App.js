@@ -1,56 +1,40 @@
-import './App.css';
-import APITester from './components/APITester.jsx';
-import AppBanner from './components/AppBanner.jsx'
-import LoginScreen from './components/LoginScreen.jsx'
-import RegisterScreen from './components/RegisterScreen.jsx'
-import { BrowserRouter, Route, Routes, Router, Switch } from 'react-router-dom'
-import { createTheme, ThemeProvider } from '@mui/material';
-import ForgetPswdScreen from './components/ForgetPswdScreen.jsx'
-import ProfileScreen from './components/ProfileScreen.jsx';
-import MUIChangeUsernameModal from './components/modals/MUIChangeUsernameModal.jsx';
-import MUIChangeEmailModal from './components/modals/MUIChangeEmailModal.jsx';
-import MUIChangePasswordModal from './components/modals/MUIChangePasswordModal.jsx';
-import MUIDeleteAccountModal from './components/modals/MUIDeleteAccountModal.jsx';
-import MUICreateMapModal from './components/modals/MUICreateMapModal.jsx'
-import MUIDeleteMapModal from './components/modals/MUIDeleteMapModal.jsx';
-import MUIPublishMapModal from './components/modals/MUIPublishMapModal.jsx';
-import MUIAddFieldModal from './components/modals/MUIAddFieldModal.jsx';
-import MUIExportMapModal from './components/modals/MUIExportMapModal.jsx';
-import MUICommentModal from './components/modals/MUICommentModal.jsx';
-import MUIAddTagModal from './components/modals/MUIAddTagModal.jsx';
-import AppBannerwithRouter from './components/AppBanner.jsx';
-import BrowsePage from './components/BrowsePage.jsx';
-import MapViewingPage from './components/MapViewingPage.jsx';
-import { useState, useRef, useEffect, useContext } from 'react';
-import { GlobalStoreContextProvider } from './store'
-import { AuthContextProvider } from './auth';
-import AuthContext from './auth'
-import { GlobalStoreContext } from './store'
-
-
+import "./App.css";
+import AppBanner from "./components/AppBanner.jsx";
+import LoginScreen from "./components/LoginScreen.jsx";
+import RegisterScreen from "./components/RegisterScreen.jsx";
+import { BrowserRouter, Route, Routes, Router, Switch } from "react-router-dom";
+import { createTheme, ThemeProvider } from "@mui/material";
+import ForgetPswdScreen from "./components/ForgetPswdScreen.jsx";
+import ProfileScreen from "./components/ProfileScreen.jsx";
+import BrowsePage from "./components/BrowsePage.jsx";
+import MapViewingPage from "./components/MapViewingPage.jsx";
+import { useState, useEffect, useContext } from "react";
+import { GlobalStoreContextProvider } from "./store";
+import { AuthContextProvider } from "./auth";
+import AuthContext from "./auth";
+import { GlobalStoreContext } from "./store";
 
 // Define your color palette
 const colors = {
   primary: {
-    100: '#00CED1',
-    200: '#00b0b3',
-    300: '#006d72',
+    100: "#00CED1",
+    200: "#00b0b3",
+    300: "#006d72",
   },
   accent: {
-    100: '#20B2AA',
-    200: '#00544f',
+    100: "#20B2AA",
+    200: "#00544f",
   },
   text: {
-    100: '#333333',
-    200: '#5c5c5c',
+    100: "#333333",
+    200: "#5c5c5c",
   },
   background: {
-    100: '#E0FFFF',
-    200: '#d6f5f5',
-    300: '#aecccc',
+    100: "#E0FFFF",
+    200: "#d6f5f5",
+    300: "#aecccc",
   },
 };
-
 
 // Create a theme instance
 const theme = createTheme({
@@ -75,7 +59,7 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: 'Inter',
+    fontFamily: "Inter",
   },
 });
 
@@ -84,71 +68,34 @@ const App = () => {
   const { store } = useContext(GlobalStoreContext);
   const [guest, setGuest] = useState(true);
 
-  useEffect(() => {
-  }, [guest]);
+  useEffect(() => {}, [guest]);
 
   return (
     <ThemeProvider theme={theme}>
       <AuthContextProvider>
         <GlobalStoreContextProvider>
           <BrowserRouter>
-
             <AppBanner guest={guest} />
             <Routes>
-              <Route path="/" element={<LoginScreen handleGuest={setGuest} />} />
-              <Route path="/login/" element={<LoginScreen handleGuest={setGuest} />} />
+              <Route
+                path="/"
+                element={<LoginScreen handleGuest={setGuest} />}
+              />
+              <Route
+                path="/login/"
+                element={<LoginScreen handleGuest={setGuest} />}
+              />
               <Route path="/register/" element={<RegisterScreen />} />
               <Route path="/forget/" element={<ForgetPswdScreen />} />
               <Route path="/profile/" element={<ProfileScreen />} />
               <Route path="/browsepage/" element={<BrowsePage />} />
               <Route path="/mapview/:id" element={<MapViewingPage />} />
             </Routes>
-
           </BrowserRouter>
         </GlobalStoreContextProvider>
       </AuthContextProvider>
     </ThemeProvider>
   );
-}
-
-// const App = () => {
-
-
-
-// return (
-//   <BrowserRouter>
-{/* <AuthContextProvider> */ }
-{/* <GlobalStoreContextProvider> */ }
-// <ThemeProvider theme={theme}>
-
-
-{/* <ProfileScreen /> */ }
-{/* <MUIChangeUsernameModal /> */ }
-{/* <MUIChangeEmailModal /> */ }
-{/* <MUIChangePasswordModal /> */ }
-{/* <MUIDeleteAccountModal /> */ }
-{/* <MUICreateMapModal /> */ }
-{/* <MUIDeleteMapModal /> */ }
-{/* <MUIPublishMapModal /> */ }
-{/* <MUIAddFieldModal /> */ }
-{/* <MUIExportMapModal /> */ }
-{/* <MUICommentModal /> */ }
-{/* <MUIAddTagModal /> */ }
-
-
-//   <Routes>
-//   <AppBanner />
-//   <Route path="/" element={<LoginScreen />} />
-//     <Route path="/login/" element={<LoginScreen />} />
-//     <Route path="/register/" element={<RegisterScreen />} />
-//     <Route path="/forget/" element={<ForgetPswdScreen />} />
-//   </Routes>
-// </ThemeProvider>
-
-{/* </GlobalStoreContextProvider> */ }
-{/* </AuthContextProvider> */ }
-//     </BrowserRouter>
-//   )
-// }
+};
 
 export default App;
