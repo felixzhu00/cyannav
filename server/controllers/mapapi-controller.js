@@ -91,13 +91,13 @@ getGeoJsonById = async (req, res) => {
             return res.status(400).end()
         }
 
-        const mapMetadata = await MapMetadata.findById(id);
+        const mapMetadata = await MapMetadata.findById(id)
 
         if (!mapMetadata) {
-            return res.status(404).end();
+            return res.status(404).end()
         }
 
-        const geojsonId = mapMetadata.geojsonId;
+        const geojsonId = mapMetadata.geojsonId
 
         const geojson = await GeoJsonSchema.findById(geojsonId)
 
@@ -406,7 +406,92 @@ updateMapPublishStatus = async (req, res) => {
 
 // Rest of the update functions to be written later.
 
-// like dislikes and comment to be written here.
+likeComment = async (req, res) => {
+    try {
+        const { id } = req.body
+        if (!id || !ObjectId.isValid(id)) {
+            return res.status(400).end()
+        }
+
+        const targetComment = await Comment.findById(id)
+        if (!targetComment) {
+            return res.status(404).end()
+        }
+
+        const userObjectId = new ObjectId(res.locals.userId)
+        // Remove existing dislike
+
+        const dislikeIndex = targetComment.downvotes.indexOf(userObjectId)
+
+        if (dislikeIndex > -1) {
+            targetComment.downvotes.splice(dislikeIndex, 1)
+        }
+
+        const likeIndex = targetComment.upvotes.indexOf(userObjectId)
+
+        if (likeIndex > -1) {
+            // Already liked, so remove like.
+            targetComment.upvotes.splice(likeIndex, 1)
+        } else {
+            // Add like to list
+            targetComment.upvotes.push(userObjectId)
+        }
+
+        const saved = await targetComment.save()
+        if (!saved) {
+            return res.status(500).end()
+        }
+
+        return res.status(200).end()
+    } catch (err) {
+        console.error("mapapi-controller::likeComment")
+        console.error(err)
+        return res.status(500).end()
+    }
+}
+
+dislikeComment = async (req, res) => {
+    try {
+        const { id } = req.body
+        if (!id || !ObjectId.isValid(id)) {
+            return res.status(400).end()
+        }
+
+        const targetComment = await Comment.findById(id)
+        if (!targetComment) {
+            return res.status(404).end()
+        }
+
+        const userObjectId = new ObjectId(res.locals.userId)
+
+        const dislikeIndex = targetComment.downvotes.indexOf(userObjectId)
+        if (dislikeIndex > -1) {
+            // Remove dislike if already exists
+            targetComment.downvotes.splice(dislikeIndex, 1)
+        } else {
+            // Add dislike if not yet disliked
+            targetComment.downvotes.push(userObjectId)
+        }
+
+        const likeIndex = targetComment.upvotes.indexOf(userObjectId)
+        if (likeIndex > -1) {
+            // If originally liked, remove the like
+            targetComment.upvotes.splice(likeIndex, 1)
+        }
+
+        const saved = await targetComment.save()
+        if (!saved) {
+            return res.status(500).end()
+        }
+
+        return res.status(200).end()
+    } catch (err) {
+        console.error("mapapi-controller::dislikelikeComment")
+        console.error(err)
+        return res.status(500).end()
+    }
+}
+
 likeMap = async (req, res) => {
     try {
         const { id } = req.body
@@ -579,13 +664,13 @@ getCommentById = async (req, res) => {
             return res.status(400).end()
         }
 
-        const targetComment = await Comment.findById(id)
+        const targetComment = await Comment.findById(id).populate("author")
         if (!targetComment) {
             return res.status(404).end()
         }
 
         return res.status(200).json({
-            author: targetComment.author,
+            author: targetComment.author.username,
             childComments: targetComment.childComments,
             upvotes: targetComment.upvotes,
             downvotes: targetComment.downvotes,
@@ -627,43 +712,43 @@ updateMapTag = async (req, res) => {
 
 updateMapGeoJson = async (req, res) => {
     try {
-        const { id, geoBuf } = req.body; // Extract the id from the URL parameter
-  
+        const { id, geoBuf } = req.body // Extract the id from the URL parameter
+
         let bufferArray = Object.values(geoBuf)
         let buffer = Buffer.from(bufferArray)
 
         if (!id || !ObjectId.isValid(id)) {
-           return res.status(400).end();
+            return res.status(400).end()
         }
-  
-        const targetMap = await MapMetadata.findById(id);
-  
+
+        const targetMap = await MapMetadata.findById(id)
+
         if (!targetMap) {
-           return res.status(404).end();
+            return res.status(404).end()
         }
-  
+
         if (targetMap.user.toString() !== res.locals.userId) {
-           return res.status(401).end();
+            return res.status(401).end()
         }
-        const targetGeoJson = await GeoJsonSchema.findById(targetMap.geojsonId);
+        const targetGeoJson = await GeoJsonSchema.findById(targetMap.geojsonId)
 
         if (!targetGeoJson) {
-           return res.status(404).end();
+            return res.status(404).end()
         }
-  
-        targetGeoJson.geoBuf = buffer;
-  
-        const saved = await targetGeoJson.save();
-  
+
+        targetGeoJson.geoBuf = buffer
+
+        const saved = await targetGeoJson.save()
+
         if (!saved) {
-           return res.status(500).end();
+            return res.status(500).end()
         }
-  
-        return res.status(200).end();
-     } catch (err) {
-        console.error("mapapi-controller::updateMapGeoJson", err);
-        return res.status(500).end();
-     }
+
+        return res.status(200).end()
+    } catch (err) {
+        console.error("mapapi-controller::updateMapGeoJson", err)
+        return res.status(500).end()
+    }
 }
 
 module.exports = {
@@ -684,4 +769,6 @@ module.exports = {
     getCommentById,
     likeMap,
     dislikeMap,
+    likeComment,
+    dislikeComment,
 }
