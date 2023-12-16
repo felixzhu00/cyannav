@@ -41,14 +41,17 @@ function GlobalStoreContextProvider(props) {
         //Map Viewing
         geojson: null,
         currentArea: -1,
-        byFeature: null, 
+        byFeature: null,
 
         //Add Field Modal
         fieldString: null,
 
         // Map likes and dislikes
         likes: 0,
-        dislikes: 0
+        dislikes: 0,
+
+        sortBy: 'recent',
+        order: 'asc'
     })
 
     useEffect(() => {
@@ -56,6 +59,26 @@ function GlobalStoreContextProvider(props) {
             store.updateMapGeoJson()
         }
     }, [store.geojson]);
+
+    useEffect(() => {
+        if (store && store.mapCollection !== null) {
+            store.sortMapBy(store.sortBy, store.order);
+        }
+    }, [store.sortBy, store.order]);
+
+
+    store.setSortBy = async (sortBy) => {
+        setStore(prevStore => ({
+            ...prevStore,
+            sortBy: sortBy,
+        }));
+    }
+    store.setOrder = async (order) => {
+        setStore(prevStore => ({
+            ...prevStore,
+            order: order,
+        }));
+    }
 
 
     //Nav Global Handlers
@@ -83,10 +106,10 @@ function GlobalStoreContextProvider(props) {
 
     store.createMap = async (title, fileType, mapTemplate, files) => {
         const file = files[0]; // Assuming files is an array with the File object
-    
+
         // Create a FileReader
         const reader = new FileReader();
-    
+
         // Wrap the logic in a Promise
         const readPromise = () => {
             return new Promise((resolve, reject) => {
@@ -95,25 +118,25 @@ function GlobalStoreContextProvider(props) {
                     if (event.target.readyState === FileReader.DONE) {
                         // event.target.result contains the content of the file
                         const geojson = JSON.parse(event.target.result);
-    
+
                         // Encode the GeoJSON with geobuf
                         const buffer = geobuf.encode(geojson, new Pbf());
-    
+
                         // Resolve the promise with the result
                         resolve(api.createNewMap(title, mapTemplate, buffer));
                     }
                 };
-    
+
                 // Reject the promise if there's an error
                 reader.onerror = function (event) {
                     reject(event.error);
                 };
             });
         };
-    
+
         // Read the content of the file as text
         reader.readAsText(file);
-    
+
         try {
             // Wait for the Promise to resolve
             const response = await readPromise();
@@ -126,15 +149,23 @@ function GlobalStoreContextProvider(props) {
 
     store.getMyMapCollection = async (userId) => {
         if (!userId) return;  // Add this line
+    
+        const response = await api.getUserMaps(userId);
+    
+        setStore((prevStore) => {
+            const updatedStore = {
+                ...prevStore,
+                mapCollection: response.data.userMaps,
+            };
+    
+            // Call sortMapBy after updating mapCollection
+            return updatedStore;
+        });
 
-        const response = await api.getUserMaps(userId)
-        setStore(prevStore => ({
-            ...prevStore,
-            mapCollection: response.data.userMaps,
-        }));
-
-        return response.data.userMaps
-    }
+        await store.sortMapBy(store.sortBy, store.order);
+    
+        return response.data.userMaps;
+    };
 
     store.getMarketplaceCollection = async () => {
         const response = await api.getAllMaps()
@@ -154,6 +185,8 @@ function GlobalStoreContextProvider(props) {
 
     store.deleteMap = async (mapId) => {
         await api.deleteMapById(mapId);
+
+
     }
 
     store.duplicateMap = async (mapId) => {
@@ -227,7 +260,6 @@ function GlobalStoreContextProvider(props) {
             ...prevStore,
             fieldString: value,
         }));
-
     }
 
     store.setGeoJsonFeatures = async (newFeatures) => {
@@ -274,48 +306,55 @@ function GlobalStoreContextProvider(props) {
         }
         // } 
 
-        return setStore({
-            ...store,
+        // Update prevStore with the new filtered array
+        setStore((prevStore) => ({
+            ...prevStore,
             mapCollection: filteredArray,
-        })
-    }
+        }));
 
+        // Sort mapCollection based on your sorting logic
+        store.sortMapBy(store.sortBy, 'asc');
+    }
     store.sortMapBy = async (key, order) => {
-        //key: 'alphabetical-order' or 'recent'
-        //order: 'asc' for ascending, 'dec' for decending
-        const sortedArray = [...store.mapCollection]
 
-        sortedArray.sort((a, b) => {
-            if (key === "alphabetical-order") {
-                //'title' field
-                const valueA = a.title[0].toString().toLowerCase()
-                const valueB = b.title[0].toString().toLowerCase()
-                return order === "asc"
-                    ? valueA.localeCompare(valueB)
-                    : valueB.localeCompare(valueA)
-            } else if (key === "recent") {
-                //'dateCreated' field
-                const valueA = new Date(a.dateCreated).getTime()
-                const valueB = new Date(b.dateCreated).getTime()
-                return order === "dec" ? valueA - valueB : valueB - valueA
-            } else if (key === "most-liked") {
-                //'like' and 'dislike' field
-                const valueA = a.like.length - a.dislike.length
-                const valueB = b.like.length - b.dislike.length
-                return order === "dec" ? valueA - valueB : valueB - valueA
-            } else if (key === "most-disliked") {
-                const valueA = a.dislike.length;
-                const valueB = b.dislike.length;
-                return order === "asc" ? valueB - valueA : valueA - valueB;
-            }
-            return 0 // Default to no sorting
-        })
+        setStore((prevStore) => {
+            // key: 'alphabetical-order' or 'recent'
+            // order: 'asc' for ascending, 'dec' for descending
+            
+            const sortedArray = [...prevStore.mapCollection];
 
-        return setStore({
-            ...store,
-            mapCollection: sortedArray,
-        })
-    }
+            sortedArray.sort((a, b) => {
+                if (key === "alphabetical-order") {
+                    //'title' field
+                    const valueA = a.title[0].toString().toLowerCase();
+                    const valueB = b.title[0].toString().toLowerCase();
+                    return order === "asc"
+                        ? valueA.localeCompare(valueB)
+                        : valueB.localeCompare(valueA);
+                } else if (key === "recent") {
+                    //'dateCreated' field
+                    const valueA = new Date(a.dateCreated).getTime();
+                    const valueB = new Date(b.dateCreated).getTime();
+                    return order === "dec" ? valueA - valueB : valueB - valueA;
+                } else if (key === "most-liked") {
+                    //'like' and 'dislike' field
+                    const valueA = a.like.length - a.dislike.length;
+                    const valueB = b.like.length - b.dislike.length;
+                    return order === "dec" ? valueA - valueB : valueB - valueA;
+                } else if (key === "most-disliked") {
+                    const valueA = a.dislike.length;
+                    const valueB = b.dislike.length;
+                    return order === "asc" ? valueB - valueA : valueA - valueB;
+                }
+                return 0; // Default to no sorting
+            });
+
+            return {
+                ...prevStore,
+                mapCollection: sortedArray,
+            };
+        });
+    };
 
     // Modal Global Handlers
     const modalProps = {
@@ -353,11 +392,10 @@ function GlobalStoreContextProvider(props) {
         }
     }
 
-    
+
     store.updateMapGeoJson = async () => {
         const buffer = geobuf.encode(store.geojson, new Pbf());
         const response = await api.updateMapGeoJson(store.currentMap._id, buffer)
-        console.log(response)
     }
 
 
