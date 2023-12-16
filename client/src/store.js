@@ -109,7 +109,7 @@ function GlobalStoreContextProvider(props) {
     };
 
     store.getMyMapCollection = async (userId) => {
-        if (!userId) return; // Add this line
+        if (!userId) return;
 
         const response = await api.getUserMaps(userId);
         setStore((prevStore) => ({
@@ -346,6 +346,19 @@ function GlobalStoreContextProvider(props) {
                 byFeature: byFeatureOption,
             };
         });
+    };
+
+    store.postComment = async (text, parentCommentId, mapId) => {
+        const response = await api.postComment(text, parentCommentId, mapId);
+        console.log(response);
+    };
+
+    store.getCommentById = async (id) => {
+        console.log(id);
+        const response = await api.getcommentbyid(id);
+        console.log(response.data);
+
+        return response.data;
     };
 
     return (

@@ -1,38 +1,55 @@
-import * as React from 'react';
-import { useState } from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
-import IconButton from '@mui/material/IconButton';
-import { Close } from '@mui/icons-material';
-import { TextField } from '@mui/material';
-import { useTheme } from '@emotion/react';
+import * as React from "react";
+import { useState, useContext } from "react";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Modal from "@mui/material/Modal";
+import IconButton from "@mui/material/IconButton";
+import { Close, Store } from "@mui/icons-material";
+import { TextField } from "@mui/material";
+import { useTheme } from "@emotion/react";
+import { GlobalStoreContext } from "../../store";
+import AuthContext from "../../auth.js";
 
 const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
     width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
+    bgcolor: "background.paper",
+    border: "2px solid #000",
     boxShadow: 24,
     p: 4,
 };
 
 export default function MUICommentModal(props) {
     const theme = useTheme();
+    const { store } = useContext(GlobalStoreContext);
+    const { auth } = useContext(AuthContext);
 
     const [open, setOpen] = React.useState(props.open);
     const handleClose = () => {
-        setOpen(false)
-        props.onClose()
+        setOpen(false);
+        props.onClose();
     };
 
     const [commentText, setCommentText] = useState("");
-    const handleSend = () => {
-        props.onAddComment(commentText); // Call the passed function with the comment text
+    const handlePostComment = async () => {
+        try {
+            const response = await store.postComment(
+                commentText,
+                null,
+                store.currentMap._id
+            );
+
+            // Assuming the response includes the newly added comment
+            if (response && response.status === 200) {
+                props.onAddComment(response.data); // Call the parent function with the new comment
+            }
+        } catch (error) {
+            console.error("Error posting comment:", error);
+        }
         handleClose();
     };
 
@@ -44,8 +61,18 @@ export default function MUICommentModal(props) {
                 aria-describedby="comment-modal-description"
             >
                 <Box sx={style}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography id="comment-modal-title" variant="h6" component="h2">
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Typography
+                            id="comment-modal-title"
+                            variant="h6"
+                            component="h2"
+                        >
                             Comment
                         </Typography>
 
@@ -56,7 +83,7 @@ export default function MUICommentModal(props) {
                     <Box
                         component="form"
                         sx={{
-                            '& .MuiTextField-root': { m: 1, width: '95%' },
+                            "& .MuiTextField-root": { m: 1, width: "95%" },
                             mt: 2,
                         }}
                         noValidate
@@ -70,9 +97,32 @@ export default function MUICommentModal(props) {
                             variant="standard"
                             onChange={(e) => setCommentText(e.target.value)}
                         />
-                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
-                            <Button onClick={handleSend} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", mr: "5px" }}>Send </Button>
-                            <Button onClick={handleClose} variant="outlined" sx={{ color: "black", ml: "5px" }}>Cancel</Button>
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                mt: 2,
+                                mr: 2,
+                            }}
+                        >
+                            <Button
+                                onClick={handlePostComment}
+                                variant="contained"
+                                sx={{
+                                    bgcolor: theme.palette.primary.main,
+                                    color: "black",
+                                    mr: "5px",
+                                }}
+                            >
+                                Send{" "}
+                            </Button>
+                            <Button
+                                onClick={handleClose}
+                                variant="outlined"
+                                sx={{ color: "black", ml: "5px" }}
+                            >
+                                Cancel
+                            </Button>
                         </Box>
                     </Box>
                 </Box>

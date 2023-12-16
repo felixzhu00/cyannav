@@ -69,9 +69,9 @@ export const createForkMapById = (id) =>
 export const deleteMapById = (id) =>
     api.delete(`/api/deletemap/${id}`).then(handleResponse).catch(handleError);
 export const likeMap = (id) =>
-    api.post(`api/likemap`, { id }).then(handleResponse).catch(handleError);
+    api.post(`/api/likemap`, { id }).then(handleResponse).catch(handleError);
 export const dislikeMap = (id) =>
-    api.post(`api/dislikeMap`, { id }).then(handleResponse).catch(handleError);
+    api.post(`/api/dislikeMap`, { id }).then(handleResponse).catch(handleError);
 export const updateMapNameById = (id, title) =>
     api
         .post(`/api/mapname`, { id, title })
@@ -90,6 +90,16 @@ export const updateMapPublishStatus = (id) =>
 export const updateMapGeoJson = (id, geoBuf) =>
     api
         .post(`/api/updategeojson`, { id, geoBuf })
+        .then(handleResponse)
+        .catch(handleError);
+export const postComment = (text, parentCommentId, mapId) =>
+    api
+        .post(`/api/postcomment`, { text, parentCommentId, mapId })
+        .then(handleResponse)
+        .catch(handleError);
+export const getcommentbyid = (id) =>
+    api
+        .post("/api/getcommentbyid", { id })
         .then(handleResponse)
         .catch(handleError);
 
@@ -187,6 +197,8 @@ const apis = {
     updateEmail,
     deleteAccount,
     updateProfilePic,
+    postComment,
+    getcommentbyid,
 };
 
 export default apis;

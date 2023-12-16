@@ -1,7 +1,7 @@
-const date = new Date(Date.now())
+// const date = new Date(Date.now())
 
-const mongoose = require("mongoose")
-const Schema = mongoose.Schema
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
 const commentSchema = new Schema({
     author: {
@@ -32,13 +32,13 @@ const commentSchema = new Schema({
     ],
     ask_date: {
         type: Date,
-        default: date,
+        default: () => new Date(Date.now()),
     },
     text: {
         type: String,
         required: true,
     },
-})
+});
 
-const commentModel = mongoose.model("comment", commentSchema)
-module.exports = commentModel
+const commentModel = mongoose.model("comment", commentSchema);
+module.exports = commentModel;
