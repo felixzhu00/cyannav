@@ -114,30 +114,6 @@ getGeoJsonById = async (req, res) => {
     }
 }
 
-getMapFieldsById = async (req, res) => {
-    try {
-        const { id } = req.body
-
-        if (!id || !ObjectId.isValid(id)) {
-            return res.status(400).end()
-        }
-
-        const mapFields = await MapFields.findById(id)
-
-        if (!mapFields) {
-            return res.status(404).end()
-        }
-
-        return res.status(200).json({
-            mapFields: mapFields, // TODO: (later) figure out how this schema works
-        })
-    } catch (err) {
-        console.error("mapapi-controller::getMapFieldsById")
-        console.error(err)
-        return res.status(500).end()
-    }
-}
-
 createNewMap = async (req, res) => {
     try {
         const { title, type, GeoJsonSchemabuf } = req.body
