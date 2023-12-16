@@ -729,7 +729,6 @@ module.exports = {
     getUserMaps,
     getAllPublishedMaps,
     getGeoJsonById,
-    getMapFieldsById,
     createNewMap,
     createDuplicateMapById,
     createForkMapById,
