@@ -83,29 +83,46 @@ function GlobalStoreContextProvider(props) {
 
     store.createMap = async (title, fileType, mapTemplate, files) => {
         const file = files[0]; // Assuming files is an array with the File object
-
+    
         // Create a FileReader
         const reader = new FileReader();
-
-        // Define the event handler for when the file read is complete
-        reader.onloadend = async function (event) {
-            if (event.target.readyState === FileReader.DONE) {
-                // event.target.result contains the content of the file
-                const geojson = JSON.parse(event.target.result);
-
-                // Encode the GeoJSON with geobuf
-                const buffer = geobuf.encode(geojson, new Pbf());
-
-                const response = await api.createNewMap(title, mapTemplate, buffer);
-
-                return response
-            }
+    
+        // Wrap the logic in a Promise
+        const readPromise = () => {
+            return new Promise((resolve, reject) => {
+                // Define the event handler for when the file read is complete
+                reader.onloadend = function (event) {
+                    if (event.target.readyState === FileReader.DONE) {
+                        // event.target.result contains the content of the file
+                        const geojson = JSON.parse(event.target.result);
+    
+                        // Encode the GeoJSON with geobuf
+                        const buffer = geobuf.encode(geojson, new Pbf());
+    
+                        // Resolve the promise with the result
+                        resolve(api.createNewMap(title, mapTemplate, buffer));
+                    }
+                };
+    
+                // Reject the promise if there's an error
+                reader.onerror = function (event) {
+                    reject(event.error);
+                };
+            });
         };
-
+    
         // Read the content of the file as text
         reader.readAsText(file);
-    }
-
+    
+        try {
+            // Wait for the Promise to resolve
+            const response = await readPromise();
+            return response;
+        } catch (error) {
+            // Handle errors
+            console.error("Error reading file:", error);
+        }
+    };
 
     store.getMyMapCollection = async (userId) => {
         if (!userId) return;  // Add this line
