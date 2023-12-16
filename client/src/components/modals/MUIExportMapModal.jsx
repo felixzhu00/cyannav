@@ -1,33 +1,64 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
-import IconButton from '@mui/material/IconButton';
-import { Close } from '@mui/icons-material';
-import { FormControl, RadioGroup, Radio, FormControlLabel, FormGroup } from '@mui/material';
-import { useTheme } from '@emotion/react';
+import * as React from "react"
+import Box from "@mui/material/Box"
+import Button from "@mui/material/Button"
+import Typography from "@mui/material/Typography"
+import Modal from "@mui/material/Modal"
+import IconButton from "@mui/material/IconButton"
+import { Close } from "@mui/icons-material"
+import {
+    FormControl,
+    RadioGroup,
+    Radio,
+    FormControlLabel,
+    FormGroup,
+} from "@mui/material"
+import { useTheme } from "@emotion/react"
+import domtoimage from "dom-to-image"
 
 const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
     width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
+    bgcolor: "background.paper",
+    border: "2px solid #000",
     boxShadow: 24,
     p: 4,
-};
+}
 
 export default function MUIExportMapModal(props) {
-    const theme = useTheme();
+    const theme = useTheme()
 
-    const [open, setOpen] = React.useState(props.open);
+    const [open, setOpen] = React.useState(props.open)
     const handleClose = () => {
         setOpen(false)
         props.onClose()
-    };
+    }
+
+    const handleExport = (e) => {
+        console.log("This ran!!!")
+        console.log(e)
+
+        const mapElement = document.getElementById("map")
+
+        // await new Promise((resolve) => tileLayer.on("load", () => resolve()));
+
+        domtoimage
+            .toPng(mapElement)
+            .then(function (dataURL) {
+                // var base64 = dataURL.split("base64,")[1]
+                // var parseFile = new Parse.File(name, { base64: base64 })
+
+                const tempLink = document.createElement("a")
+                tempLink.href = dataURL
+                tempLink.download = "prettypicture.png"
+                tempLink.click()
+            })
+            .catch(function (err) {
+                console.log("THIS FAILE D WHAHSHASHDH")
+            })
+    }
 
     return (
         <div>
@@ -37,8 +68,18 @@ export default function MUIExportMapModal(props) {
                 aria-describedby="export-map-modal-description"
             >
                 <Box sx={style}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography id="export-map-modal-title" variant="h6" component="h2">
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Typography
+                            id="export-map-modal-title"
+                            variant="h6"
+                            component="h2"
+                        >
                             Export Map
                         </Typography>
                         <IconButton onClick={handleClose}>
@@ -48,35 +89,72 @@ export default function MUIExportMapModal(props) {
                     <Box
                         component="form"
                         sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
+                            display: "flex",
+                            flexDirection: "column",
                             mt: 2,
                         }}
                         noValidate
                         autoComplete="off"
                     >
                         <FormGroup>
-                            <Typography id="exportMapModalText" sx={{ mb: 1 }}>Select the format you would like to export as:</Typography>
+                            <Typography id="exportMapModalText" sx={{ mb: 1 }}>
+                                Select the format you would like to export as:
+                            </Typography>
                             <FormControl component="fieldset">
                                 <RadioGroup
                                     name="map-file-type"
                                     defaultValue="jpeg"
                                     sx={{ ml: 2 }}
                                 >
-                                    <FormControlLabel value="jpeg" control={<Radio />} label="JPEG" />
-                                    <FormControlLabel value="png" control={<Radio />} label="PNG" />
-                                    <FormControlLabel value="navjson" control={<Radio />} label="NavJSON" />
+                                    <FormControlLabel
+                                        value="jpeg"
+                                        control={<Radio />}
+                                        label="JPEG"
+                                    />
+                                    <FormControlLabel
+                                        value="png"
+                                        control={<Radio />}
+                                        label="PNG"
+                                    />
+                                    <FormControlLabel
+                                        value="navjson"
+                                        control={<Radio />}
+                                        label="NavJSON"
+                                    />
                                 </RadioGroup>
                             </FormControl>
                         </FormGroup>
 
-                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                            <Button id="exportBtnOnModal" onClick={handleClose} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", mr: '5px' }}>Export</Button>
-                            <Button onClick={handleClose} variant="outlined" sx={{ color: "black", ml: '5px' }}>Cancel</Button> {/* CHANGE THE ONCLICK! */}
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                mt: 2,
+                            }}
+                        >
+                            <Button
+                                id="exportBtnOnModal"
+                                onClick={handleExport}
+                                variant="contained"
+                                sx={{
+                                    bgcolor: theme.palette.primary.main,
+                                    color: "black",
+                                    mr: "5px",
+                                }}
+                            >
+                                Export
+                            </Button>
+                            <Button
+                                onClick={handleClose}
+                                variant="outlined"
+                                sx={{ color: "black", ml: "5px" }}
+                            >
+                                Cancel
+                            </Button>{" "}
                         </Box>
                     </Box>
                 </Box>
             </Modal>
         </div>
-    );
+    )
 }
