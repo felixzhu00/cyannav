@@ -1,22 +1,22 @@
 //temp global store
-import { createContext, useState, useContext, useEffect } from "react"
-import MUIAddFieldModal from "./components/modals/MUIAddFieldModal"
-import MUIAddTagModal from "./components/modals/MUIAddTagModal"
-import MUIChangeEmailModal from "./components/modals/MUIChangeEmailModal"
-import MUIChangePasswordModal from "./components/modals/MUIChangePasswordModal"
-import MUIChangeProfilePicModal from "./components/modals/MUIChangeProfilePicModal"
-import MUIChangeUsernameModal from "./components/modals/MUIChangeUsernameModal"
-import MUICommentModal from "./components/modals/MUICommentModal"
-import MUICreateMapModal from "./components/modals/MUICreateMapModal"
-import MUIDeleteAccountModal from "./components/modals/MUIDeleteAccountModal"
-import MUIDeleteMapModal from "./components/modals/MUIDeleteMapModal"
-import MUIExportMapModal from "./components/modals/MUIExportMapModal"
-import MUIPublishMapModal from "./components/modals/MUIPublishMapModal"
-import AuthContext from "./auth"
-import api from "./store-api"
+import { createContext, useState, useContext, useEffect } from "react";
+import MUIAddFieldModal from "./components/modals/MUIAddFieldModal";
+import MUIAddTagModal from "./components/modals/MUIAddTagModal";
+import MUIChangeEmailModal from "./components/modals/MUIChangeEmailModal";
+import MUIChangePasswordModal from "./components/modals/MUIChangePasswordModal";
+import MUIChangeProfilePicModal from "./components/modals/MUIChangeProfilePicModal";
+import MUIChangeUsernameModal from "./components/modals/MUIChangeUsernameModal";
+import MUICommentModal from "./components/modals/MUICommentModal";
+import MUICreateMapModal from "./components/modals/MUICreateMapModal";
+import MUIDeleteAccountModal from "./components/modals/MUIDeleteAccountModal";
+import MUIDeleteMapModal from "./components/modals/MUIDeleteMapModal";
+import MUIExportMapModal from "./components/modals/MUIExportMapModal";
+import MUIPublishMapModal from "./components/modals/MUIPublishMapModal";
+import AuthContext from "./auth";
+import api from "./store-api";
 
-const geobuf = require('geobuf')
-const Pbf = require('pbf')
+const geobuf = require("geobuf");
+const Pbf = require("pbf");
 
 export const GlobalStoreContext = createContext({});
 
@@ -41,22 +41,21 @@ function GlobalStoreContextProvider(props) {
         //Map Viewing
         geojson: null,
         currentArea: -1,
-        byFeature: null, 
+        byFeature: null,
 
         //Add Field Modal
         fieldString: null,
 
         // Map likes and dislikes
         likes: 0,
-        dislikes: 0
-    })
+        dislikes: 0,
+    });
 
     useEffect(() => {
         if (store && store.geojson !== null && store.currentMap) {
-            store.updateMapGeoJson()
+            store.updateMapGeoJson();
         }
     }, [store.geojson]);
-
 
     //Nav Global Handlers
     store.toggleBrowsePage = async (option) => {
@@ -65,21 +64,20 @@ function GlobalStoreContextProvider(props) {
             // Allow toggle if user is logged in or if the option is not "home"
             return setStore({
                 ...store,
-                togglebrowseHome: option === "home"
+                togglebrowseHome: option === "home",
             });
         } else {
             // If the user is not logged in and trying to access "My Maps", redirect to "Marketplace"
             return setStore({
                 ...store,
-                togglebrowseHome: false // false corresponds to "Marketplace"
+                togglebrowseHome: false, // false corresponds to "Marketplace"
             });
         }
-    }
-
+    };
 
     store.updateMapTag = async (mapId, tags) => {
         return await api.updateMapTag(mapId, tags);
-    }
+    };
 
     store.createMap = async (title, fileType, mapTemplate, files) => {
         const file = files[0]; // Assuming files is an array with the File object
@@ -96,84 +94,86 @@ function GlobalStoreContextProvider(props) {
                 // Encode the GeoJSON with geobuf
                 const buffer = geobuf.encode(geojson, new Pbf());
 
-                const response = await api.createNewMap(title, mapTemplate, buffer);
+                const response = await api.createNewMap(
+                    title,
+                    mapTemplate,
+                    buffer
+                );
 
-                return response
+                return response;
             }
         };
 
         // Read the content of the file as text
         reader.readAsText(file);
-    }
-
+    };
 
     store.getMyMapCollection = async (userId) => {
-        if (!userId) return;  // Add this line
+        if (!userId) return; // Add this line
 
-        const response = await api.getUserMaps(userId)
-        setStore(prevStore => ({
+        const response = await api.getUserMaps(userId);
+        setStore((prevStore) => ({
             ...prevStore,
             mapCollection: response.data.userMaps,
         }));
 
-        return response.data.userMaps
-    }
+        return response.data.userMaps;
+    };
 
     store.getMarketplaceCollection = async () => {
-        const response = await api.getAllMaps()
+        const response = await api.getAllMaps();
 
         setStore({
             ...store,
-            mapCollection: response.data.publishedMaps
-        })
-        return response.data.publishedMaps
-
-    }
+            mapCollection: response.data.publishedMaps,
+        });
+        return response.data.publishedMaps;
+    };
 
     store.renameMap = async (mapId, newName) => {
         // Call to backend API to update the map name
         await api.updateMapNameById(mapId, newName);
-    }
+    };
 
     store.deleteMap = async (mapId) => {
         await api.deleteMapById(mapId);
-    }
+    };
 
     store.duplicateMap = async (mapId) => {
         await api.createDuplicateMapById(mapId);
-    }
+    };
 
     store.forkMap = async (mapId) => {
         await api.createForkMapById(mapId);
-    }
+    };
 
     store.likeMap = async (id) => {
         const response = await api.likeMap(id);
         console.log(response);
         if (response.status === 200) {
-            setStore(prevStore => ({
+            setStore((prevStore) => ({
                 ...prevStore,
                 likes: response.data.metadata.like.length,
                 dislikes: response.data.metadata.dislike.length,
             }));
         }
-    }
+    };
 
     store.dislikeMap = async (id) => {
         const response = await api.dislikeMap(id);
         console.log(response);
         if (response.status === 200) {
-            setStore(prevStore => ({
+            setStore((prevStore) => ({
                 ...prevStore,
                 likes: response.data.metadata.like.length,
                 dislikes: response.data.metadata.dislike.length,
             }));
         }
-    }
+    };
 
     store.publishMap = async (mapId) => {
         await api.updateMapPublishStatus(mapId);
-    }
+    };
 
     store.getGeojson = async (geojsonId) => {
         const response = await api.getGeoJsonById(geojsonId);
@@ -184,18 +184,17 @@ function GlobalStoreContextProvider(props) {
             // Decode the GeoJSON
             const geojson = geobuf.decode(pbf);
 
-
-            setStore(prevStore => ({
+            setStore((prevStore) => ({
                 ...prevStore,
                 geojson: geojson,
             }));
 
             return geojson;
         }
-    }
+    };
 
     store.setCurrentArea = (value) => {
-        setStore(prevStore => {
+        setStore((prevStore) => {
             const updatedStore = {
                 ...prevStore,
                 currentArea: value,
@@ -206,12 +205,11 @@ function GlobalStoreContextProvider(props) {
     };
 
     store.setField = async (value) => {
-        setStore(prevStore => ({
+        setStore((prevStore) => ({
             ...prevStore,
             fieldString: value,
         }));
-
-    }
+    };
 
     store.setGeoJsonFeatures = async (newFeatures) => {
         setStore((prevStore) => {
@@ -219,7 +217,6 @@ function GlobalStoreContextProvider(props) {
                 ...prevStore.geojson,
                 features: newFeatures,
             };
-
 
             return {
                 ...prevStore,
@@ -230,7 +227,7 @@ function GlobalStoreContextProvider(props) {
 
     //Map Card Global Handlers
     store.searchForMapBy = async (filter, string) => {
-        let response
+        let response;
 
         if (store.togglebrowseHome) {
             response = await store.getMyMapCollection(auth.user.userId);
@@ -238,67 +235,67 @@ function GlobalStoreContextProvider(props) {
             response = await store.getMarketplaceCollection();
         }
 
-        let filteredArray = []
+        let filteredArray = [];
 
         // if (string !== "") {
         if (filter == "mapName") {
             filteredArray = response.filter((item) => {
-                return item.title[0].includes(string)
-            })
+                return item.title[0].includes(string);
+            });
         } else if (filter == "username") {
             filteredArray = response.filter((item) => {
-                return item.user[0].username.includes(string)
-            })
+                return item.user[0].username.includes(string);
+            });
         } else if (filter == "tag") {
             //Need UI implemenation and Backend
             filteredArray = response.filter((item) => {
-                return item.tag[0].includes(string)
-            })
+                return item.tag[0].includes(string);
+            });
         }
-        // } 
+        // }
 
         return setStore({
             ...store,
             mapCollection: filteredArray,
-        })
-    }
+        });
+    };
 
     store.sortMapBy = async (key, order) => {
         //key: 'alphabetical-order' or 'recent'
         //order: 'asc' for ascending, 'dec' for decending
-        const sortedArray = [...store.mapCollection]
+        const sortedArray = [...store.mapCollection];
 
         sortedArray.sort((a, b) => {
             if (key === "alphabetical-order") {
                 //'title' field
-                const valueA = a.title[0].toString().toLowerCase()
-                const valueB = b.title[0].toString().toLowerCase()
+                const valueA = a.title[0].toString().toLowerCase();
+                const valueB = b.title[0].toString().toLowerCase();
                 return order === "asc"
                     ? valueA.localeCompare(valueB)
-                    : valueB.localeCompare(valueA)
+                    : valueB.localeCompare(valueA);
             } else if (key === "recent") {
                 //'dateCreated' field
-                const valueA = new Date(a.dateCreated).getTime()
-                const valueB = new Date(b.dateCreated).getTime()
-                return order === "dec" ? valueA - valueB : valueB - valueA
+                const valueA = new Date(a.dateCreated).getTime();
+                const valueB = new Date(b.dateCreated).getTime();
+                return order === "dec" ? valueA - valueB : valueB - valueA;
             } else if (key === "most-liked") {
                 //'like' and 'dislike' field
-                const valueA = a.like.length - a.dislike.length
-                const valueB = b.like.length - b.dislike.length
-                return order === "dec" ? valueA - valueB : valueB - valueA
+                const valueA = a.like.length - a.dislike.length;
+                const valueB = b.like.length - b.dislike.length;
+                return order === "dec" ? valueA - valueB : valueB - valueA;
             } else if (key === "most-disliked") {
                 const valueA = a.dislike.length;
                 const valueB = b.dislike.length;
                 return order === "asc" ? valueB - valueA : valueA - valueB;
             }
-            return 0 // Default to no sorting
-        })
+            return 0; // Default to no sorting
+        });
 
         return setStore({
             ...store,
             mapCollection: sortedArray,
-        })
-    }
+        });
+    };
 
     // Modal Global Handlers
     const modalProps = {
@@ -306,43 +303,41 @@ function GlobalStoreContextProvider(props) {
         onClose: () => store.setCurrentModal(null), // Set onClose to close the modal
     };
 
-
     store.setCurrentModal = (option, id) => {
-
-        setStore(prevStore => ({
+        setStore((prevStore) => ({
             ...prevStore,
             currentModal: option,
             currentModalMapId: id,
         }));
-
-    }
+    };
 
     store.setCurrentMap = (mapMeta) => {
         return setStore({
             ...store,
-            currentMap: mapMeta
-        })
-    }
+            currentMap: mapMeta,
+        });
+    };
 
     store.getMapById = async (id) => {
         const response = await api.getMapById(id);
         if (response.status === 200) {
-            setStore(prevStore => ({
+            setStore((prevStore) => ({
                 ...prevStore,
                 currentMap: response.data.metadata,
                 likes: response.data.metadata.like.length,
                 dislikes: response.data.metadata.dislike.length,
             }));
         }
-    }
+    };
 
-    
     store.updateMapGeoJson = async () => {
         const buffer = geobuf.encode(store.geojson, new Pbf());
-        const response = await api.updateMapGeoJson(store.currentMap._id, buffer)
-        console.log(response)
-    }
-
+        const response = await api.updateMapGeoJson(
+            store.currentMap._id,
+            buffer
+        );
+        console.log(response);
+    };
 
     store.setByFeature = async (byFeatureOption) => {
         setStore((prevStore) => {
@@ -352,8 +347,6 @@ function GlobalStoreContextProvider(props) {
             };
         });
     };
-
-
 
     return (
         <GlobalStoreContext.Provider value={{ store }}>
