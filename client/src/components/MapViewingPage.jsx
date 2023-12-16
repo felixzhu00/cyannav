@@ -33,7 +33,7 @@ function MapViewingPage() {
 
   //Runs on initial load
   useEffect(() => {
-    if (id != null && store.geojson == null) {
+    if (id != null) {
       console.log("trigger1")
       store.getMapById(id);
       store.getGeojson(id);
