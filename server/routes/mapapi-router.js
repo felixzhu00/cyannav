@@ -93,11 +93,17 @@ router.post(
     mapMetadataSchemaController.postComment
 );
 
-// router.post(
-//     "/likecomment",
-//     auth.verify,
-//     mapMetadataSchemaController.likeComment
-// )
+router.post(
+    "/likecomment",
+    auth.verify,
+    mapMetadataSchemaController.likeComment
+)
+
+router.post(
+    "/dislikecomment",
+    auth.verify,
+    mapMetadataSchemaController.likeComment
+)
 
 router.post(
     "/getcommentbyid",
