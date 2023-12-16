@@ -42,13 +42,20 @@ export default function MUICreateMapModal(props) {
     const [title, setTitle] = useState("Untitled");
     const [fileType, setFileType] = useState("shapefiles");
     const [template, setTemplate] = useState("heatmap");
-    const [files, setFiles] = useState([]);
+    const [file, setFile] = useState(null);
     const [allowedFileTypes, setAllowedFileTypes] = useState({
         "application/zip": [".zip"],
     });
 
+    const onDrop = (acceptedFiles) => {
+        console.log(acceptedFiles);
+        if (acceptedFiles.length > 0) {
+            setFile(acceptedFiles[0]);
+        }
+    };
+
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        onDrop: handleFileChange,
+        onDrop,
         accept: allowedFileTypes,
         maxFiles: 1,
         multiple: false,
@@ -91,6 +98,7 @@ export default function MUICreateMapModal(props) {
 
     // Handler to file out files that do not match the allowed file types
     const handleFileChange = (files) => {
+        console.log(files);
         const filteredFiles = files.filter((file) =>
             allowedFileTypes.some((type) => file.name.endsWith(type))
         );
@@ -100,7 +108,7 @@ export default function MUICreateMapModal(props) {
 
     // Handler to create the map
     const handleCreateMap = async () => {
-        await store.createMap(title, fileType, template, files);
+        await store.createMap(title, fileType, template, file);
 
         // closes modal
         setOpen(false);
