@@ -1,7 +1,26 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import "leaflet/dist/leaflet.css";
-import { Typography, Box, Menu, MenuItem, Paper, Button, IconButton, TextField, Tabs, Tab, useTheme } from "@mui/material";
-import { Undo, Redo, Delete, KeyboardArrowDown, ThumbUp, ThumbDown } from "@mui/icons-material";
+import {
+  Typography,
+  Box,
+  Menu,
+  MenuItem,
+  Paper,
+  Button,
+  IconButton,
+  TextField,
+  Tabs,
+  Tab,
+  useTheme,
+} from "@mui/material";
+import {
+  Undo,
+  Redo,
+  Delete,
+  KeyboardArrowDown,
+  ThumbUp,
+  ThumbDown,
+} from "@mui/icons-material";
 import { useParams } from "react-router-dom";
 
 import MUIExportMapModal from "./modals/MUIExportMapModal";
@@ -19,7 +38,6 @@ function MapViewingPage() {
   const { auth } = useContext(AuthContext);
   const { id } = useParams();
 
-
   const [value, setValue] = useState("1");
 
   const [currentModel, setCurrentModel] = useState("");
@@ -31,13 +49,16 @@ function MapViewingPage() {
 
   const [features, setFeatures] = useState([]);
 
+  //trigger if textfield is unfocused
+  const [focusedField, setFocusedField] = useState(null);
+  const focusedFieldRef = useRef(null);
+
   //Runs on initial load
   useEffect(() => {
     if (id != null) {
-      console.log("trigger1")
       store.getMapById(id);
       store.getGeojson(id);
-      store.setCurrentArea(-1)
+      store.setCurrentArea(-1);
     }
   }, [id]);
 
@@ -50,8 +71,8 @@ function MapViewingPage() {
         }
         if (
           originalFields.radius === undefined &&
-          (store.currentMap.mapType === 'heatmap' ||
-            store.currentMap.mapType === 'pointmap')
+          (store.currentMap.mapType === "heatmap" ||
+            store.currentMap.mapType === "pointmap")
         ) {
           originalFields.radius = 0;
         }
@@ -60,12 +81,8 @@ function MapViewingPage() {
           fields: originalFields,
         };
       });
-
       setFeatures(updatedFeatures);
-
-      console.log("rerender1");
     }
-    console.log("rerender", store.geojson);
   }, [store.geojson]);
 
   // Separate useEffect for setting byFeature
@@ -81,41 +98,50 @@ function MapViewingPage() {
         store.setByFeature(store.geojson.features[0].fields._byFeature);
       }
     }
-    
   }, [features]);
 
-  // // Used for Indexing currentArea Feature in geojson array
-  // useEffect(() => {
-  //   console.log("current",store.currentArea)
-  // }, [store.currentArea]);
+  useEffect(() => {
+    // Compare current focusedField with the previous one
+    if (
+      features.length !== 0 &&
+      focusedFieldRef.current !== focusedField &&
+      !areFeaturesEqual(features, store.geojson.features)
+    ) {
+      store.setGeoJsonFeatures(features);
+    }
+    focusedFieldRef.current = focusedField;
+  }, [focusedField, features]);
 
   const areFeaturesEqual = (featuresA, featuresB) => {
     if (featuresA.length !== featuresB.length) {
       return false;
     }
-  
+
     for (let i = 0; i < featuresA.length; i++) {
       // Use a deep equality check for the fields property
-
-      console.log(deepEqual(featuresA[i].fields, featuresB[i].fields))
       if (!deepEqual(featuresA[i].fields, featuresB[i].fields)) {
         return false;
       }
     }
-  
+
     return true;
   };
-  
+
   // Recursive deep equality check
   const deepEqual = (a, b) => {
     if (a === b) {
       return true;
     }
-  
-    if (typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) {
+
+    if (
+      typeof a !== "object" ||
+      typeof b !== "object" ||
+      a === null ||
+      b === null
+    ) {
       return false;
     }
-  
+
     const keysA = Object.keys(a);
     const keysB = Object.keys(b);
 
@@ -128,43 +154,38 @@ function MapViewingPage() {
         return false;
       }
     }
-  
+
     return true;
   };
   useEffect(() => {
     if (store.byFeature !== null) {
-      addField("_byFeature", store.byFeature)
+      addField("_byFeature", store.byFeature);
     }
   }, [store.byFeature]);
 
   useEffect(() => {
     if (store.byFeature !== null) {
-      addField("_mapCenter", store.mapCenter)
-      console.log("rerender3")
+      addField("_mapCenter", store.mapCenter);
     }
   }, [store.mapCenter]);
 
   useEffect(() => {
     if (store.byFeature !== null) {
-      addField("_mapZoom", store.mapZoom)
-      console.log("rerender2")
+      addField("_mapZoom", store.mapZoom);
     }
   }, [store.mapZoom]);
 
-    useEffect(() => {
-    if (store && features.length !== 0 && !areFeaturesEqual(features, store.geojson.features)) {
-      store.setGeoJsonFeatures(features)
-    }
-  }, [features]);
-
-
+  //   useEffect(() => {
+  //   if (store && features.length !== 0 && !areFeaturesEqual(features, store.geojson.features)) {
+  //     store.setGeoJsonFeatures(features)
+  //   }
+  // }, [features]);
 
   // Temp way for now to add field, need a better way
   useEffect(() => {
     if (store && store.fieldString) {
       const key = store.fieldString;
       addField(key, "");
-      console.log("trigger5")
     }
   }, [store.fieldString]);
 
@@ -199,12 +220,13 @@ function MapViewingPage() {
 
     //reset byFeature
     if (store.byFeature == key) {
-      store.setByFeature(null)
+      store.setByFeature(null);
     }
   };
 
   // Handler to change the value of a field in the selected feature
   const changeFieldValue = async (key, newValue) => {
+    setFocusedField(key);
     setFeatures((prevFeatures) => {
       if (store.currentArea === -1) {
         // Feature not found, do nothing or handle accordingly
@@ -242,12 +264,12 @@ function MapViewingPage() {
     maxWidth: "90%",
   };
 
-
-
   function isNumeric(str) {
-    if (typeof str != "string") return false // we only process strings!  
-    return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
-      !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
+    if (typeof str != "string") return false; // we only process strings!
+    return (
+      !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+      !isNaN(parseFloat(str))
+    ); // ...and ensure strings of whitespace fail
   }
   /**
    * Like/Dislikes constants and states
@@ -257,16 +279,12 @@ function MapViewingPage() {
   const [hasDisliked, setHasDisliked] = useState(false);
   const [isPublished, setIsPublished] = useState(false);
 
-
-
   const handleChoroplethClick = (event) => {
     setAnchorElChoropleth(event.currentTarget);
   };
 
-
-
   const handleSelectedByFeature = (option) => {
-    store.setByFeature(option)
+    store.setByFeature(option);
     setAnchorElChoropleth(null);
   };
 
@@ -417,7 +435,6 @@ function MapViewingPage() {
     );
   };
 
-
   const mapView = () => {
     return (
       <Box
@@ -538,12 +555,7 @@ function MapViewingPage() {
       if (store.currentArea === -1) {
         return null;
       }
-
       const selectedFeature = features[store.currentArea];
-
-      console.log("current area", store.currentArea)
-      console.log("feature", features)
-
       return (
         <>
           <Box
@@ -566,47 +578,58 @@ function MapViewingPage() {
               }}
             >
               <TextField
-                value={selectedFeature && selectedFeature.fields && selectedFeature.fields.name}
+                value={
+                  selectedFeature &&
+                  selectedFeature.fields &&
+                  selectedFeature.fields.name
+                }
                 onChange={(e) => changeFieldValue("name", e.target.value)}
+                onBlur={() => setFocusedField(null)}
               />
               {/* No delete icon for 'name' */}
             </Box>
           </Box>
 
           {/* Mapping through other fields */}
-          {selectedFeature && selectedFeature.fields && Object.entries(selectedFeature.fields).map(
-            ([key, value]) =>
-              key !== "name" && key !== "_byFeature" && key !== "_mapZoom" && key !== "_mapCenter" && (
-                <Box
-                  key={key}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginBottom: "10px",
-                  }}
-                >
-                  <Box sx={{ alignSelf: "center", marginRight: "10px" }}>
-                    <Typography>{key}:</Typography>
-                  </Box>
+          {selectedFeature &&
+            selectedFeature.fields &&
+            Object.entries(selectedFeature.fields).map(
+              ([key, value]) =>
+                key !== "name" &&
+                key !== "_byFeature" &&
+                key !== "_mapZoom" &&
+                key !== "_mapCenter" && (
                   <Box
+                    key={key}
                     sx={{
                       display: "flex",
-                      flexDirection: "row",
-                      alignSelf: "flex-end",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      marginBottom: "10px",
                     }}
                   >
-                    <TextField
-                      value={value}
-                      onChange={(e) => changeFieldValue(key, e.target.value)}
-                    />
-                    <IconButton onClick={() => removeField(key)}>
-                      <Delete />
-                    </IconButton>
+                    <Box sx={{ alignSelf: "center", marginRight: "10px" }}>
+                      <Typography>{key}:</Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignSelf: "flex-end",
+                      }}
+                    >
+                      <TextField
+                        value={value}
+                        onChange={(e) => changeFieldValue(key, e.target.value)}
+                        onBlur={() => setFocusedField(null)}
+                      />
+                      <IconButton onClick={() => removeField(key)}>
+                        <Delete />
+                      </IconButton>
+                    </Box>
                   </Box>
-                </Box>
-              )
-          )}
+                )
+            )}
         </>
       );
     };
@@ -628,99 +651,104 @@ function MapViewingPage() {
       >
         {store.currentArea == -1 ? (
           <Typography variant="h6">Choose an area to edit</Typography>
-        ) : (<>
-          <Box>{fieldEdit()}</Box><Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              marginBottom: "10px", // Adjust as needed
-            }}
-          >
-            {auth.loggedIn && (
-              <Button
-                id="addFieldBtn"
-                variant="contained"
-                color="primary"
-                onClick={handleAddField}
-                sx={{
-                  marginBottom: "10px",
-                  color: "black",
-                  bgcolor: theme.palette.secondary.main,
-                }}
-              >
-                + Add Field
-              </Button>
-            )}
-
+        ) : (
+          <>
+            <Box>{fieldEdit()}</Box>
             <Box
               sx={{
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
+                marginBottom: "10px", // Adjust as needed
               }}
             >
-              <Typography sx={{ m: "10px" }}>{store.currentMap && store.currentMap.mapType} by:</Typography>
-              <Box sx={{ textAlign: "right" }}>
+              {auth.loggedIn && (
                 <Button
-                  onClick={handleChoroplethClick}
+                  id="addFieldBtn"
                   variant="contained"
+                  color="primary"
+                  onClick={handleAddField}
                   sx={{
+                    marginBottom: "10px",
                     color: "black",
-                    width: "150px",
                     bgcolor: theme.palette.secondary.main,
                   }}
                 >
-                  <Box
+                  + Add Field
+                </Button>
+              )}
+
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <Typography sx={{ m: "10px" }}>
+                  {store.currentMap && store.currentMap.mapType} by:
+                </Typography>
+                <Box sx={{ textAlign: "right" }}>
+                  <Button
+                    onClick={handleChoroplethClick}
+                    variant="contained"
                     sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      width: "100%",
+                      color: "black",
+                      width: "150px",
+                      bgcolor: theme.palette.secondary.main,
                     }}
                   >
-                    <span>{store.byFeature && store.byFeature}</span>
-                    <KeyboardArrowDown />
-                  </Box>
-                </Button>
-                <Menu
-                  anchorEl={anchorElChoropleth}
-                  open={Boolean(anchorElChoropleth)}
-                  onClose={() => { setAnchorElChoropleth(null) }}
-                  anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "left",
-                  }}
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "left",
-                  }}
-                >
-                  {
-                    store.geojson &&
-                    store.geojson.features &&
-                    store.currentArea !== null &&
-                    store.geojson.features[store.currentArea] &&
-                    store.geojson.features[store.currentArea].fields &&
-                    Object.entries(store.geojson.features[store.currentArea].fields).map(
-                      ([key, value]) => {
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        width: "100%",
+                      }}
+                    >
+                      <span>{store.byFeature && store.byFeature}</span>
+                      <KeyboardArrowDown />
+                    </Box>
+                  </Button>
+                  <Menu
+                    anchorEl={anchorElChoropleth}
+                    open={Boolean(anchorElChoropleth)}
+                    onClose={() => {
+                      setAnchorElChoropleth(null);
+                    }}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "left",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "left",
+                    }}
+                  >
+                    {store.geojson &&
+                      store.geojson.features &&
+                      store.currentArea !== null &&
+                      store.geojson.features[store.currentArea] &&
+                      store.geojson.features[store.currentArea].fields &&
+                      Object.entries(
+                        store.geojson.features[store.currentArea].fields
+                      ).map(([key, value]) => {
                         if (isNumeric(value) && key != "_byFeature") {
                           return (
-                            <MenuItem key={key} onClick={() => handleSelectedByFeature(key)}>
+                            <MenuItem
+                              key={key}
+                              onClick={() => handleSelectedByFeature(key)}
+                            >
                               {key}
                             </MenuItem>
                           );
                         }
                         return null;
-                      }
-                    )
-                  }
-                </Menu>
+                      })}
+                  </Menu>
+                </Box>
               </Box>
             </Box>
-          </Box>
-        </>
+          </>
         )}
-
-
       </Box>
     );
   };
@@ -788,7 +816,6 @@ function MapViewingPage() {
 }
 
 export default MapViewingPage;
-
 
 // useEffect(() => {
 //   if (store.geojson == null) {
