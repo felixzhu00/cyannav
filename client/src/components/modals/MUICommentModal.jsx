@@ -35,6 +35,7 @@ export default function MUICommentModal(props) {
     };
 
     const [commentText, setCommentText] = useState("");
+
     const handlePostComment = async () => {
         try {
             const response = await store.postComment(
@@ -45,7 +46,7 @@ export default function MUICommentModal(props) {
 
             // Assuming the response includes the newly added comment
             if (response && response.status === 200) {
-                props.onAddComment(response.data); // Call the parent function with the new comment
+                props.onAddComment(response); // Call the parent function with the new comment
             }
         } catch (error) {
             console.error("Error posting comment:", error);

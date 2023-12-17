@@ -85,7 +85,7 @@ export const updateMapTag = (id, newTags) =>
         .catch(handleError);
 
 export const updateMapPublishStatus = (id) =>
-    api.post("/api/publishmap", { id }).then(handleResponse).catch(handleError);
+    api.post(`/api/publishmap`, { id }).then(handleResponse).catch(handleError);
 
 export const updateMapGeoJson = (id, geoBuf) =>
     api
@@ -100,6 +100,16 @@ export const postComment = (text, parentCommentId, mapId) =>
 export const getcommentbyid = (id) =>
     api
         .post("/api/getcommentbyid", { id })
+        .then(handleResponse)
+        .catch(handleError);
+export const likeComment = (id) =>
+    api
+        .post(`/api/likecomment`, { id })
+        .then(handleResponse)
+        .catch(handleError);
+export const dislikeComment = (id) =>
+    api
+        .post(`/api/dislikecomment`, { id })
         .then(handleResponse)
         .catch(handleError);
 
@@ -199,6 +209,8 @@ const apis = {
     updateProfilePic,
     postComment,
     getcommentbyid,
+    likeComment,
+    dislikeComment,
 };
 
 export default apis;
