@@ -105,7 +105,7 @@ getGeoJsonById = async (req, res) => {
         }
 
         return res.status(200).json({
-            geoBuf: geojson.geoBuf, // TODO: (later) figure out geobuf
+            geoBuf: geojson.geoBuf,
         })
     } catch (err) {
         console.error("mapapi-controller::getGeoJsonById")
