@@ -59,6 +59,12 @@ function MapViewingPage() {
     }, [id]);
 
     useEffect(() => {
+        if (store.currentMap != null) {
+            setIsPublished(store.currentMap.published);
+        }
+    }, [store.currentMap]);
+
+    useEffect(() => {
         if (store.geojson && store.geojson.features && features.length == 0) {
             const updatedFeatures = store.geojson.features.map((feature) => {
                 const originalFields = { ...feature.fields };
@@ -211,8 +217,7 @@ function MapViewingPage() {
         // Comment bubble styling
         margin: theme.spacing(1),
         padding: theme.spacing(1),
-        backgroundColor: theme.palette.background.paper,
-        borderRadius: theme.shape.borderRadius,
+        backgroundColor: theme.palette.background.default,
         boxShadow: theme.shadows[2],
         maxWidth: "90%",
     };
@@ -224,10 +229,10 @@ function MapViewingPage() {
             !isNaN(parseFloat(str))
         ); // ...and ensure strings of whitespace fail
     }
+
     /**
      * Like/Dislikes constants and states
      */
-
     const [hasLiked, setHasLiked] = useState(false);
     const [hasDisliked, setHasDisliked] = useState(false);
     const [isPublished, setIsPublished] = useState(false);
@@ -353,12 +358,12 @@ function MapViewingPage() {
                     boxSizing: "border-box",
                     display: "flex",
                     justifyContent: "flex-end",
-                    bgcolor: theme.palette.primary.main, // Use theme color
+                    bgcolor: theme.palette.primary.main,
                     padding: "4px",
                     boxShadow: 4,
                     height: "60px",
                     zIndex: 1,
-                    position: "relative", // Ensure this element is positioned
+                    position: "relative",
                 }}
             >
                 <Box sx={{ width: "100%", height: "relative" }}>
@@ -468,10 +473,16 @@ function MapViewingPage() {
                     justifyContent: "flex-start",
                     padding: "10px",
                     width: "100%",
+                    height: "100%",
                     bgcolor: theme.palette.background.paper,
                 }}
             >
-                <Box sx={{ height: `calc(100vh - 181px)`, overflow: "auto" }}>
+                <Box
+                    sx={{
+                        height: `calc(100vh - 181px)`,
+                        overflow: "auto",
+                    }}
+                >
                     {" "}
                     {/* Use overflow auto */}
                     {/* Map through the comments and display them */}
@@ -493,20 +504,19 @@ function MapViewingPage() {
                         </Paper>
                     ))}
                 </Box>
-                {auth.loggedIn && (
-                    <Button
-                        variant="contained"
-                        sx={{
-                            mt: "auto",
-                            width: "100%",
-                            color: "black",
-                            bgcolor: theme.palette.secondary.main,
-                        }}
-                        onClick={handleComments}
-                    >
-                        Add Comment
-                    </Button>
-                )}
+
+                <Button
+                    disabled={!auth.loggedIn}
+                    variant="contained"
+                    sx={{
+                        width: "100%",
+                        color: "black",
+                        bgcolor: theme.palette.secondary.main,
+                    }}
+                    onClick={handleComments}
+                >
+                    Add Comment
+                </Button>
             </Box>
         );
     };
