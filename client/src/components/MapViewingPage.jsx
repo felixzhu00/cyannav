@@ -37,41 +37,80 @@ function MapViewingPage() {
       console.log("trigger1")
       store.getMapById(id);
       store.getGeojson(id);
+      store.setCurrentArea(-1)
     }
   }, [id]);
 
   useEffect(() => {
-    if (store.geojson && store.geojson.features && features.length == 0) {
-      console.log(store.geojson)
-
+    if (store.geojson && store.geojson.features) {
       const updatedFeatures = store.geojson.features.map((feature) => {
         const originalFields = { ...feature.fields };
         if (originalFields.name === undefined) {
           originalFields.name = feature.properties.admin;
+        }
+        if (
+          originalFields.radius === undefined &&
+          (store.currentMap.mapType === 'heatmap' ||
+            store.currentMap.mapType === 'pointmap')
+        ) {
+          originalFields.radius = 0;
         }
         return {
           ...feature,
           fields: originalFields,
         };
       });
-      setFeatures(updatedFeatures);
-      
-      //Sets the exisitng map by feature if it exist
-      if(store.geojson.features[0].fields && store.geojson.features[0].fields._byFeature){
-        const currentFeature = store.geojson.features[0].fields._byFeature
-        if(store.geojson.features[0].fields.hasOwnProperty(currentFeature)){
-          store.setByFeature(store.geojson.features[0].fields._byFeature)
-        }
+  
+      // Check if the features have actually changed before updating the state
+      if (!areFeaturesEqual(features, updatedFeatures)) {
+        setFeatures(updatedFeatures);
       }
-      console.log("rerender1")
+  
+      console.log("rerender1");
     }
-    console.log("rerender", store.geojson)
+    console.log("rerender", store.geojson);
   }, [store.geojson]);
+  
+  // Separate useEffect for setting byFeature
+  useEffect(() => {
+    if (
+      store.geojson &&
+      store.geojson.features &&
+      store.geojson.features[0].fields &&
+      store.geojson.features[0].fields._byFeature
+    ) {
+      const currentFeature = store.geojson.features[0].fields._byFeature;
+      if (store.geojson.features[0].fields.hasOwnProperty(currentFeature)) {
+        store.setByFeature(store.geojson.features[0].fields._byFeature);
+      }
+    }
+  }, [features]);
 
   // // Used for Indexing currentArea Feature in geojson array
   // useEffect(() => {
   //   console.log("current",store.currentArea)
   // }, [store.currentArea]);
+
+  const areFeaturesEqual = (featuresA, featuresB) => {
+    if (featuresA.length !== featuresB.length) {
+      return false;
+    }
+  
+    for (let i = 0; i < featuresA.length; i++) {
+      // Assuming features have a unique identifier, replace 'id' with the actual identifier
+      if (featuresA[i].id !== featuresB[i].id) {
+        return false;
+      }
+  
+      // Check if other properties are equal, adjust as needed
+      if (featuresA[i].fields !== featuresB[i].fields) {
+        return false;
+      }
+    }
+  
+    return true;
+  };
+
   useEffect(() => {
     if (store.byFeature !== null) {
       addField("_byFeature", store.byFeature)
@@ -94,11 +133,11 @@ function MapViewingPage() {
 
 
 
-  useEffect(() => {
-    if (store && features.length !== 0) {
-      store.setGeoJsonFeatures(features)
-    }
-  }, [features]);
+  // useEffect(() => {
+  //   if (store && features.length !== 0) {
+  //     store.setGeoJsonFeatures(features)
+  //   }
+  // }, [features]);
 
 
 
@@ -484,6 +523,8 @@ function MapViewingPage() {
 
       const selectedFeature = features[store.currentArea];
 
+      console.log("current area", store.currentArea)
+      console.log("feature", features)
 
       return (
         <>
