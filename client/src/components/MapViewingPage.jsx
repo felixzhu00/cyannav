@@ -82,23 +82,20 @@ function MapViewingPage() {
         };
       });
       setFeatures(updatedFeatures);
-    }
-  }, [store.geojson]);
 
-  // Separate useEffect for setting byFeature
-  useEffect(() => {
-    if (
-      store.geojson &&
-      store.geojson.features &&
-      store.geojson.features[0].fields &&
-      store.geojson.features[0].fields._byFeature
-    ) {
-      const currentFeature = store.geojson.features[0].fields._byFeature;
-      if (store.geojson.features[0].fields.hasOwnProperty(currentFeature)) {
-        store.setByFeature(store.geojson.features[0].fields._byFeature);
+      //Sets the exisitng map by feature if it exist
+      if (
+        store.geojson.features[0].fields &&
+        store.geojson.features[0].fields._byFeature
+      ) {
+        console.log("feature");
+        const currentFeature = store.geojson.features[0].fields._byFeature;
+        if (store.geojson.features[0].fields.hasOwnProperty(currentFeature)) {
+          store.setByFeature(store.geojson.features[0].fields._byFeature);
+        }
       }
     }
-  }, [features]);
+  }, [store.geojson]);
 
   useEffect(() => {
     // Compare current focusedField with the previous one
@@ -110,6 +107,7 @@ function MapViewingPage() {
       store.setGeoJsonFeatures(features);
     }
     focusedFieldRef.current = focusedField;
+    setFocusedField(null)
   }, [focusedField, features]);
 
   const areFeaturesEqual = (featuresA, featuresB) => {
@@ -159,27 +157,10 @@ function MapViewingPage() {
   };
   useEffect(() => {
     if (store.byFeature !== null) {
+      setFocusedField("feature")
       addField("_byFeature", store.byFeature);
     }
   }, [store.byFeature]);
-
-  useEffect(() => {
-    if (store.byFeature !== null) {
-      addField("_mapCenter", store.mapCenter);
-    }
-  }, [store.mapCenter]);
-
-  useEffect(() => {
-    if (store.byFeature !== null) {
-      addField("_mapZoom", store.mapZoom);
-    }
-  }, [store.mapZoom]);
-
-  //   useEffect(() => {
-  //   if (store && features.length !== 0 && !areFeaturesEqual(features, store.geojson.features)) {
-  //     store.setGeoJsonFeatures(features)
-  //   }
-  // }, [features]);
 
   // Temp way for now to add field, need a better way
   useEffect(() => {
@@ -225,24 +206,36 @@ function MapViewingPage() {
   };
 
   // Handler to change the value of a field in the selected feature
-  const changeFieldValue = async (key, newValue) => {
+  const changeFieldValue = async (key, newValue, updateAll = false) => {
     setFocusedField(key);
     setFeatures((prevFeatures) => {
-      if (store.currentArea === -1) {
-        // Feature not found, do nothing or handle accordingly
-        return prevFeatures;
-      }
+      if (!updateAll) {
+        if (store.currentArea === -1) {
+          // Feature not found, do nothing or handle accordingly
+          return prevFeatures;
+        }
 
-      const updatedFeatures = [...prevFeatures];
-      const updatedFeature = {
-        ...updatedFeatures[store.currentArea],
-        fields: {
-          ...updatedFeatures[store.currentArea].fields,
-          [key]: newValue,
-        },
-      };
-      updatedFeatures[store.currentArea] = updatedFeature;
-      return updatedFeatures;
+        const updatedFeatures = [...prevFeatures];
+        const updatedFeature = {
+          ...updatedFeatures[store.currentArea],
+          fields: {
+            ...updatedFeatures[store.currentArea].fields,
+            [key]: newValue,
+          },
+        };
+        updatedFeatures[store.currentArea] = updatedFeature;
+        return updatedFeatures;
+      } else {
+        return prevFeatures.map((feature, index) => {
+          return {
+            ...feature,
+            fields: {
+              ...feature.fields,
+              [key]: newValue,
+            },
+          };
+        });
+      }
     });
   };
 
@@ -596,9 +589,7 @@ function MapViewingPage() {
             Object.entries(selectedFeature.fields).map(
               ([key, value]) =>
                 key !== "name" &&
-                key !== "_byFeature" &&
-                key !== "_mapZoom" &&
-                key !== "_mapCenter" && (
+                key !== "_byFeature" && (
                   <Box
                     key={key}
                     sx={{
@@ -608,7 +599,12 @@ function MapViewingPage() {
                       marginBottom: "10px",
                     }}
                   >
-                    <Box sx={{ alignSelf: "center", marginRight: "10px" }}>
+                    <Box
+                      sx={{
+                        alignSelf: "center",
+                        marginRight: "10px",
+                      }}
+                    >
                       <Typography>{key}:</Typography>
                     </Box>
                     <Box
@@ -618,11 +614,23 @@ function MapViewingPage() {
                         alignSelf: "flex-end",
                       }}
                     >
-                      <TextField
-                        value={value}
-                        onChange={(e) => changeFieldValue(key, e.target.value)}
-                        onBlur={() => setFocusedField(null)}
-                      />
+                      {key !== "radius" ? (
+                        <TextField
+                          value={value}
+                          onChange={(e) =>
+                            changeFieldValue(key, e.target.value)
+                          }
+                          onBlur={() => setFocusedField(null)}
+                        />
+                      ) : (
+                        <TextField
+                          value={value}
+                          onChange={(e) =>
+                            changeFieldValue(key, e.target.value, true)
+                          }
+                          onBlur={() => setFocusedField(null)}
+                        />
+                      )}
                       <IconButton onClick={() => removeField(key)}>
                         <Delete />
                       </IconButton>
