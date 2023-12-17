@@ -324,7 +324,17 @@ updateMapNameById = async (req, res) => {
             return res.status(401).end()
         }
 
-        // TODO: (later) see if the title is already used for this user.
+        // Checks if this title already exists for the current user.
+        const userMapWithTitle = await MapMetadata.countDocuments({
+            title: title,
+            user: res.locals.userId,
+        })
+        if (userMapWithTitle > 0) {
+            return res.status(400).json({
+                errorMessage: "Map with title already exists.",
+            })
+        }
+
         // Make sure the following works
         const updated = await MapMetadata.findByIdAndUpdate(id, {
             title: title,
