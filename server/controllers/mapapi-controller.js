@@ -295,11 +295,28 @@ deleteMapById = async (req, res) => {
             return res.status(401).end()
         }
 
+        var toBeDeletedGeoJson = toBeDeleted.geojsonId
+
         const deleted = await MapMetadata.findByIdAndDelete(id)
         if (!deleted) {
             return res.status(500).end()
         }
-        // TODO: delete associated values as well
+
+        // Additional data to be deleted.
+        const geoJsonDeleted = await GeoJsonSchema.findByIdAndDelete(
+            toBeDeletedGeoJson
+        )
+        const commentsDeleted = await Comment.deleteMany({ associated_map: id })
+        if (!geoJsonDeleted) {
+            console.error(
+                `mapapi-controller::deleteMapById-> Associated goejson ${toBeDeletedGeoJson} failed to delete.`
+            )
+        }
+        if (!commentsDeleted) {
+            console.error(
+                `mapapi-controller::deleteMapById-> Associated comments failed to delete. Map id: ${id}`
+            )
+        }
 
         return res.status(200).end()
     } catch (err) {
@@ -570,20 +587,15 @@ dislikeMap = async (req, res) => {
 postComment = async (req, res) => {
     try {
         const { text, parentCommentId, mapId } = req.body
-        console.log(text)
-        console.log(parentCommentId)
-        console.log(mapId)
         if (
             !text ||
             !mapId ||
             !ObjectId.isValid(mapId)
             // || !ObjectId.isValid(parentCommentId)
         ) {
-            console.log("IM STILL HERE")
             return res.status(400).end()
         }
 
-        console.log(parentCommentId != null)
         var parentComment = undefined
         var map = undefined
         if (parentCommentId != null) {
@@ -605,6 +617,7 @@ postComment = async (req, res) => {
         const newComment = new Comment({
             author: res.locals.userId,
             text: text,
+            associated_map: mapId,
         })
 
         const saved = await newComment.save()

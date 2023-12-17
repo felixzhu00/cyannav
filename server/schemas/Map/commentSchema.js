@@ -1,7 +1,7 @@
 // const date = new Date(Date.now())
 
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const mongoose = require("mongoose")
+const Schema = mongoose.Schema
 
 const commentSchema = new Schema({
     author: {
@@ -38,7 +38,12 @@ const commentSchema = new Schema({
         type: String,
         required: true,
     },
-});
+    associated_map: {
+        type: Schema.Types.ObjectID,
+        ref: "mapMetadata",
+        required: true,
+    },
+})
 
-const commentModel = mongoose.model("comment", commentSchema);
-module.exports = commentModel;
+const commentModel = mongoose.model("comment", commentSchema)
+module.exports = commentModel
