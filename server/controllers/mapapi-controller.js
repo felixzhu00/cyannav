@@ -138,15 +138,16 @@ createNewMap = async (req, res) => {
             })
         }
 
-        // const userMapWithTitle = await MapMetadata.countDocuments({
-        //     title: title,
-        //     user: res.locals.userId,
-        // })
-        // if (userMapWithTitle > 0) {
-        //     return res.status(400).json({
-        //         errorMessage: "Map with title already exists.",
-        //     })
-        // }
+        // Checks if this title already exists for the current user.
+        const userMapWithTitle = await MapMetadata.countDocuments({
+            title: title,
+            user: res.locals.userId,
+        })
+        if (userMapWithTitle > 0) {
+            return res.status(400).json({
+                errorMessage: "Map with title already exists.",
+            })
+        }
 
         const newGeoJsonSchema = new GeoJsonSchema({
             geoBuf: buffer,
