@@ -50,6 +50,18 @@ function MapViewingPage() {
     const [features, setFeatures] = useState([]);
 
     const [comments, setComments] = useState([]);
+
+    /**
+     * Like/Dislikes constants and states
+     */
+    const [hasLiked, setHasLiked] = useState(false);
+    const [hasDisliked, setHasDisliked] = useState(false);
+
+    /**
+     * Map published status state
+     */
+    const [isPublished, setIsPublished] = useState(false);
+
     //Runs on initial load
     useEffect(() => {
         if (id != null && store.geojson == null) {
@@ -61,6 +73,36 @@ function MapViewingPage() {
     useEffect(() => {
         if (store.currentMap != null) {
             setIsPublished(store.currentMap.published);
+            setHasLiked(store.currentMap.like.includes(auth.user.userId));
+            setHasDisliked(store.currentMap.dislike.includes(auth.user.userId));
+        }
+
+        if (store.currentMap && store.currentMap.commentsId) {
+            const fetchComments = async () => {
+                const commentsPromises = store.currentMap.commentsId.map(
+                    (commentId) => store.getCommentById(commentId)
+                );
+                try {
+                    const commentsResponses = await Promise.all(
+                        commentsPromises
+                    );
+                    const fetchedComments = commentsResponses.map(
+                        (response) => ({
+                            ...response,
+                            hasLikedComment: response.upvotes.includes(
+                                auth.user.userId
+                            ),
+                            hasDislikedComment: response.downvotes.includes(
+                                auth.user.userId
+                            ),
+                        })
+                    );
+                    setComments(fetchedComments);
+                } catch (error) {
+                    console.error("Error fetching comments:", error);
+                }
+            };
+            fetchComments();
         }
     }, [store.currentMap]);
 
@@ -133,29 +175,6 @@ function MapViewingPage() {
             addField(key, "");
         }
     }, [store.fieldString]);
-
-    // Fetches comments when the component mounts or the id changes
-    useEffect(() => {
-        if (store.currentMap && store.currentMap.commentsId) {
-            const fetchComments = async () => {
-                const commentsPromises = store.currentMap.commentsId.map(
-                    (commentId) => store.getCommentById(commentId)
-                );
-                try {
-                    const commentsResponses = await Promise.all(
-                        commentsPromises
-                    );
-                    const fetchedComments = commentsResponses.map(
-                        (response) => response
-                    );
-                    setComments(fetchedComments);
-                } catch (error) {
-                    console.error("Error fetching comments:", error);
-                }
-            };
-            fetchComments();
-        }
-    }, [id, store]);
 
     // Handler to add a new field to the selected feature
     const addField = (key, value) => {
@@ -230,13 +249,6 @@ function MapViewingPage() {
         ); // ...and ensure strings of whitespace fail
     }
 
-    /**
-     * Like/Dislikes constants and states
-     */
-    const [hasLiked, setHasLiked] = useState(false);
-    const [hasDisliked, setHasDisliked] = useState(false);
-    const [isPublished, setIsPublished] = useState(false);
-
     const handleChoroplethClick = (event) => {
         setAnchorElChoropleth(event.currentTarget);
     };
@@ -268,14 +280,100 @@ function MapViewingPage() {
         setCurrentModel("addfield");
     };
 
+    /**
+     * Handler for when the user clicks on the like map button
+     */
     const handleLike = async () => {
-        // handles likes
-        await store.likeMap(store.currentMap._id);
+        if (hasLiked) {
+            // If already liked, send request to unlike the map
+            await store.likeMap(store.currentMap._id);
+            setHasLiked(false);
+        } else {
+            // If not liked, send request to like the map
+            await store.likeMap(store.currentMap._id);
+            setHasLiked(true);
+            setHasDisliked(false); // Reset dislike state
+        }
     };
 
+    /**
+     * Handler for when the user clicks on the dislike map button
+     */
     const handleDislike = async () => {
-        // handles dislikes
-        await store.dislikeMap(store.currentMap._id);
+        if (hasDisliked) {
+            // If already disliked, send request to undislike the map
+            await store.dislikeMap(store.currentMap._id);
+            setHasDisliked(false);
+        } else {
+            // If not disliked, send request to dislike the map
+            await store.dislikeMap(store.currentMap._id);
+            setHasDisliked(true);
+            setHasLiked(false); // Reset like state
+        }
+    };
+
+    /**
+     * Handler for when the user clicks on like comment. Dynamically updates the votes
+     * @param {*} commentId the id of the comment
+     */
+    const handleLikeComment = async (commentId) => {
+        await store.likeComment(commentId);
+        setComments(
+            comments.map((comment) => {
+                if (comment.id === commentId) {
+                    const hasLiked = comment.upvotes.includes(auth.user.userId);
+                    const hasDisliked = comment.downvotes.includes(
+                        auth.user.userId
+                    );
+                    return {
+                        ...comment,
+                        upvotes: hasLiked
+                            ? comment.upvotes.filter(
+                                  (userId) => userId !== auth.user.userId
+                              )
+                            : [...comment.upvotes, auth.user.userId],
+                        downvotes: hasDisliked
+                            ? comment.downvotes.filter(
+                                  (userId) => userId !== auth.user.userId
+                              )
+                            : comment.downvotes,
+                    };
+                }
+                return comment;
+            })
+        );
+    };
+
+    /**
+     * Handler for when the user clicks on dislike comment. Dynamically updates the votes
+     * @param {*} commentId the id of the comment
+     */
+    const handleDislikeComment = async (commentId) => {
+        const updatedComment = await store.dislikeComment(commentId);
+        setComments(
+            comments.map((comment) => {
+                if (comment.id === commentId) {
+                    const hasLiked = comment.upvotes.includes(auth.user.userId);
+                    const hasDisliked = comment.downvotes.includes(
+                        auth.user.userId
+                    );
+                    return {
+                        ...comment,
+                        upvotes: hasLiked
+                            ? comment.upvotes.filter(
+                                  (userId) => userId !== auth.user.userId
+                              )
+                            : comment.upvotes,
+                        downvotes: hasDisliked
+                            ? comment.downvotes.filter(
+                                  (userId) => userId !== auth.user.userId
+                              )
+                            : [...comment.downvotes, auth.user.userId],
+                    };
+                }
+                return comment;
+            })
+        );
     };
 
     const topLeft = () => {
@@ -462,7 +560,6 @@ function MapViewingPage() {
             </Box>
         );
     };
-
     const commentSide = () => {
         return (
             <Box
@@ -483,8 +580,6 @@ function MapViewingPage() {
                         overflow: "auto",
                     }}
                 >
-                    {" "}
-                    {/* Use overflow auto */}
                     {/* Map through the comments and display them */}
                     {comments.map((comment, index) => (
                         <Paper key={index} sx={commentBubbleStyle}>
@@ -496,10 +591,43 @@ function MapViewingPage() {
                                 sx={{ display: "block", marginTop: "5px" }}
                             >
                                 <Typography variant="caption">
-                                    {comment.author}
+                                    Author: {comment.author}
                                 </Typography>
                                 <br></br>
                                 {new Date(comment.ask_date).toLocaleString()}
+                            </Typography>
+
+                            <IconButton
+                                sx={{
+                                    color: comment.upvotes.includes(
+                                        auth.user.userId
+                                    )
+                                        ? "black"
+                                        : "default",
+                                }}
+                                onClick={() => handleLikeComment(comment.id)}
+                            >
+                                <ThumbUp sx={{ fontSize: "small" }}></ThumbUp>
+                            </IconButton>
+                            <Typography variant="caption">
+                                {comment.upvotes.length}
+                            </Typography>
+                            <IconButton
+                                sx={{
+                                    color: comment.downvotes.includes(
+                                        auth.user.userId
+                                    )
+                                        ? "black"
+                                        : "default",
+                                }}
+                                onClick={() => handleDislikeComment(comment.id)}
+                            >
+                                <ThumbDown
+                                    sx={{ fontSize: "small" }}
+                                ></ThumbDown>
+                            </IconButton>
+                            <Typography variant="caption">
+                                {comment.downvotes.length}
                             </Typography>
                         </Paper>
                     ))}
