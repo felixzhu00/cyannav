@@ -46,10 +46,6 @@ const mapMetadataSchema = new Schema({
         type: Date,
         default: Date.now,
     },
-    thumbnail: {
-        data: Buffer,
-        type: String,
-    },
     geojsonId: {
         type: Schema.Types.ObjectID,
         ref: "geojson",

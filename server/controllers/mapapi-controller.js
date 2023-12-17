@@ -161,8 +161,6 @@ createNewMap = async (req, res) => {
             title: title,
             user: res.locals.userId,
             mapType: type,
-            // TODO: (later)
-            // Generate thumbnail here?
             geojsonId: savedGeoJsonSchema._id,
         })
 
