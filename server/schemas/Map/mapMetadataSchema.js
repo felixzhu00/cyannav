@@ -2,12 +2,10 @@ const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 
 const mapMetadataSchema = new Schema({
-    title: [
-        {
-            type: String,
-            required: [true, "No title has been provided"],
-        },
-    ],
+    title: {
+        type: String,
+        required: [true, "No title has been provided"],
+    },
     user: [
         {
             type: Schema.Types.ObjectID,
@@ -48,10 +46,6 @@ const mapMetadataSchema = new Schema({
         type: Date,
         default: Date.now,
     },
-    thumbnail: {
-        data: Buffer,
-        type: String,
-    },
     geojsonId: {
         type: Schema.Types.ObjectID,
         ref: "geojson",
@@ -62,13 +56,6 @@ const mapMetadataSchema = new Schema({
             type: Schema.Types.ObjectID,
             ref: "comment",
             default: [],
-        },
-    ],
-    fieldDataId: [
-        {
-            type: Schema.Types.ObjectID,
-            ref: "geojson", // TODO: (later) change this to fieldData.
-            required: [true, "No fieldData have been specified."],
         },
     ],
     parentMapId: this,

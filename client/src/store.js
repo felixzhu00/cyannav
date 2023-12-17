@@ -242,7 +242,7 @@ function GlobalStoreContextProvider(props) {
         // if (string !== "") {
         if (filter == "mapName") {
             filteredArray = response.filter((item) => {
-                return item.title[0].includes(string)
+                return item.title.includes(string)
             })
         } else if (filter == "username") {
             filteredArray = response.filter((item) => {
@@ -270,8 +270,8 @@ function GlobalStoreContextProvider(props) {
         sortedArray.sort((a, b) => {
             if (key === "alphabetical-order") {
                 //'title' field
-                const valueA = a.title[0].toString().toLowerCase()
-                const valueB = b.title[0].toString().toLowerCase()
+                const valueA = a.title.toString().toLowerCase()
+                const valueB = b.title.toString().toLowerCase()
                 return order === "asc"
                     ? valueA.localeCompare(valueB)
                     : valueB.localeCompare(valueA)
