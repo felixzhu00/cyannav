@@ -20,7 +20,6 @@ const {
     getUserMaps,
     getAllPublishedMaps,
     getGeoJsonById,
-    getMapFieldsById,
     createNewMap,
     createDuplicateMapById,
     createForkMapById,
@@ -33,14 +32,12 @@ const {
 
 const MapMetaData = require("../schemas/Map/mapMetadataSchema")
 const GeoJsonSchema = require("../schemas/Map/geoJsonSchema")
-const MapFields = require("../schemas/Map/fieldDataSchema.js")
 
 jest.mock("../schemas/mapGraphicSchema")
 jest.mock("../schemas/tagSchema")
 jest.mock("../schemas/userProfileSchema")
 
 jest.mock("../schemas/Map/commentSchema")
-jest.mock("../schemas/Map/fieldDataSchema")
 jest.mock("../schemas/Map/geoJsonSchema")
 jest.mock("../schemas/Map/mapMetadataSchema")
 
@@ -58,7 +55,6 @@ describe("getMapById function", () => {
             mapType: "pointmap",
             published: true,
             geojsonId: buffer,
-            fieldDataId: buffer, //change when field data gets implemented
         })
         const req = { params: { id: 1 } }
         const res = {
@@ -77,7 +73,6 @@ describe("getMapById function", () => {
                 mapType: "pointmap",
                 published: true,
                 geojsonId: buffer,
-                fieldDataId: buffer, //change when field data gets implemented
             },
         })
     })
@@ -92,7 +87,6 @@ describe("getUserMaps function", () => {
             mapType: "pointmap",
             published: true,
             geojsonId: buffer,
-            fieldDataId: buffer, //change when field data gets implemented
         })
         const req = {
             params: {
@@ -118,7 +112,6 @@ describe("getUserMaps function", () => {
                 mapType: "pointmap",
                 published: true,
                 geojsonId: buffer,
-                fieldDataId: buffer, //change when field data gets implemented
             },
         })
     })
@@ -135,7 +128,6 @@ describe("getAllPublishedMaps function", () => {
                     mapType: "pointmap",
                     published: true,
                     geojsonId: buffer,
-                    fieldDataId: buffer,
                 },
             ]),
         })
@@ -163,7 +155,6 @@ describe("getGeoJsonById function", () => {
             mapType: "pointmap",
             published: true,
             geojsonId: buffer,
-            fieldDataId: buffer, //change when field data gets implemented
         })
         const req = {
             params: {
@@ -184,32 +175,6 @@ describe("getGeoJsonById function", () => {
     })
 })
 
-describe("getMapFieldsById function", () => {
-    it("correctly returns mapFields", async () => {
-        MapFields.findById = jest.fn().mockResolvedValueOnce({
-            geoBuf: buffer,
-        })
-        const req = {
-            body: {
-                id: 1,
-            },
-        }
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn(),
-            end: jest.fn(),
-        }
-        await getMapFieldsById(req, res)
-
-        expect(res.status).toHaveBeenCalledWith(200)
-        expect(res.json).toHaveBeenCalledWith({
-            mapFields: {
-                geoBuf: buffer,
-            },
-        })
-    })
-})
-
 //create new map tests
 
 // describe("createDuplicateMap function", () => {
@@ -222,7 +187,6 @@ describe("getMapFieldsById function", () => {
 //                 mapType: 'pointmap',
 //                 published: true,
 //                 geojsonId: buffer,
-//                 fieldDataId: buffer,
 //             }
 //         )
 //         MapMetaData.findById = jest.fn().mockReturnValueOnce({
@@ -234,7 +198,6 @@ describe("getMapFieldsById function", () => {
 //                     mapType: 'pointmap',
 //                     published: true,
 //                     geojsonId: buffer,
-//                     fieldDataId: buffer,
 //                 }
 //             ]),
 //         });
@@ -264,7 +227,6 @@ describe("deleteMapById function", () => {
             mapType: "pointmap",
             published: true,
             geojsonId: buffer,
-            fieldDataId: buffer, //change when field data gets implemented
         })
         MapMetaData.findByIdAndDelete = jest.fn().mockResolvedValueOnce(true)
         const req = { params: { id: 1 } }
@@ -291,7 +253,6 @@ describe("updateMapNameById function", () => {
             mapType: "pointmap",
             published: true,
             geojsonId: buffer,
-            fieldDataId: buffer, //change when field data gets implemented
         })
         MapMetaData.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(true)
         const req = { body: { id: 1, title: "hello" } }
@@ -318,7 +279,6 @@ describe("updateMapPublishStatus function", () => {
             mapType: "pointmap",
             published: true,
             geojsonId: buffer,
-            fieldDataId: buffer, //change when field data gets implemented
         })
         MapMetaData.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(true)
         const req = { body: { id: 1 } }
