@@ -60,17 +60,14 @@ function MapViewingPage() {
           fields: originalFields,
         };
       });
-  
-      // Check if the features have actually changed before updating the state
-      if (!areFeaturesEqual(features, updatedFeatures)) {
-        setFeatures(updatedFeatures);
-      }
-  
+
+      setFeatures(updatedFeatures);
+
       console.log("rerender1");
     }
     console.log("rerender", store.geojson);
   }, [store.geojson]);
-  
+
   // Separate useEffect for setting byFeature
   useEffect(() => {
     if (
@@ -84,6 +81,7 @@ function MapViewingPage() {
         store.setByFeature(store.geojson.features[0].fields._byFeature);
       }
     }
+    
   }, [features]);
 
   // // Used for Indexing currentArea Feature in geojson array
@@ -97,20 +95,42 @@ function MapViewingPage() {
     }
   
     for (let i = 0; i < featuresA.length; i++) {
-      // Assuming features have a unique identifier, replace 'id' with the actual identifier
-      if (featuresA[i].id !== featuresB[i].id) {
-        return false;
-      }
-  
-      // Check if other properties are equal, adjust as needed
-      if (featuresA[i].fields !== featuresB[i].fields) {
+      // Use a deep equality check for the fields property
+
+      console.log(deepEqual(featuresA[i].fields, featuresB[i].fields))
+      if (!deepEqual(featuresA[i].fields, featuresB[i].fields)) {
         return false;
       }
     }
   
     return true;
   };
+  
+  // Recursive deep equality check
+  const deepEqual = (a, b) => {
+    if (a === b) {
+      return true;
+    }
+  
+    if (typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) {
+      return false;
+    }
+  
+    const keysA = Object.keys(a);
+    const keysB = Object.keys(b);
 
+    if (keysA.length !== keysB.length) {
+      return false;
+    }
+
+    for (const key of keysA) {
+      if (!keysB.includes(key) || !deepEqual(a[key], b[key])) {
+        return false;
+      }
+    }
+  
+    return true;
+  };
   useEffect(() => {
     if (store.byFeature !== null) {
       addField("_byFeature", store.byFeature)
@@ -131,13 +151,11 @@ function MapViewingPage() {
     }
   }, [store.mapZoom]);
 
-
-
-  // useEffect(() => {
-  //   if (store && features.length !== 0) {
-  //     store.setGeoJsonFeatures(features)
-  //   }
-  // }, [features]);
+    useEffect(() => {
+    if (store && features.length !== 0 && !areFeaturesEqual(features, store.geojson.features)) {
+      store.setGeoJsonFeatures(features)
+    }
+  }, [features]);
 
 
 
@@ -180,7 +198,7 @@ function MapViewingPage() {
     });
 
     //reset byFeature
-    if(store.byFeature == key){
+    if (store.byFeature == key) {
       store.setByFeature(null)
     }
   };
