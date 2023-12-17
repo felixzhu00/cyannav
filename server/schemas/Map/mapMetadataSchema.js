@@ -58,13 +58,6 @@ const mapMetadataSchema = new Schema({
             default: [],
         },
     ],
-    fieldDataId: [
-        {
-            type: Schema.Types.ObjectID,
-            ref: "geojson", // TODO: (later) change this to fieldData.
-            required: [true, "No fieldData have been specified."],
-        },
-    ],
     parentMapId: this,
     tags: {
         type: [String],
