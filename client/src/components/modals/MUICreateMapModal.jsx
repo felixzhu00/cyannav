@@ -72,6 +72,7 @@ export default function MUICreateMapModal(props) {
     });
     const [dropzoneErrorMessage, setDropzoneErrorMessage] = useState("");
     const [noFileErrorMessage, setNoFileErrorMessage] = useState("");
+    const [uploadErrorMessage, setUploadErrorMessage] = useState("");
 
     /**
      * Check if the file being dropped is a valid file
@@ -158,8 +159,17 @@ export default function MUICreateMapModal(props) {
             );
             setDropzoneErrorMessage("");
         } else {
-            await store.createMap(title, fileType, template, file);
-            props.onClose();
+            const response = await store.createMap(
+                title,
+                fileType,
+                template,
+                file
+            );
+            if (response.status == 400) {
+                setUploadErrorMessage(response.data.errorMessage);
+            } else {
+                props.onClose();
+            }
             await store.getMyMapCollection(auth.user.userId);
         }
     };
@@ -349,6 +359,11 @@ export default function MUICreateMapModal(props) {
                         {noFileErrorMessage && (
                             <Alert severity="error" sx={{ mt: "10px" }}>
                                 {noFileErrorMessage}
+                            </Alert>
+                        )}
+                        {uploadErrorMessage && (
+                            <Alert severity="error" sx={{ mt: "10px" }}>
+                                {uploadErrorMessage}
                             </Alert>
                         )}
 

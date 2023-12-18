@@ -21,12 +21,13 @@ export default function MUIPublishMapModal(props) {
     const { store } = useContext(GlobalStoreContext);
     const { auth } = useContext(AuthContext);
 
-    const currentMapId = store.currentModalMapId;
+    const currentMapId = store.currentMap._id;
 
     const handlePublish = async () => {
         await store.publishMap(currentMapId);
         props.onClose();
         await store.getMyMapCollection(auth.user.userId);
+        await store.getMapById(currentMapId); // Refreshs map and get new published status.
     };
 
     return (
