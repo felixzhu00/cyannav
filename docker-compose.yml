@@ -5,10 +5,14 @@ services:
         container_name: client
         ports:
             - "80:80"
+            - "443:443"
+        restart: always
         depends_on:
             - server
         networks:
             - mern-networks
+        volumes:
+            - /etc/letsencrypt:/etc/letsencrypt
 
     server:
         build: ./server
