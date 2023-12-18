@@ -1,22 +1,24 @@
-import * as React from "react"
-import Box from "@mui/material/Box"
-import Button from "@mui/material/Button"
-import Typography from "@mui/material/Typography"
-import Modal from "@mui/material/Modal"
-import IconButton from "@mui/material/IconButton"
-import { Close } from "@mui/icons-material"
+import React, { useState, useContext } from "react";
+import { Close } from "@mui/icons-material";
 import {
+    Box,
+    Button,
     FormControl,
-    RadioGroup,
-    Radio,
     FormControlLabel,
     FormGroup,
-} from "@mui/material"
-import { useTheme } from "@emotion/react"
-import domtoimage from "dom-to-image"
-import { useState, useContext } from "react"
-import { GlobalStoreContext } from "../../store"
+    IconButton,
+    Modal,
+    RadioGroup,
+    Radio,
+    Typography,
+} from "@mui/material";
+import { useTheme } from "@emotion/react";
+import domtoimage from "dom-to-image";
+import { GlobalStoreContext } from "../../store";
 
+/**
+ * Modal box style
+ */
 const style = {
     position: "absolute",
     top: "50%",
@@ -24,24 +26,21 @@ const style = {
     transform: "translate(-50%, -50%)",
     width: 400,
     bgcolor: "background.paper",
-    border: "2px solid #000",
     boxShadow: 24,
     p: 4,
-}
+};
 
 export default function MUIExportMapModal(props) {
-    const theme = useTheme()
-    const [fileType, setFileType] = useState("jpeg")
-    const { store } = useContext(GlobalStoreContext)
+    const theme = useTheme();
+    const [fileType, setFileType] = useState("jpeg");
+    const { store } = useContext(GlobalStoreContext);
 
-    const [open, setOpen] = React.useState(props.open)
-    const handleClose = () => {
-        setOpen(false)
-        props.onClose()
-    }
-
+    /**
+     * Handler for when the user wants to export the map as PNG, JPEG, or NAVJSON
+     * @param {*} event
+     */
     const handleExport = (event) => {
-        const mapElement = document.getElementById("map")
+        const mapElement = document.getElementById("map");
 
         switch (fileType) {
             case "jpeg":
@@ -49,61 +48,66 @@ export default function MUIExportMapModal(props) {
                     .toJpeg(mapElement) // Creates image
                     .then(function (dataURL) {
                         // Temporary link to created image
-                        const tempLink = document.createElement("a")
-                        tempLink.href = dataURL
-                        tempLink.download = `${store.currentMap.title}.jpeg`
+                        const tempLink = document.createElement("a");
+                        tempLink.href = dataURL;
+                        tempLink.download = `${store.currentMap.title}.jpeg`;
                         // Click on behalf of user
-                        tempLink.click()
+                        tempLink.click();
                     })
                     .catch(function (err) {
-                        alert("JPEG export failed") // Simple alert for edge case
-                    })
-                break
+                        alert("JPEG export failed"); // Simple alert for edge case
+                    });
+                break;
             case "png":
                 domtoimage
                     .toPng(mapElement) // Creates image
                     .then(function (dataURL) {
                         // Temporary link to created image
-                        const tempLink = document.createElement("a")
-                        tempLink.href = dataURL
-                        tempLink.download = `${store.currentMap.title}.png`
+                        const tempLink = document.createElement("a");
+                        tempLink.href = dataURL;
+                        tempLink.download = `${store.currentMap.title}.png`;
                         // Click on behalf of user
-                        tempLink.click()
+                        tempLink.click();
                     })
                     .catch(function (err) {
-                        alert("PNG export failed") // Simple alert for edge case
-                    })
-                break
+                        alert("PNG export failed"); // Simple alert for edge case
+                    });
+                break;
             case "navjson":
                 const navjson = {
                     title: store.currentMap.title,
                     mapType: store.currentMap.mapType,
                     tags: store.currentMap.tags,
                     geojson: store.geojson,
-                }
+                };
                 // Convert to json text document
                 const navJsonStr =
                     "data:text/json;charset=utf-8," +
-                    encodeURIComponent(JSON.stringify(navjson))
+                    encodeURIComponent(JSON.stringify(navjson));
 
                 // Temp link to download form
-                const tempLink = document.createElement("a")
-                tempLink.href = navJsonStr
-                tempLink.download = `${store.currentMap.title}.navjson`
+                const tempLink = document.createElement("a");
+                tempLink.href = navJsonStr;
+                tempLink.download = `${store.currentMap.title}.navjson`;
                 // Click temp link
-                tempLink.click()
-                break
+                tempLink.click();
+                break;
         }
-    }
+        props.onClose();
+    };
 
+    /**
+     * Radio button changes for which file the user wants
+     * @param {*} e radio button
+     */
     const handleTypeChange = (e) => {
-        setFileType(e.target.value)
-    }
+        setFileType(e.target.value);
+    };
 
     return (
         <div>
             <Modal
-                open={open}
+                open={props.open}
                 aria-labelledby="export-map-modal-title"
                 aria-describedby="export-map-modal-description"
             >
@@ -122,7 +126,7 @@ export default function MUIExportMapModal(props) {
                         >
                             Export Map
                         </Typography>
-                        <IconButton onClick={handleClose}>
+                        <IconButton onClick={props.onClose}>
                             <Close />
                         </IconButton>
                     </Box>
@@ -186,7 +190,7 @@ export default function MUIExportMapModal(props) {
                                 Export
                             </Button>
                             <Button
-                                onClick={handleClose}
+                                onClick={props.onClose}
                                 variant="outlined"
                                 sx={{ color: "black", ml: "5px" }}
                             >
@@ -197,5 +201,5 @@ export default function MUIExportMapModal(props) {
                 </Box>
             </Modal>
         </div>
-    )
+    );
 }

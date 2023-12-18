@@ -1,51 +1,57 @@
-import * as React from 'react';
-import { useState, useContext, useEffect } from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
-import IconButton from '@mui/material/IconButton';
-import { Close } from '@mui/icons-material';
-import { TextField } from '@mui/material';
-import { useTheme } from '@emotion/react';
-import AuthContext from '../../auth.js';
+import React, { useState, useContext } from "react";
+import {
+    Alert,
+    Box,
+    Button,
+    Modal,
+    Typography,
+    IconButton,
+    TextField,
+} from "@mui/material";
+import { Close } from "@mui/icons-material";
+import { useTheme } from "@emotion/react";
+import AuthContext from "../../auth.js";
 
+/**
+ * Modal box style
+ */
 const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
     width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
+    bgcolor: "background.paper",
     boxShadow: 24,
     p: 4,
 };
 
 export default function MUIChangeUsernameModal(props) {
     // const [token, setToken] = useCookies(["user"]);
-
     const theme = useTheme();
     const { auth } = useContext(AuthContext);
-    const [open, setOpen] = useState(props.open);
-    const [newUsername, setNewUsername] = useState('');
+    const [newUsername, setNewUsername] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
-    const [errorMessage, setErrorMessage] = React.useState('');
-
-    const handleClose = () => {
-        setOpen(false)
-        props.onClose()
+    /**
+     * Handler to save the new username
+     */
+    const handleSave = async () => {
+        if (newUsername !== "") {
+            try {
+                await auth.updateUsername(newUsername, newUsername);
+                props.onClose();
+            } catch (error) {
+                setErrorMessage(error.message);
+            }
+        } else {
+            setErrorMessage("Please fill in all required fields.");
+        }
     };
 
-    const handleSave = async () => {
-        try {
-            await auth.updateUsername(newUsername, newUsername);
-            handleClose();
-        } catch (error) {
-            setErrorMessage(error.message);
-        }
-    }
-
+    /**
+     * Handler when the user types in a new username
+     */
     const handleUsernameChange = (event) => {
         setNewUsername(event.target.value);
     };
@@ -53,23 +59,33 @@ export default function MUIChangeUsernameModal(props) {
     return (
         <div>
             <Modal
-                open={open}
+                open={props.open}
                 aria-labelledby="change-username-modal-title"
                 aria-describedby="change-username-modal-description"
             >
                 <Box sx={style}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography id="change-username-modal-title" variant="h6" component="h2">
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Typography
+                            id="change-username-modal-title"
+                            variant="h6"
+                            component="h2"
+                        >
                             Change Username
                         </Typography>
-                        <IconButton onClick={handleClose}>
+                        <IconButton onClick={props.onClose}>
                             <Close />
                         </IconButton>
                     </Box>
                     <Box
                         component="form"
                         sx={{
-                            '& .MuiTextField-root': { m: 1, width: '95%' },
+                            "& .MuiTextField-root": { m: 1, width: "95%" },
                             mt: 2,
                         }}
                         noValidate
@@ -90,17 +106,41 @@ export default function MUIChangeUsernameModal(props) {
                             fullWidth
                             onChange={(event) => {
                                 handleUsernameChange(event);
-                                setErrorMessage('');
+                                setErrorMessage("");
                             }}
                         />
                         {errorMessage && (
-                            <Typography color="error" variant='subtitle2' sx={{ mt: 1, ml: 1 }}>
+                            <Alert severity="error" sx={{ mt: "10px" }}>
                                 {errorMessage}
-                            </Typography>
+                            </Alert>
                         )}
-                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
-                            <Button onClick={handleSave} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", mr: "10px", width: "90px" }}>Save</Button>
-                            <Button onClick={handleClose} variant="outlined" sx={{ color: "black" }}>Cancel</Button>
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                mt: 2,
+                                mr: 2,
+                            }}
+                        >
+                            <Button
+                                onClick={handleSave}
+                                variant="contained"
+                                sx={{
+                                    bgcolor: theme.palette.primary.main,
+                                    color: "black",
+                                    mr: "10px",
+                                    width: "90px",
+                                }}
+                            >
+                                Save
+                            </Button>
+                            <Button
+                                onClick={props.onClose}
+                                variant="outlined"
+                                sx={{ color: "black" }}
+                            >
+                                Cancel
+                            </Button>
                         </Box>
                     </Box>
                 </Box>

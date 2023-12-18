@@ -1,25 +1,27 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
-import IconButton from '@mui/material/IconButton';
-import { Close } from '@mui/icons-material';
-import { TextField } from '@mui/material';
-import { useContext,useEffect, useState } from 'react';
-import { useTheme } from '@mui/material';
-import { GlobalStoreContext } from '../../store' 
+import React, { useContext, useState } from "react";
+import {
+    Alert,
+    Box,
+    Button,
+    IconButton,
+    Modal,
+    TextField,
+    Typography,
+} from "@mui/material";
+import { Close } from "@mui/icons-material";
+import { useTheme } from "@mui/material";
+import { GlobalStoreContext } from "../../store";
 
-
-
+/**
+ * Modal box style
+ */
 const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
     width: 500,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
+    bgcolor: "background.paper",
     boxShadow: 24,
     p: 4,
 };
@@ -27,52 +29,59 @@ const style = {
 export default function MUIAddFieldModal(props) {
     const { store } = useContext(GlobalStoreContext);
     const theme = useTheme();
-    const [open, setOpen] = useState(props.open);
-    const [fieldName, setFieldName] = useState('');
+    const [fieldName, setFieldName] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
-    const handleClose = () => {
-        setOpen(false)
-        props.onClose()
-    };
-
+    /**
+     * Handler for adding a field to a map
+     */
     const handleAdd = async () => {
-        // console.log(store)
-        if(fieldName != ""){
-            await store.setField(fieldName)
-            handleClose()
-            console.log("field set")
-        }else{
-            //error message in UI
-            console.log("empty field")
+        if (fieldName != "") {
+            await store.setField(fieldName);
+            props.onClose();
+        } else {
+            setErrorMessage("Please fill in the required fields.");
         }
-
-        
-    }
+    };
 
     return (
         <div>
             <Modal
-                open={open}
+                open={props.open}
                 aria-labelledby="add-field-modal-title"
                 aria-describedby="add-field-modal-description"
             >
                 <Box sx={style}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography id="add-field-modal-title" variant="h6" component="h2">
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Typography
+                            id="add-field-modal-title"
+                            variant="h6"
+                            component="h2"
+                        >
                             Add Field
                         </Typography>
 
-                        <IconButton onClick={handleClose}>
+                        <IconButton onClick={props.onClose}>
                             <Close />
                         </IconButton>
                     </Box>
-                    <Typography id="add-field-modal-description" variant='body1' component="body1">
+                    <Typography
+                        id="add-field-modal-description"
+                        variant="body1"
+                        component="body1"
+                    >
                         What is the name of the field you would like to add?
                     </Typography>
                     <Box
                         component="form"
                         sx={{
-                            '& .MuiTextField-root': { m: 1, width: '95%' },
+                            "& .MuiTextField-root": { m: 1, width: "95%" },
                             mt: 2,
                         }}
                         noValidate
@@ -87,7 +96,19 @@ export default function MUIAddFieldModal(props) {
                             value={fieldName}
                             onChange={(e) => setFieldName(e.target.value)}
                         />
-                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
+                        {errorMessage && (
+                            <Alert severity="error" sx={{ mt: "10px" }}>
+                                {errorMessage}
+                            </Alert>
+                        )}
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                mt: 2,
+                                mr: 2,
+                            }}
+                        >
                             <Button
                                 onClick={handleAdd}
                                 variant="contained"
@@ -95,24 +116,23 @@ export default function MUIAddFieldModal(props) {
                                     bgcolor: theme.palette.primary.main,
                                     color: "black",
                                     mr: "5px",
-                                    width: '100px' // Set a fixed width
+                                    width: "100px",
                                 }}
                             >
                                 Add
                             </Button>
                             <Button
-                                onClick={handleClose}
+                                onClick={props.onClose}
                                 variant="outlined"
                                 sx={{
                                     color: "black",
                                     ml: "5px",
-                                    width: '100px' // Ensure the width is the same as the first button
+                                    width: "100px",
                                 }}
                             >
                                 Cancel
                             </Button>
                         </Box>
-
                     </Box>
                 </Box>
             </Modal>

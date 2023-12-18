@@ -15,12 +15,18 @@ import {
     MenuItem,
     InputLabel,
     TextField,
+    Paper,
+    Alert,
 } from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useDropzone } from "react-dropzone";
 import { useTheme } from "@emotion/react";
 import { GlobalStoreContext } from "../../store";
 import AuthContext from "../../auth.js";
 
+/**
+ * Modal box style
+ */
 const style = {
     position: "absolute",
     top: "50%",
@@ -28,9 +34,27 @@ const style = {
     transform: "translate(-50%, -50%)",
     width: 750,
     bgcolor: "background.paper",
-    border: "2px solid #000",
     boxShadow: 24,
     p: 4,
+};
+
+/**
+ * Dropzone style
+ */
+const dropzoneStyle = {
+    mt: 2,
+    border: "1px dashed grey",
+    padding: "20px",
+    textAlign: "center",
+    transition: "border .3s ease-in-out",
+};
+
+/**
+ * Style of the dropzone when the user drags a file on top of the dropzone
+ */
+const activeDropzoneStyle = {
+    borderColor: "green",
+    backgroundColor: "#f4f4f4",
 };
 
 export default function MUICreateMapModal(props) {
@@ -44,16 +68,36 @@ export default function MUICreateMapModal(props) {
     const [template, setTemplate] = useState("heatmap");
     const [file, setFile] = useState(null);
     const [allowedFileTypes, setAllowedFileTypes] = useState({
-        "application/zip": [".zip"],
+        "application/json": [".json"],
     });
+    const [dropzoneErrorMessage, setDropzoneErrorMessage] = useState("");
+    const [noFileErrorMessage, setNoFileErrorMessage] = useState("");
 
-    const onDrop = (acceptedFiles) => {
+    /**
+     * Check if the file being dropped is a valid file
+     * @param {*} acceptedFiles files with correct extension
+     * @param {*} fileRejections bad files
+     */
+    const onDrop = (acceptedFiles, fileRejections) => {
         console.log(acceptedFiles);
+        console.log(fileRejections);
         if (acceptedFiles.length > 0) {
             setFile(acceptedFiles[0]);
+            setDropzoneErrorMessage("");
+            setNoFileErrorMessage("");
+        }
+        if (fileRejections.length > 0) {
+            setFile(null);
+            setDropzoneErrorMessage(
+                "Invalid file type. Please upload a compatible file."
+            );
+            setNoFileErrorMessage("");
         }
     };
 
+    /**
+     * Dropzone config
+     */
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
         accept: allowedFileTypes,
@@ -61,12 +105,18 @@ export default function MUICreateMapModal(props) {
         multiple: false,
     });
 
+    /**
+     * Handler for closing the modal
+     */
     const handleClose = () => {
         setOpen(false);
         props.onClose();
     };
 
-    // Handler for changing radio buttons
+    /**
+     * Handler for changing radio buttons
+     * @param {*} event radio button
+     */
     const handleFileTypeChange = (event) => {
         setFileType(event.target.value);
         switch (event.target.value) {
@@ -90,30 +140,28 @@ export default function MUICreateMapModal(props) {
         }
     };
 
-    // Handler for map template drop-down menu changes
+    /**
+     * Handler for map template drop-down menu changes
+     * @param {*} event template
+     */
     const handleTemplateChange = (event) => {
-        // drop down menu
         setTemplate(event.target.value);
     };
 
-    // Handler to file out files that do not match the allowed file types
-    const handleFileChange = (files) => {
-        console.log(files);
-        const filteredFiles = files.filter((file) =>
-            allowedFileTypes.some((type) => file.name.endsWith(type))
-        );
-        // Set the filtered files to state
-        setFiles(filteredFiles);
-    };
-
-    // Handler to create the map
+    /**
+     * Handler to create the map
+     */
     const handleCreateMap = async () => {
-        await store.createMap(title, fileType, template, file);
-
-        // closes modal
-        setOpen(false);
-        props.onClose();
-        await store.getMyMapCollection(auth.user.userId);
+        if (file === null) {
+            setNoFileErrorMessage(
+                "Please upload a compatible file to create map!"
+            );
+            setDropzoneErrorMessage("");
+        } else {
+            await store.createMap(title, fileType, template, file);
+            props.onClose();
+            await store.getMyMapCollection(auth.user.userId);
+        }
     };
 
     return (
@@ -164,7 +212,6 @@ export default function MUICreateMapModal(props) {
                                 sx={{ ml: 2, width: "75%" }}
                             />
                         </Box>
-
                         <FormGroup
                             sx={{
                                 display: "flex",
@@ -181,19 +228,19 @@ export default function MUICreateMapModal(props) {
                                         id="mapFileType"
                                         row
                                         name="map-file-type"
-                                        defaultValue={"shapefiles"}
+                                        defaultValue={"geojson"}
                                         onChange={handleFileTypeChange}
                                     >
-                                        <FormControlLabel
-                                            value="shapefiles"
-                                            control={<Radio />}
-                                            label="Shapefiles"
-                                        />
                                         <FormControlLabel
                                             id="geojsonOption"
                                             value="geojson"
                                             control={<Radio />}
                                             label="GeoJSON"
+                                        />
+                                        <FormControlLabel
+                                            value="shapefiles"
+                                            control={<Radio />}
+                                            label="Shapefiles"
                                         />
                                         <FormControlLabel
                                             value="kml"
@@ -210,75 +257,100 @@ export default function MUICreateMapModal(props) {
                             </Box>
                         </FormGroup>
 
-                        <FormGroup
-                            sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                flexDirection: "row",
-                            }}
-                        >
-                            <Box sx={{ display: "flex", alignItems: "center" }}>
-                                <Typography sx={{ mr: 2 }}>
-                                    Select your map template:
-                                </Typography>
-                                <FormControl sx={{ m: 1, minWidth: 300 }}>
-                                    <InputLabel id="template-select-label">
-                                        Template
-                                    </InputLabel>
-                                    <Select
-                                        labelId="template-select-label"
-                                        id="template-select"
-                                        value={template}
-                                        label="Template"
-                                        onChange={handleTemplateChange}
-                                    >
-                                        <MenuItem
-                                            id="heatmapOption"
-                                            value={"heatmap"}
+                        {fileType !== "navjson" && (
+                            <FormGroup
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    flexDirection: "row",
+                                }}
+                            >
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                    }}
+                                >
+                                    <Typography sx={{ mr: 2 }}>
+                                        Select your map template:
+                                    </Typography>
+                                    <FormControl sx={{ m: 1, minWidth: 300 }}>
+                                        <InputLabel id="template-select-label">
+                                            Template
+                                        </InputLabel>
+                                        <Select
+                                            labelId="template-select-label"
+                                            id="template-select"
+                                            value={template}
+                                            label="Template"
+                                            onChange={handleTemplateChange}
                                         >
-                                            Heat Map
-                                        </MenuItem>
-                                        <MenuItem value={"distributiveflowmap"}>
-                                            Distributive Flow Map
-                                        </MenuItem>
-                                        <MenuItem value={"pointmap"}>
-                                            Point Map
-                                        </MenuItem>
-                                        <MenuItem value={"choroplethmap"}>
-                                            Choropleth Map
-                                        </MenuItem>
-                                        <MenuItem value={"3drectangle"}>
-                                            3D Rectangle Map
-                                        </MenuItem>
-                                    </Select>
-                                </FormControl>
-                            </Box>
-                        </FormGroup>
-
-                        <Box
+                                            <MenuItem
+                                                id="heatmapOption"
+                                                value={"heatmap"}
+                                            >
+                                                Heat Map
+                                            </MenuItem>
+                                            <MenuItem
+                                                value={"distributiveflowmap"}
+                                            >
+                                                Distributive Flow Map
+                                            </MenuItem>
+                                            <MenuItem value={"pointmap"}>
+                                                Point Map
+                                            </MenuItem>
+                                            <MenuItem value={"choroplethmap"}>
+                                                Choropleth Map
+                                            </MenuItem>
+                                            <MenuItem value={"3drectangle"}>
+                                                3D Rectangle Map
+                                            </MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Box>
+                            </FormGroup>
+                        )}
+                        <Paper
                             {...getRootProps({
-                                sx: {
-                                    mt: 2,
-                                    border: "1px dashed grey",
-                                    padding: "20px",
-                                    textAlign: "center",
-                                },
+                                sx: isDragActive
+                                    ? {
+                                          ...dropzoneStyle,
+                                          ...activeDropzoneStyle,
+                                      }
+                                    : dropzoneStyle,
                             })}
                         >
                             <input {...getInputProps()} />
+                            <CloudUploadIcon style={{ fontSize: 48 }} />
                             {isDragActive ? (
-                                <p>Drop the file here ...</p>
+                                <Typography>Drop the file here ...</Typography>
                             ) : (
-                                <p>
+                                <Typography>
                                     Drag 'n' drop a file here, or click to
                                     select one (
                                     {Object.keys(allowedFileTypes)
                                         .flatMap((key) => allowedFileTypes[key])
                                         .join(", ")}
                                     )
-                                </p>
+                                </Typography>
                             )}
-                        </Box>
+                        </Paper>
+                        {dropzoneErrorMessage ? (
+                            <Alert severity="warning" sx={{ mt: "10px" }}>
+                                {dropzoneErrorMessage}
+                            </Alert>
+                        ) : (
+                            file && (
+                                <Alert severity="success" sx={{ mt: "10px" }}>
+                                    File Uploaded: {file.name}
+                                </Alert>
+                            )
+                        )}
+                        {noFileErrorMessage && (
+                            <Alert severity="error" sx={{ mt: "10px" }}>
+                                {noFileErrorMessage}
+                            </Alert>
+                        )}
 
                         <Box
                             sx={{

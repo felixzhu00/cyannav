@@ -1,16 +1,20 @@
-import * as React from "react";
-import { useState, useContext } from "react";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import Modal from "@mui/material/Modal";
-import IconButton from "@mui/material/IconButton";
-import { Close, Store } from "@mui/icons-material";
-import { TextField } from "@mui/material";
+import React, { useState, useContext } from "react";
+import {
+    Box,
+    Button,
+    IconButton,
+    Modal,
+    TextField,
+    Typography,
+} from "@mui/material";
+import { Close } from "@mui/icons-material";
 import { useTheme } from "@emotion/react";
 import { GlobalStoreContext } from "../../store";
 import AuthContext from "../../auth.js";
 
+/**
+ * Modal box style
+ */
 const style = {
     position: "absolute",
     top: "50%",
@@ -18,7 +22,6 @@ const style = {
     transform: "translate(-50%, -50%)",
     width: 400,
     bgcolor: "background.paper",
-    border: "2px solid #000",
     boxShadow: 24,
     p: 4,
 };
@@ -27,15 +30,11 @@ export default function MUICommentModal(props) {
     const theme = useTheme();
     const { store } = useContext(GlobalStoreContext);
     const { auth } = useContext(AuthContext);
-
-    const [open, setOpen] = React.useState(props.open);
-    const handleClose = () => {
-        setOpen(false);
-        props.onClose();
-    };
-
     const [commentText, setCommentText] = useState("");
 
+    /**
+     * Handler for when the user posts a comment
+     */
     const handlePostComment = async () => {
         try {
             const response = await store.postComment(
@@ -44,20 +43,19 @@ export default function MUICommentModal(props) {
                 store.currentMap._id
             );
 
-            // Assuming the response includes the newly added comment
             if (response && response.status === 200) {
-                props.onAddComment(response); // Call the parent function with the new comment
+                props.onClose();
+                // props.onAddComment(response); // Call the parent function with the new comment
             }
         } catch (error) {
             console.error("Error posting comment:", error);
         }
-        handleClose();
     };
 
     return (
         <div>
             <Modal
-                open={open}
+                open={props.open}
                 aria-labelledby="comment-modal-title"
                 aria-describedby="comment-modal-description"
             >
@@ -77,7 +75,7 @@ export default function MUICommentModal(props) {
                             Comment
                         </Typography>
 
-                        <IconButton onClick={handleClose}>
+                        <IconButton onClick={props.onClose}>
                             <Close />
                         </IconButton>
                     </Box>
@@ -118,7 +116,7 @@ export default function MUICommentModal(props) {
                                 Send{" "}
                             </Button>
                             <Button
-                                onClick={handleClose}
+                                onClick={props.onClose}
                                 variant="outlined"
                                 sx={{ color: "black", ml: "5px" }}
                             >
