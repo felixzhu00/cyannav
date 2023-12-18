@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 import {
     Typography,
@@ -32,6 +32,7 @@ import { MuiColorInput } from "mui-color-input";
 import NavJSON from "./NavJSON";
 import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
+import * as turf from "@turf/turf";
 
 function MapViewingPage() {
     const theme = useTheme();
@@ -62,11 +63,17 @@ function MapViewingPage() {
      */
     const [isPublished, setIsPublished] = useState(false);
 
+    //trigger if textfield is unfocused
+    const [focusedField, setFocusedField] = useState(null);
+    const focusedFieldRef = useRef(null);
+
     //Runs on initial load
     useEffect(() => {
-        if (id != null && store.geojson == null) {
+        if (id != null) {
             store.getMapById(id);
             store.getGeojson(id);
+            store.setCurrentArea(-1);
+            store.setByFeature(null);
         }
     }, [id]);
 
@@ -106,13 +113,49 @@ function MapViewingPage() {
         }
     }, [store.currentMap]);
 
+
     useEffect(() => {
-        if (store.geojson && store.geojson.features && features.length == 0) {
+        if (store.geojson && store.geojson.features) {
             const updatedFeatures = store.geojson.features.map((feature) => {
                 const originalFields = { ...feature.fields };
+
+                //Set name field if name doesnt exist
                 if (originalFields.name === undefined) {
                     originalFields.name = feature.properties.admin;
                 }
+
+                //Set center if center doesnt exist
+                if (
+                    originalFields.center_longitude === undefined &&
+                    originalFields.center_latitude === undefined
+                ) {
+                    const coordinates =
+                        turf.centerOfMass(feature).geometry.coordinates;
+                    const roundedCoordinates = coordinates.map((coord) =>
+                        parseFloat(coord).toFixed(3)
+                    );
+                    const [lng, lat] = roundedCoordinates;
+                    originalFields.center_longitude = String(lng);
+                    originalFields.center_latitude = String(lat);
+                }
+
+                // Add required radius field for heatmap and pointmap
+                if (
+                    originalFields.radius === undefined &&
+                    (store.currentMap.mapType === "heatmap" ||
+                        store.currentMap.mapType === "pointmap")
+                ) {
+                    originalFields.radius = 0;
+                }
+
+                // Add required scale field for distributiveflowmap
+                if (
+                    originalFields.scale === undefined &&
+                    store.currentMap.mapType === "distributiveflowmap"
+                ) {
+                    originalFields.scale = 0;
+                }
+
                 return {
                     ...feature,
                     fields: originalFields,
@@ -140,33 +183,77 @@ function MapViewingPage() {
         }
     }, [store.geojson]);
 
+    useEffect(() => {
+        // Compare current focusedField with the previous one
+        console.log(features);
+        if (
+            features.length !== 0 &&
+            focusedFieldRef.current !== focusedField &&
+            !areFeaturesEqual(features, store.geojson.features)
+        ) {
+            store.setGeoJsonFeatures(features);
+        }
+        focusedFieldRef.current = focusedField;
+        setFocusedField(null);
+    }, [focusedField, features]);
+        
     // // Used for Indexing currentArea Feature in geojson array
     // useEffect(() => {
     //   console.log("current",store.currentArea)
     // }, [store.currentArea]);
+
+    const areFeaturesEqual = (featuresA, featuresB) => {
+        if (featuresA.length !== featuresB.length) {
+            return false;
+        }
+
+        for (let i = 0; i < featuresA.length; i++) {
+            // Use a deep equality check for the fields property
+            if (!deepEqual(featuresA[i].fields, featuresB[i].fields)) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
+    // Recursive deep equality check
+    const deepEqual = (a, b) => {
+        if (a === b) {
+            return true;
+        }
+
+        if (
+            typeof a !== "object" ||
+            typeof b !== "object" ||
+            a === null ||
+            b === null
+        ) {
+            return false;
+        }
+
+        const keysA = Object.keys(a);
+        const keysB = Object.keys(b);
+
+        if (keysA.length !== keysB.length) {
+            return false;
+        }
+
+        for (const key of keysA) {
+            if (!keysB.includes(key) || !deepEqual(a[key], b[key])) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
     useEffect(() => {
         if (store.byFeature !== null) {
+            setFocusedField("feature");
             addField("_byFeature", store.byFeature);
         }
     }, [store.byFeature]);
-
-    useEffect(() => {
-        if (store.byFeature !== null) {
-            addField("_mapCenter", store.mapCenter);
-        }
-    }, [store.mapCenter]);
-
-    useEffect(() => {
-        if (store.byFeature !== null) {
-            addField("_mapZoom", store.mapZoom);
-        }
-    }, [store.mapZoom]);
-
-    useEffect(() => {
-        if (store && features.length !== 0) {
-            store.setGeoJsonFeatures(features);
-        }
-    }, [features]);
 
     // Temp way for now to add field, need a better way
     useEffect(() => {
@@ -212,26 +299,42 @@ function MapViewingPage() {
     };
 
     // Handler to change the value of a field in the selected feature
-    const changeFieldValue = async (key, newValue) => {
+    const changeFieldValue = async (key, newValue, updateAll = false) => {
+        setFocusedField(key);
         setFeatures((prevFeatures) => {
-            if (store.currentArea === -1) {
-                // Feature not found, do nothing or handle accordingly
-                return prevFeatures;
-            }
+            if (!updateAll) {
+                console.log("setting indiv", key, newValue);
 
-            const updatedFeatures = [...prevFeatures];
-            const updatedFeature = {
-                ...updatedFeatures[store.currentArea],
-                fields: {
-                    ...updatedFeatures[store.currentArea].fields,
-                    [key]: newValue,
-                },
-            };
-            updatedFeatures[store.currentArea] = updatedFeature;
-            return updatedFeatures;
+                if (store.currentArea === -1) {
+                    // Feature not found, do nothing or handle accordingly
+                    return prevFeatures;
+                }
+
+                const updatedFeatures = [...prevFeatures];
+                const updatedFeature = {
+                    ...updatedFeatures[store.currentArea],
+                    fields: {
+                        ...updatedFeatures[store.currentArea].fields,
+                        [key]: newValue,
+                    },
+                };
+                updatedFeatures[store.currentArea] = updatedFeature;
+                return updatedFeatures;
+            } else {
+                return prevFeatures.map((feature, index) => {
+                    return {
+                        ...feature,
+                        fields: {
+                            ...feature.fields,
+                            [key]: newValue,
+                        },
+                    };
+                });
+            }
         });
     };
 
+    
     const commentBubbleStyle = {
         // Comment bubble styling
         margin: theme.spacing(1),
@@ -560,6 +663,7 @@ function MapViewingPage() {
             </Box>
         );
     };
+
     const commentSide = () => {
         return (
             <Box
@@ -654,7 +758,6 @@ function MapViewingPage() {
             if (store.currentArea === -1) {
                 return null;
             }
-
             const selectedFeature = features[store.currentArea];
 
             return (
@@ -668,7 +771,6 @@ function MapViewingPage() {
                             marginBottom: "10px",
                         }}
                     >
-                        {/* <MuiColorInput value={color} onChange={} /> */}
                         <Box sx={{ alignSelf: "center", marginRight: "10px" }}>
                             <Typography>Name:</Typography>
                         </Box>
@@ -680,64 +782,111 @@ function MapViewingPage() {
                             }}
                         >
                             <TextField
-                                value={selectedFeature.fields.name}
+                                value={
+                                    selectedFeature &&
+                                    selectedFeature.fields &&
+                                    selectedFeature.fields.name
+                                }
                                 onChange={(e) =>
                                     changeFieldValue("name", e.target.value)
                                 }
+                                onBlur={() => setFocusedField(null)}
                             />
                             {/* No delete icon for 'name' */}
                         </Box>
                     </Box>
 
                     {/* Mapping through other fields */}
-                    {Object.entries(selectedFeature.fields).map(
-                        ([key, value]) =>
-                            key !== "name" &&
-                            key !== "_byFeature" &&
-                            key !== "_mapZoom" &&
-                            key !== "_mapCenter" && (
-                                <Box
-                                    key={key}
-                                    sx={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "space-between",
-                                        marginBottom: "10px",
-                                    }}
-                                >
+                    {selectedFeature &&
+                        selectedFeature.fields &&
+                        Object.entries(selectedFeature.fields).map(
+                            ([key, value]) =>
+                                key !== "name" &&
+                                key !== "_byFeature" && (
                                     <Box
-                                        sx={{
-                                            alignSelf: "center",
-                                            marginRight: "10px",
-                                        }}
-                                    >
-                                        <Typography>{key}:</Typography>
-                                    </Box>
-                                    <Box
+                                        key={key}
                                         sx={{
                                             display: "flex",
-                                            flexDirection: "row",
-                                            alignSelf: "flex-end",
+                                            alignItems: "center",
+                                            justifyContent: "space-between",
+                                            marginBottom: "10px",
                                         }}
                                     >
-                                        <TextField
-                                            value={value}
-                                            onChange={(e) =>
-                                                changeFieldValue(
-                                                    key,
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-                                        <IconButton
-                                            onClick={() => removeField(key)}
+                                        <Box
+                                            sx={{
+                                                alignSelf: "center",
+                                                marginRight: "10px",
+                                            }}
                                         >
-                                            <Delete />
-                                        </IconButton>
+                                            <Typography>
+                                                {key.charAt(0).toUpperCase() +
+                                                    key.slice(1)}
+                                                :
+                                            </Typography>
+                                        </Box>
+                                        <Box
+                                            sx={{
+                                                display: "flex",
+                                                flexDirection: "row",
+                                                alignSelf: "flex-end",
+                                            }}
+                                        >
+                                            {!(
+                                                key == "scale" ||
+                                                key == "radius" ||
+                                                key == "center_longitude" ||
+                                                key == "center_latitude"
+                                            ) ? (
+                                                <>
+                                                    <TextField
+                                                        value={value}
+                                                        onChange={(e) =>
+                                                            changeFieldValue(
+                                                                key,
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        onBlur={() =>
+                                                            setFocusedField(
+                                                                null
+                                                            )
+                                                        }
+                                                    />
+                                                    <IconButton
+                                                        onClick={() =>
+                                                            removeField(key)
+                                                        }
+                                                    >
+                                                        <Delete />
+                                                    </IconButton>
+                                                </>
+                                            ) : (
+                                                <TextField
+                                                    value={value}
+                                                    onChange={(e) => {
+                                                        key ==
+                                                            "center_longitude" ||
+                                                        key == "center_latitude"
+                                                            ? changeFieldValue(
+                                                                  key,
+                                                                  e.target.value
+                                                              )
+                                                            : changeFieldValue(
+                                                                  key,
+                                                                  e.target
+                                                                      .value,
+                                                                  true
+                                                              );
+                                                    }}
+                                                    onBlur={() =>
+                                                        setFocusedField(null)
+                                                    }
+                                                />
+                                            )}
+                                        </Box>
                                     </Box>
-                                </Box>
-                            )
-                    )}
+                                )
+                        )}
                 </>
             );
         };
@@ -750,7 +899,7 @@ function MapViewingPage() {
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "space-between",
-                    height: `calc(100vh - 125px)`,
+                    height: `calc(100vh - 121px)`,
                     width: "100%",
                     padding: "10px",
                     boxShadow: 1,
@@ -913,6 +1062,7 @@ function MapViewingPage() {
             <Box sx={{ gridColumn: "1", gridRow: "2", zIndex: 0 }}>
                 {mapView()}
             </Box>
+
             <Box sx={{ gridColumn: "2", gridRow: "2" }}>
                 {value === "1" ? editBar() : commentSide()}
             </Box>

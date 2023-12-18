@@ -58,6 +58,10 @@ function GlobalStoreContextProvider(props) {
         likes: 0,
         dislikes: 0,
 
+        // BrowsePage Sorting params
+        sortBy: "recent",
+        order: "asc",
+
         // Comment likes and dislikes
         commentLikes: 0,
         commentDislikes: 0,
@@ -68,6 +72,25 @@ function GlobalStoreContextProvider(props) {
             store.updateMapGeoJson();
         }
     }, [store.geojson]);
+
+    useEffect(() => {
+        if (store && store.mapCollection !== null) {
+            store.sortMapBy(store.sortBy, store.order);
+        }
+    }, [store.sortBy, store.order]);
+
+    store.setSortBy = async (sortBy) => {
+        setStore((prevStore) => ({
+            ...prevStore,
+            sortBy: sortBy,
+        }));
+    };
+    store.setOrder = async (order) => {
+        setStore((prevStore) => ({
+            ...prevStore,
+            order: order,
+        }));
+    };
 
     //Nav Global Handlers
     store.toggleBrowsePage = async (option) => {
@@ -96,52 +119,54 @@ function GlobalStoreContextProvider(props) {
 
         // Create a FileReader
         const reader = new FileReader();
+        // Wrap the logic in a Promise
+        const readPromise = () => {
+            return new Promise((resolve, reject) => {
+                // Define the event handler for when the file read is complete
+                reader.onloadend = async function (event) {
+                    if (event.target.readyState === FileReader.DONE) {
+                        var geojson = undefined;
+                        var tags = undefined;
+                        switch (fileType) {
+                            case "geojson":
+                                geojson = JSON.parse(event.target.result);
+                                break;
+                            case "kml":
+                                var kml = new DOMParser().parseFromString(
+                                    event.target.result
+                                );
+                                geojson = tj.kml(kml);
+                                break;
+                            case "shapefiles":
+                                await shp(event.target.result).then(
+                                    function (shpgeojson) {
+                                        geojson = shpgeojson;
+                                    },
+                                    function () {
+                                        alert("Invalid shapefile zip.");
+                                    }
+                                );
+                                break;
+                            case "navjson":
+                                const navjson = JSON.parse(event.target.result);
+                                geojson = navjson.geojson;
+                                mapTemplate = navjson.mapType;
+                                tags = navjson.tags;
+                                break;
+                        }
+        
+                        // Encode the GeoJSON with geobuf
+                        const buffer = geobuf.encode(geojson, new Pbf());
+        
+                        resolve(api.createNewMap(title, mapTemplate, buffer, tags));
+                    }
+                };
 
-        // Define the event handler for when the file read is complete
-        reader.onloadend = async function (event) {
-            if (event.target.readyState === FileReader.DONE) {
-                var geojson = undefined;
-                var tags = undefined;
-                switch (fileType) {
-                    case "geojson":
-                        geojson = JSON.parse(event.target.result);
-                        break;
-                    case "kml":
-                        var kml = new DOMParser().parseFromString(
-                            event.target.result
-                        );
-                        geojson = tj.kml(kml);
-                        break;
-                    case "shapefiles":
-                        await shp(event.target.result).then(
-                            function (shpgeojson) {
-                                geojson = shpgeojson;
-                            },
-                            function () {
-                                alert("Invalid shapefile zip.");
-                            }
-                        );
-                        break;
-                    case "navjson":
-                        const navjson = JSON.parse(event.target.result);
-                        geojson = navjson.geojson;
-                        mapTemplate = navjson.mapType;
-                        tags = navjson.tags;
-                        break;
-                }
-
-                // Encode the GeoJSON with geobuf
-                const buffer = geobuf.encode(geojson, new Pbf());
-
-                const response = await api.createNewMap(
-                    title,
-                    mapTemplate,
-                    buffer,
-                    tags
-                );
-
-                return response;
-            }
+                // Reject the promise if there's an error
+                reader.onerror = function (event) {
+                    reject(event.error);
+                };
+            });
         };
 
         if (fileType == "shapefiles") {
@@ -151,16 +176,33 @@ function GlobalStoreContextProvider(props) {
             // Read the content of the file as text
             reader.readAsText(mapFile);
         }
+
+        try {
+            // Wait for the Promise to resolve
+            const response = await readPromise();
+            return response;
+        } catch (error) {
+            // Handle errors
+            console.error("Error reading file:", error);
+        }
     };
 
     store.getMyMapCollection = async (userId) => {
-        if (!userId) return;
+        if (!userId) return; // Add this line
 
         const response = await api.getUserMaps(userId);
-        setStore((prevStore) => ({
-            ...prevStore,
-            mapCollection: response.data.userMaps,
-        }));
+
+        setStore((prevStore) => {
+            const updatedStore = {
+                ...prevStore,
+                mapCollection: response.data.userMaps,
+            };
+
+            // Call sortMapBy after updating mapCollection
+            return updatedStore;
+        });
+
+        await store.sortMapBy(store.sortBy, store.order);
 
         return response.data.userMaps;
     };
@@ -298,46 +340,52 @@ function GlobalStoreContextProvider(props) {
         }
         // }
 
-        return setStore({
-            ...store,
+        // Update prevStore with the new filtered array
+        setStore((prevStore) => ({
+            ...prevStore,
             mapCollection: filteredArray,
-        });
+        }));
+
+        // Sort mapCollection based on your sorting logic
+        store.sortMapBy(store.sortBy, "asc");
     };
-
     store.sortMapBy = async (key, order) => {
-        //key: 'alphabetical-order' or 'recent'
-        //order: 'asc' for ascending, 'dec' for decending
-        const sortedArray = [...store.mapCollection];
+        setStore((prevStore) => {
+            // key: 'alphabetical-order' or 'recent'
+            // order: 'asc' for ascending, 'dec' for descending
 
-        sortedArray.sort((a, b) => {
-            if (key === "alphabetical-order") {
-                //'title' field
-                const valueA = a.title.toString().toLowerCase();
-                const valueB = b.title.toString().toLowerCase();
-                return order === "asc"
-                    ? valueA.localeCompare(valueB)
-                    : valueB.localeCompare(valueA);
-            } else if (key === "recent") {
-                //'dateCreated' field
-                const valueA = new Date(a.dateCreated).getTime();
-                const valueB = new Date(b.dateCreated).getTime();
-                return order === "dec" ? valueA - valueB : valueB - valueA;
-            } else if (key === "most-liked") {
-                //'like' and 'dislike' field
-                const valueA = a.like.length - a.dislike.length;
-                const valueB = b.like.length - b.dislike.length;
-                return order === "dec" ? valueA - valueB : valueB - valueA;
-            } else if (key === "most-disliked") {
-                const valueA = a.dislike.length;
-                const valueB = b.dislike.length;
-                return order === "asc" ? valueB - valueA : valueA - valueB;
-            }
-            return 0; // Default to no sorting
-        });
+            const sortedArray = [...prevStore.mapCollection];
 
-        return setStore({
-            ...store,
-            mapCollection: sortedArray,
+            sortedArray.sort((a, b) => {
+                if (key === "alphabetical-order") {
+                    //'title' field
+                    const valueA = a.title[0].toString().toLowerCase();
+                    const valueB = b.title[0].toString().toLowerCase();
+                    return order === "asc"
+                        ? valueA.localeCompare(valueB)
+                        : valueB.localeCompare(valueA);
+                } else if (key === "recent") {
+                    //'dateCreated' field
+                    const valueA = new Date(a.dateCreated).getTime();
+                    const valueB = new Date(b.dateCreated).getTime();
+                    return order === "dec" ? valueA - valueB : valueB - valueA;
+                } else if (key === "most-liked") {
+                    //'like' and 'dislike' field
+                    const valueA = a.like.length - a.dislike.length;
+                    const valueB = b.like.length - b.dislike.length;
+                    return order === "dec" ? valueA - valueB : valueB - valueA;
+                } else if (key === "most-disliked") {
+                    const valueA = a.dislike.length;
+                    const valueB = b.dislike.length;
+                    return order === "asc" ? valueB - valueA : valueA - valueB;
+                }
+                return 0; // Default to no sorting
+            });
+
+            return {
+                ...prevStore,
+                mapCollection: sortedArray,
+            };
         });
     };
 
@@ -390,6 +438,7 @@ function GlobalStoreContextProvider(props) {
             };
         });
     };
+
 
     store.exportImage = async () => {
         const mapElement = Document.getElementById("map");
@@ -450,6 +499,7 @@ function GlobalStoreContextProvider(props) {
         }
         return null;
     };
+
 
     return (
         <GlobalStoreContext.Provider value={{ store }}>

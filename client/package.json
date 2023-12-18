@@ -9,6 +9,7 @@
         "@mapbox/togeojson": "^0.16.2",
         "@mui/icons-material": "^5.14.16",
         "@mui/material": "^5.14.17",
+        "@turf/turf": "^6.5.0",
         "assert": "^2.1.0",
         "axios": "^1.6.0",
         "buffer": "^6.0.3",

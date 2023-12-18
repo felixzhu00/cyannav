@@ -19,7 +19,6 @@ function BrowsePage() {
   //Search Sort options
   const [searchBy, setSearchBy] = useState('mapName'); // 'mapName' or 'username'
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('');
 
 
   // PAGE STUFF
@@ -54,14 +53,6 @@ function BrowsePage() {
     }
   }, [store.togglebrowseHome]);
 
-  // Sort functionality
-  useEffect(() => {
-    if (store.mapCollection != null) {
-      store.sortMapBy(sortBy, 'asc');
-    }
-  }, [sortBy]);
-
-
   useEffect(() => {
     if (auth.user != null) {
       if (store.togglebrowseHome) {
@@ -76,9 +67,6 @@ function BrowsePage() {
   useEffect(() => {
     if (store.mapCollection != null) {
       setTotalMaps(store.mapCollection.length)
-      if (sortBy == '') {
-        setSortBy('recent');
-      }
     }
   }, [store.mapCollection]);
 
@@ -97,7 +85,8 @@ function BrowsePage() {
   };
 
   const handleSortByChange = (event) => {
-    setSortBy(event.target.value);
+    store.setSortBy(event.target.value)
+    // implemet the asc and dec order later
   }
 
   const handleSearchInputChange = (event) => {
@@ -182,7 +171,7 @@ function BrowsePage() {
         <FormControl variant="outlined" sx={{ width: 200 }}>
           <Select
             id="outerSortByMenuBtn"
-            value={sortBy}
+            value={store.sortBy}
             onChange={handleSortByChange}
             displayEmpty
             inputProps={{ 'aria-label': 'Sort By' }}

@@ -19,10 +19,15 @@ export default function LoginScreen(props) {
     const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
+
+
+
         if (auth.user == null) {
             setErrorMessage(auth.error);
         } else {
-            navigate("/browsepage");
+            if(auth.loggedIn){
+                navigate('/browsepage');
+            }
         }
     }, [auth]);
 
