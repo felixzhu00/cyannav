@@ -1236,7 +1236,7 @@ function MapViewingPage() {
                 {mapView()}
             </Box>
 
-            <Box sx={{ gridColumn: "2", gridRow: "2" }}>
+            <Box key={comments.length} sx={{ gridColumn: "2", gridRow: "2" }}>
                 {value === "1" ? editBar() : commentSide()}
             </Box>
 
@@ -1255,7 +1255,10 @@ function MapViewingPage() {
             {currentModel === "comment" && (
                 <MUICommentModal
                     open={currentModel === "comment"}
-                    onClose={() => setCurrentModel("")}
+                    onClose={() => {
+                        setCurrentModel("")
+                        store.getMapById(store.currentMap._id)
+                    }}
                 />
             )}
             {currentModel === "addfield" && (
