@@ -7,7 +7,7 @@ const fileuploader = require("express-fileupload");
 const mongoose = require("mongoose");
 
 if (process.env.NODE_ENV === undefined) {
-  process.env.NODE_ENV = "development";
+    process.env.NODE_ENV = "development";
 }
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` }); // Loads .env
 
@@ -17,14 +17,14 @@ const port = process.env.SERVER_PORT;
 const app = express();
 
 // MIDDLE WARE
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(
-  cors({
-    origin: [`http://${corsOrigin}`], // TODO: change to https for production later
-    credentials: true,
-  })
+    cors({
+        origin: [`http://${corsOrigin}`], // TODO: change to https for production later
+        credentials: true,
+    })
 );
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 app.use(fileuploader());
 
@@ -40,7 +40,7 @@ db.on("error", console.error.bind(console, "MongoDB connection failed"));
 
 // Run server
 if (process.env.NODE_ENV !== "test") {
-  app.listen(port, () => console.log(`Server running on port ${port}`));
+    app.listen(port, () => console.log(`Server running on port ${port}`));
 }
 
 module.exports = app;
