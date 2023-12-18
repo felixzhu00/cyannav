@@ -408,6 +408,18 @@ updatePasscodeNotLoggedIn = async (req, res) => {
             })
         }
 
+        if (
+            password.length < 9 ||
+            [...password.matchAll(/[0-9]/g)].length == 0 || // numbers
+            [...password.matchAll(/\W/g)].length < 2 // Special characters
+        ) {
+            return res.status(401).json({
+                loggedIn: false,
+                user: null,
+                errorMessage: "Password fails security requirement.",
+            })
+        }
+
         const targetUser = await User.findOne({ email: email })
         if (!targetUser) {
             return res.status(401).json({
@@ -478,6 +490,18 @@ updatePasscode = async (req, res) => {
                     .status(401)
                     .json({ errorMessage: "Incorrect original password." })
             }
+        }
+
+        if (
+            password.length < 9 ||
+            [...password.matchAll(/[0-9]/g)].length == 0 || // numbers
+            [...password.matchAll(/\W/g)].length < 2 // Special characters
+        ) {
+            return res.status(401).json({
+                loggedIn: false,
+                user: null,
+                errorMessage: "Password fails security requirement.",
+            })
         }
 
         const hashed_password = await bcrypt.hash(password, saltRounds)
