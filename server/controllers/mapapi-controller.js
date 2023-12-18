@@ -709,13 +709,12 @@ updateMapGeoJson = async (req, res) => {
     try {
         const { id, geoBuf } = req.body // Extract the id from the URL parameter
 
-        if(geoBuf){
-            let bufferArray = Object.values(geoBuf)
-            let buffer = Buffer.from(bufferArray)
-        }
-        else{
+        // console.log(geoBuf)
+        if(!geoBuf){
             return res.status(400).end()
         }
+        let bufferArray = Object.values(geoBuf)
+        let buffer = Buffer.from(bufferArray)
 
         if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
