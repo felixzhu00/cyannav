@@ -96,19 +96,21 @@ function MapViewingPage() {
 
     useEffect(() => {
         if (store.currentMap == "Unauthorized") {
-            navigate("/unauthorized")
-            return
+            navigate("/unauthorized");
+            return;
         }
         if (store.currentMap == "Notfound") {
-            navigate("/notfound")
-            return
+            navigate("/notfound");
+            return;
         }
 
         if (store.currentMap != null) {
             setIsPublished(store.currentMap.published);
             if (auth.user && auth.user.userId) {
                 setHasLiked(store.currentMap.like.includes(auth.user.userId));
-                setHasDisliked(store.currentMap.dislike.includes(auth.user.userId));    
+                setHasDisliked(
+                    store.currentMap.dislike.includes(auth.user.userId)
+                );
             }
         }
 
@@ -125,14 +127,18 @@ function MapViewingPage() {
                         (response) => ({
                             ...response,
                             hasLikedComment: response.upvotes.includes(
-                                (auth.user && auth.user.userId) ? auth.user.userId : "####"
+                                auth.user && auth.user.userId
+                                    ? auth.user.userId
+                                    : "####"
                             ),
                             hasDislikedComment: response.downvotes.includes(
-                                (auth.user && auth.user.userId) ? auth.user.userId : "####"
+                                auth.user && auth.user.userId
+                                    ? auth.user.userId
+                                    : "####"
                             ),
                         })
                     );
-                    setComments(fetchedComments);
+                    setComments(fetchedComments.reverse());
                 } catch (error) {
                     console.error("Error fetching comments:", error);
                 }
@@ -610,7 +616,11 @@ function MapViewingPage() {
                             sx={{ "&.Mui-selected": { color: "black" } }}
                             onClick={handleEdit}
                             value="1"
-                            label={(store.currentMap && !store.currentMap.published) ? "Edit" : "Values"}
+                            label={
+                                store.currentMap && !store.currentMap.published
+                                    ? "Edit"
+                                    : "Values"
+                            }
                         />
                         <Tab
                             id="commentTab"
@@ -756,7 +766,9 @@ function MapViewingPage() {
                             <IconButton
                                 sx={{
                                     color: comment.upvotes.includes(
-                                        (auth.user && auth.user.userId) ? auth.user.userId : "####"
+                                        auth.user && auth.user.userId
+                                            ? auth.user.userId
+                                            : "####"
                                     )
                                         ? "black"
                                         : "default",
@@ -771,7 +783,9 @@ function MapViewingPage() {
                             <IconButton
                                 sx={{
                                     color: comment.downvotes.includes(
-                                        (auth.user && auth.user.userId) ? auth.user.userId : "####"
+                                        auth.user && auth.user.userId
+                                            ? auth.user.userId
+                                            : "####"
                                     )
                                         ? "black"
                                         : "default",
@@ -839,7 +853,10 @@ function MapViewingPage() {
                                 }
                                 onBlur={() => setFocusedField(null)}
                                 sx={{ width: "100%" }}
-                                disabled={store.currentMap && store.currentMap.published}
+                                disabled={
+                                    store.currentMap &&
+                                    store.currentMap.published
+                                }
                             />
                             {/* No delete icon for 'name' */}
                         </Box>
@@ -943,7 +960,11 @@ function MapViewingPage() {
                                                                     null
                                                                 )
                                                             }
-                                                            disabled={store.currentMap && store.currentMap.published}
+                                                            disabled={
+                                                                store.currentMap &&
+                                                                store.currentMap
+                                                                    .published
+                                                            }
                                                         />
                                                         <IconButton
                                                             onClick={() =>
@@ -978,7 +999,11 @@ function MapViewingPage() {
                                                                 null
                                                             )
                                                         }
-                                                        disabled={store.currentMap && store.currentMap.published}
+                                                        disabled={
+                                                            store.currentMap &&
+                                                            store.currentMap
+                                                                .published
+                                                        }
                                                     />
                                                 )}
                                             </Box>
@@ -1022,9 +1047,9 @@ function MapViewingPage() {
                                 fontWeight: "bold",
                             }}
                         >
-                            {store.currentMap && store.currentMap.published ?
-                            "Choose an area to view values" :
-                            "Choose an area to edit"}
+                            {store.currentMap && store.currentMap.published
+                                ? "Choose an area to view values"
+                                : "Choose an area to edit"}
                         </Typography>
                     </Box>
                 ) : (
@@ -1256,8 +1281,8 @@ function MapViewingPage() {
                 <MUICommentModal
                     open={currentModel === "comment"}
                     onClose={() => {
-                        setCurrentModel("")
-                        store.getMapById(store.currentMap._id)
+                        setCurrentModel("");
+                        store.getMapById(store.currentMap._id);
                     }}
                 />
             )}
