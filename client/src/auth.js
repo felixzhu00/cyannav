@@ -160,6 +160,20 @@ function AuthContextProvider(props) {
         }
     }
 
+    auth.reset = async function(email) {
+        const response = api.requestReset(email);
+        return response
+    }
+
+    auth.verify = async function(email, passcode) {
+        const response = api.verifyCode(email, passcode);
+        return response
+    }
+
+    auth.updatePasscodeNotLoggedIn = async function(email, password, confirmPassword){
+        const response = await api.updatePasscodeNotLoggedIn(email, password, confirmPassword);
+        return response
+    }
 
     auth.updateUsername = async function (newUsername) {
         const response = await api.updateUsername(newUsername, newUsername);

@@ -1,5 +1,7 @@
 const auth = require("../auth") // This is the auth manager, so some code should be abstracted to this file.
 const User = require("../schemas/userProfileSchema")
+const Passcode = require("../schemas/passcodeSchema")
+const nodemailer = require("nodemailer")
 
 const bcrypt = require("bcrypt")
 const saltRounds = 10
@@ -142,7 +144,6 @@ register = async (req, res) => {
         const { email, username, password, passwordVerify } = req.body
         console.log(req.body)
         if (!email || !username || !password || !passwordVerify) {
-            console.log("HERE")
             return res.status(400).json({
                 loggedIn: false,
                 user: null,
@@ -248,14 +249,171 @@ resetRequest = async (req, res) => {
     // Return status
     // send email
     // add verification code to database
+    try {
+        const { email } = req.body
+
+        if(!email){
+            return res.status(400).json({
+                user: null,
+                errorMessage: "Required fields empty.",
+            })
+        }
+
+        // Find user
+        const targetUser = await User.findOne({ email: email })
+        if (!targetUser) {
+            return res.status(401).json({
+                user: null,
+                errorMessage: "Email is not associated with a user",
+            })
+        }
+
+        //create verification code(6 digit number)
+        verificationCode = ''
+        for(let i = 0; i < 6; i++){
+            var randNum = Math.floor(Math.random() * 10)
+            verificationCode += randNum.toString()
+        }
+
+        //add passcode to db
+        const newPasscode = new Passcode({
+            userEmail: email,
+            creationDate: Date.now(),
+            passcode: verificationCode,
+        })
+        const saved = await newPasscode.save()
+
+        if (!saved) {
+            return res.status(500).end()
+        }
+
+        //send email
+        const transporter = nodemailer.createTransport({
+            service: "outlook",
+            auth: {
+                user: "cyannav416@outlook.com",
+                pass: "Cyannavrules"
+            }
+          });
+
+        const info = await transporter.sendMail({
+            from: "cyannav416@outlook.com",
+            to: email,
+            subject: "Reset Password",
+            text: "Here is your verification code: " + verificationCode +
+            "\nThis code expires in 10 minutes."
+        })
+
+        console.log(info.messageId)
+
+        return res.status(200)
+            .json({
+                user: {
+                    email: targetUser.email,
+                },
+            })
+    } catch (err) {
+        console.error("auth-controllers::resetRequest")
+        console.error(err)
+
+        return res.status(500).end()
+    }
 }
 
 verifyCode = async (req, res) => {
-    // Get code from req
-    // Send to auth manager
-    // Return status
-    // check code against databse
-    // if yes, then ask
+    try {
+        currentTime = Date.now()
+        const { email, passcode } = req.body
+
+        if(!email | !passcode){
+            return res.status(400).json({
+                user: null,
+                errorMessage: "Required fields empty.",
+            })
+        }
+        const targetPasscode = await Passcode.findOne({ userEmail: email })
+        if (!targetPasscode) {
+            return res.status(401).json({
+                errorMessage: "No verification code associated with this email",
+            })
+        }
+        const currpasscode = targetPasscode.passcode;
+
+        console.log((currentTime - targetPasscode.creationDate)/1000)
+        if((currentTime - targetPasscode.creationDate)/1000 > targetPasscode.expirationData){
+            return res.status(400).json({
+                errorMessage: "Verification code expired",
+            })
+        }
+        if(passcode != currpasscode){
+            return res.status(400).json({
+                errorMessage: "Incorrect verification code",
+            })
+        }
+
+        const result = await Passcode.findByIdAndDelete({_id: targetPasscode._id})
+        if(passcode == currpasscode && result ){
+            return res.status(200)
+            .json({
+                    email: targetPasscode.userEmail,
+                })
+        }
+        else {
+            return res.status(500).end()
+        }
+    } catch (err) {
+        console.error("auth-controllers::verifyCode")
+        console.error(err)
+
+        return res.status(500).end()
+    }
+}
+
+updatePasscodeNotLoggedIn = async (req, res) => {
+    try {
+        const { email, password, confirmPassword } = req.body
+
+        if(!email | !password | !confirmPassword){
+            return res.status(400).json({
+                user: null,
+                errorMessage: "Required fields empty.",
+            })
+        }
+
+        if(password != confirmPassword){
+            return res.status(401).json({
+                errorMessage: "Passwords do not match",
+            })
+        }
+
+        const targetUser = await User.findOne({ email: email })
+        if (!targetUser) {
+            return res.status(401).json({
+                errorMessage: "No user with this email exists",
+            })
+        }
+
+        const hashed_password = await bcrypt.hash(password, saltRounds)
+
+        if (!hashed_password) {
+            return res.status(500).end()
+        }
+
+        const success = await User.findByIdAndUpdate(targetUser._id, {
+            password: hashed_password,
+        })
+        if (!success) {
+            return res.status(500).end()
+        }
+        return res.status(200).json({
+            email: email,
+        }).end()
+    } catch (err) {
+        console.error("auth-controller::updatePassword")
+        console.error(err)
+
+        return res.status(500).end()
+    }
 }
 
 updatePasscode = async (req, res) => {
@@ -298,12 +456,6 @@ updatePasscode = async (req, res) => {
                     .status(401)
                     .json({ errorMessage: "Incorrect original password." })
             }
-        }
-
-        if (verificationCode) {
-            // TODO: (later)
-            // match verification code
-            // get userId from verification code.
         }
 
         const hashed_password = await bcrypt.hash(password, saltRounds)
@@ -442,6 +594,7 @@ module.exports = {
     register,
     resetRequest,
     verifyCode,
+    updatePasscodeNotLoggedIn,
     updatePasscode,
     updateUsername,
     updateEmail,
