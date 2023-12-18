@@ -221,6 +221,7 @@ register = async (req, res) => {
                     username: saved.username,
                     email: saved.email,
                     picture: null, // Since new user have no profile picture.
+                    userId: saved._id,
                 },
             })
     } catch (err) {
