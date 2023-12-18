@@ -413,7 +413,6 @@ likeComment = async (req, res) => {
         }
 
         const targetComment = await Comment.findById(id)
-        console.log(targetComment)
         if (!targetComment) {
             return res.status(404).end()
         }
@@ -474,7 +473,6 @@ dislikeComment = async (req, res) => {
         }
 
         const likeIndex = targetComment.upvotes.indexOf(userObjectId)
-        console.log(likeIndex)
         if (likeIndex > -1) {
             // If originally liked, remove the like
             targetComment.upvotes.splice(likeIndex, 1)
@@ -656,7 +654,6 @@ postComment = async (req, res) => {
 getCommentById = async (req, res) => {
     try {
         const { id } = req.body
-        console.log(id)
         if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
         }
@@ -696,7 +693,6 @@ updateMapTag = async (req, res) => {
         targetMap.tags = newTags
         const saved = await targetMap.save()
         if (!saved) {
-            console.log("rest")
             return res.status(500).end()
         }
         return res.status(200).end()
@@ -711,8 +707,13 @@ updateMapGeoJson = async (req, res) => {
     try {
         const { id, geoBuf } = req.body // Extract the id from the URL parameter
 
-        let bufferArray = Object.values(geoBuf)
-        let buffer = Buffer.from(bufferArray)
+        if(geoBuf){
+            let bufferArray = Object.values(geoBuf)
+            let buffer = Buffer.from(bufferArray)
+        }
+        else{
+            return res.status(400).end()
+        }
 
         if (!id || !ObjectId.isValid(id)) {
             return res.status(400).end()
