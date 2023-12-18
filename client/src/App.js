@@ -91,6 +91,7 @@ const App = () => {
               <Route path="/browsepage/" element={<BrowsePage />} />
               <Route path="/mapview/:id" element={<MapViewingPage />} />
               <Route path="/mapview" element={<Navigate to="/browsepage"/>} />
+              <Route path="/*" element={<Navigate to="/browsepage"/>} />
             </Routes>
           </BrowserRouter>
         </GlobalStoreContextProvider>
