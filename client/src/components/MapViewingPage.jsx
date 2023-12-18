@@ -96,13 +96,11 @@ function MapViewingPage() {
 
     useEffect(() => {
         if (store.currentMap == "Unauthorized") {
-            alert("You do not permission to access this map")
-            navigate("/browsepage")
+            navigate("/unauthorized")
             return
         }
         if (store.currentMap == "Notfound") {
-            alert("Map not found")
-            navigate("/browsepage")
+            navigate("/notfound")
             return
         }
 
