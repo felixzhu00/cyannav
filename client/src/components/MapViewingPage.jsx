@@ -108,8 +108,10 @@ function MapViewingPage() {
 
         if (store.currentMap != null) {
             setIsPublished(store.currentMap.published);
-            setHasLiked(store.currentMap.like.includes(auth.user.userId));
-            setHasDisliked(store.currentMap.dislike.includes(auth.user.userId));
+            if (auth.user && auth.user.userId) {
+                setHasLiked(store.currentMap.like.includes(auth.user.userId));
+                setHasDisliked(store.currentMap.dislike.includes(auth.user.userId));    
+            }
         }
 
         if (store.currentMap && store.currentMap.commentsId) {
@@ -125,10 +127,10 @@ function MapViewingPage() {
                         (response) => ({
                             ...response,
                             hasLikedComment: response.upvotes.includes(
-                                auth.user.userId
+                                (auth.user && auth.user.userId) ? auth.user.userId : "####"
                             ),
                             hasDislikedComment: response.downvotes.includes(
-                                auth.user.userId
+                                (auth.user && auth.user.userId) ? auth.user.userId : "####"
                             ),
                         })
                     );
@@ -605,18 +607,21 @@ function MapViewingPage() {
                             },
                         }}
                     >
-                        <Tab
-                            id="editTab"
-                            sx={{ "&.Mui-selected": { color: "black" } }}
-                            onClick={handleEdit}
-                            value="1"
-                            label="Edit"
-                        />
+                        {
+                            (store.currentMap && !store.currentMap.published) ?
+                            <Tab
+                                id="editTab"
+                                sx={{ "&.Mui-selected": { color: "black" } }}
+                                onClick={handleEdit}
+                                value="1"
+                                label="Edit"
+                            /> : ("")
+                        }
                         <Tab
                             id="commentTab"
                             sx={{ "&.Mui-selected": { color: "black" } }}
                             onClick={handleEdit}
-                            value="2"
+                            value={(store.currentMap && !store.currentMap.published) ? "2" : "1"}
                             label="Comment"
                         />
                     </Tabs>
@@ -756,7 +761,7 @@ function MapViewingPage() {
                             <IconButton
                                 sx={{
                                     color: comment.upvotes.includes(
-                                        auth.user.userId
+                                        (auth.user && auth.user.userId) ? auth.user.userId : "####"
                                     )
                                         ? "black"
                                         : "default",
@@ -771,7 +776,7 @@ function MapViewingPage() {
                             <IconButton
                                 sx={{
                                     color: comment.downvotes.includes(
-                                        auth.user.userId
+                                        (auth.user && auth.user.userId) ? auth.user.userId : "####"
                                     )
                                         ? "black"
                                         : "default",
@@ -1232,7 +1237,7 @@ function MapViewingPage() {
             </Box>
 
             <Box sx={{ gridColumn: "2", gridRow: "2" }}>
-                {value === "1" ? editBar() : commentSide()}
+                {value === "1" && store.currentMap && !store.currentMap.published ? editBar() : commentSide()}
             </Box>
 
             {currentModel === "export" && (

@@ -68,7 +68,7 @@ function GlobalStoreContextProvider(props) {
     });
 
     useEffect(() => {
-        if (store && store.geojson !== null && store.currentMap) {
+        if (store && store.geojson !== null && store.currentMap && !store.currentMap.published) {
             store.updateMapGeoJson();
         }
     }, [store.geojson]);
