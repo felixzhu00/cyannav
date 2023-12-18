@@ -96,13 +96,11 @@ function MapViewingPage() {
 
     useEffect(() => {
         if (store.currentMap == "Unauthorized") {
-            alert("You do not permission to access this map")
-            navigate("/browsepage")
+            navigate("/unauthorized")
             return
         }
         if (store.currentMap == "Notfound") {
-            alert("Map not found")
-            navigate("/browsepage")
+            navigate("/notfound")
             return
         }
 
@@ -1238,7 +1236,7 @@ function MapViewingPage() {
                 {mapView()}
             </Box>
 
-            <Box sx={{ gridColumn: "2", gridRow: "2" }}>
+            <Box key={comments.length} sx={{ gridColumn: "2", gridRow: "2" }}>
                 {value === "1" ? editBar() : commentSide()}
             </Box>
 
@@ -1257,7 +1255,10 @@ function MapViewingPage() {
             {currentModel === "comment" && (
                 <MUICommentModal
                     open={currentModel === "comment"}
-                    onClose={() => setCurrentModel("")}
+                    onClose={() => {
+                        setCurrentModel("")
+                        store.getMapById(store.currentMap._id)
+                    }}
                 />
             )}
             {currentModel === "addfield" && (

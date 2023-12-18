@@ -122,9 +122,14 @@ const App = () => {
                                 element={<Navigate to="/browsepage" />}
                             />
                             <Route
-                                path="/error"
+                                path="/notfound"
                                 element={<ErrorScreen errorType="notFound" />}
                             />
+                            <Route
+                                path="/unauthorized"
+                                element={<ErrorScreen errorType="unauthorized" />}
+                            />
+
                         </Routes>
                     </BrowserRouter>
                 </GlobalStoreContextProvider>
