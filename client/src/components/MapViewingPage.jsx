@@ -1,10 +1,16 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 import {
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
     Typography,
     Box,
     Menu,
     MenuItem,
+    List,
+    ListItem,
+    ListItemText,
     Paper,
     Button,
     IconButton,
@@ -17,6 +23,7 @@ import {
     Undo,
     Redo,
     Delete,
+    ExpandMore,
     KeyboardArrowDown,
     ThumbUp,
     ThumbDown,
@@ -113,7 +120,6 @@ function MapViewingPage() {
         }
     }, [store.currentMap]);
 
-
     useEffect(() => {
         if (store.geojson && store.geojson.features) {
             const updatedFeatures = store.geojson.features.map((feature) => {
@@ -196,7 +202,7 @@ function MapViewingPage() {
         focusedFieldRef.current = focusedField;
         setFocusedField(null);
     }, [focusedField, features]);
-        
+
     // // Used for Indexing currentArea Feature in geojson array
     // useEffect(() => {
     //   console.log("current",store.currentArea)
@@ -334,7 +340,6 @@ function MapViewingPage() {
         });
     };
 
-    
     const commentBubbleStyle = {
         // Comment bubble styling
         margin: theme.spacing(1),
@@ -754,6 +759,8 @@ function MapViewingPage() {
     };
 
     const editBar = () => {
+        const [selectedItem, setSelectedItem] = useState("");
+
         const fieldEdit = () => {
             if (store.currentArea === -1) {
                 return null;
@@ -763,25 +770,20 @@ function MapViewingPage() {
             return (
                 <>
                     <Box
-                        key={"name"}
                         sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            marginBottom: "10px",
+                            overflow: "auto",
+                            padding: "10px",
                         }}
                     >
-                        <Box sx={{ alignSelf: "center", marginRight: "10px" }}>
-                            <Typography>Name:</Typography>
-                        </Box>
                         <Box
+                            key={"name"}
                             sx={{
-                                display: "flex",
-                                flexDirection: "row",
-                                alignSelf: "flex-end",
+                                display: "flex", // Add this line
+                                mb: "10px",
                             }}
                         >
                             <TextField
+                                label="Name"
                                 value={
                                     selectedFeature &&
                                     selectedFeature.fields &&
@@ -791,102 +793,151 @@ function MapViewingPage() {
                                     changeFieldValue("name", e.target.value)
                                 }
                                 onBlur={() => setFocusedField(null)}
+                                sx={{ width: "100%" }}
                             />
                             {/* No delete icon for 'name' */}
                         </Box>
-                    </Box>
 
-                    {/* Mapping through other fields */}
-                    {selectedFeature &&
-                        selectedFeature.fields &&
-                        Object.entries(selectedFeature.fields).map(
-                            ([key, value]) =>
-                                key !== "name" &&
-                                key !== "_byFeature" && (
-                                    <Box
-                                        key={key}
-                                        sx={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "space-between",
-                                            marginBottom: "10px",
-                                        }}
-                                    >
+                        {/* <TextField
+                            label="FIELD WITH NO GARBAGE"
+                            defaultValue="Hello World"
+                        />
+
+                        <Box sx={{ display: "flex" }}>
+                            <TextField
+                                label="FIELD WITH GARBAGE"
+                                defaultValue="Hello World"
+                            />
+                            <IconButton onClick={() => removeField(key)}>
+                                <Delete />
+                            </IconButton>
+                        </Box>
+
+                        <Box
+                            sx={{
+                                display: "flex",
+                            }}
+                        >
+                            <TextField
+                                label="Longitude"
+                                defaultValue="Hello World"
+                                sx={{ mr: "5px" }}
+                            />
+                            <TextField
+                                label="Latitude"
+                                defaultValue="Hello World"
+                                sx={{ ml: "5px" }}
+                            />
+                        </Box>
+
+                        <Box
+                            sx={{
+                                display: "flex",
+                            }}
+                        >
+                            <MuiColorInput sx={{ mr: "5px" }}></MuiColorInput>
+                            <MuiColorInput sx={{ ml: "5px" }}></MuiColorInput>
+                        </Box> */}
+
+                        {/* Mapping through other fields */}
+                        {selectedFeature &&
+                            selectedFeature.fields &&
+                            Object.entries(selectedFeature.fields).map(
+                                ([key, value]) =>
+                                    key !== "name" &&
+                                    key !== "_byFeature" && (
                                         <Box
-                                            sx={{
-                                                alignSelf: "center",
-                                                marginRight: "10px",
-                                            }}
-                                        >
-                                            <Typography>
-                                                {key.charAt(0).toUpperCase() +
-                                                    key.slice(1)}
-                                                :
-                                            </Typography>
-                                        </Box>
-                                        <Box
+                                            key={key}
                                             sx={{
                                                 display: "flex",
-                                                flexDirection: "row",
-                                                alignSelf: "flex-end",
+                                                alignItems: "center",
+                                                justifyContent: "space-between",
+                                                marginBottom: "10px",
                                             }}
                                         >
-                                            {!(
-                                                key == "scale" ||
-                                                key == "radius" ||
-                                                key == "center_longitude" ||
-                                                key == "center_latitude"
-                                            ) ? (
-                                                <>
+                                            <Box
+                                                sx={{
+                                                    alignSelf: "center",
+                                                    marginRight: "10px",
+                                                }}
+                                            >
+                                                <Typography>
+                                                    {key
+                                                        .charAt(0)
+                                                        .toUpperCase() +
+                                                        key.slice(1)}
+                                                    :
+                                                </Typography>
+                                            </Box>
+                                            <Box
+                                                sx={{
+                                                    display: "flex",
+                                                    flexDirection: "row",
+                                                    alignSelf: "flex-end",
+                                                }}
+                                            >
+                                                {!(
+                                                    key == "scale" ||
+                                                    key == "radius" ||
+                                                    key == "center_longitude" ||
+                                                    key == "center_latitude"
+                                                ) ? (
+                                                    <>
+                                                        <TextField
+                                                            value={value}
+                                                            onChange={(e) =>
+                                                                changeFieldValue(
+                                                                    key,
+                                                                    e.target
+                                                                        .value
+                                                                )
+                                                            }
+                                                            onBlur={() =>
+                                                                setFocusedField(
+                                                                    null
+                                                                )
+                                                            }
+                                                        />
+                                                        <IconButton
+                                                            onClick={() =>
+                                                                removeField(key)
+                                                            }
+                                                        >
+                                                            <Delete />
+                                                        </IconButton>
+                                                    </>
+                                                ) : (
                                                     <TextField
                                                         value={value}
-                                                        onChange={(e) =>
-                                                            changeFieldValue(
-                                                                key,
-                                                                e.target.value
-                                                            )
-                                                        }
+                                                        onChange={(e) => {
+                                                            key ==
+                                                                "center_longitude" ||
+                                                            key ==
+                                                                "center_latitude"
+                                                                ? changeFieldValue(
+                                                                      key,
+                                                                      e.target
+                                                                          .value
+                                                                  )
+                                                                : changeFieldValue(
+                                                                      key,
+                                                                      e.target
+                                                                          .value,
+                                                                      true
+                                                                  );
+                                                        }}
                                                         onBlur={() =>
                                                             setFocusedField(
                                                                 null
                                                             )
                                                         }
                                                     />
-                                                    <IconButton
-                                                        onClick={() =>
-                                                            removeField(key)
-                                                        }
-                                                    >
-                                                        <Delete />
-                                                    </IconButton>
-                                                </>
-                                            ) : (
-                                                <TextField
-                                                    value={value}
-                                                    onChange={(e) => {
-                                                        key ==
-                                                            "center_longitude" ||
-                                                        key == "center_latitude"
-                                                            ? changeFieldValue(
-                                                                  key,
-                                                                  e.target.value
-                                                              )
-                                                            : changeFieldValue(
-                                                                  key,
-                                                                  e.target
-                                                                      .value,
-                                                                  true
-                                                              );
-                                                    }}
-                                                    onBlur={() =>
-                                                        setFocusedField(null)
-                                                    }
-                                                />
-                                            )}
+                                                )}
+                                            </Box>
                                         </Box>
-                                    </Box>
-                                )
-                        )}
+                                    )
+                            )}
+                    </Box>
                 </>
             );
         };
@@ -898,8 +949,7 @@ function MapViewingPage() {
                     boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
-                    justifyContent: "space-between",
-                    height: `calc(100vh - 121px)`,
+                    height: `calc(100vh - 125px)`,
                     width: "100%",
                     padding: "10px",
                     boxShadow: 1,
@@ -910,67 +960,78 @@ function MapViewingPage() {
                     <Typography variant="h6">Choose an area to edit</Typography>
                 ) : (
                     <>
-                        <Box>{fieldEdit()}</Box>
+                        {auth.loggedIn && (
+                            <Button
+                                id="addFieldBtn"
+                                variant="contained"
+                                color="primary"
+                                onClick={handleAddField}
+                                sx={{
+                                    color: "black",
+                                    bgcolor: theme.palette.secondary.main,
+                                    width: "100%",
+                                    mb: "10px",
+                                }}
+                            >
+                                + Add Field
+                            </Button>
+                        )}
+                        <Box
+                            sx={{
+                                overflow: "auto",
+                                maxHeight: "calc(100vh - 220px)", // Adjust the maxHeight as needed
+                                mb: "10px",
+                            }}
+                        >
+                            {fieldEdit()}
+                        </Box>
+
+                        {/* Spacer to push accordion to the bottom */}
+                        <Box sx={{ flexGrow: 1 }}></Box>
+
                         <Box
                             sx={{
                                 display: "flex",
                                 flexDirection: "column",
                                 alignItems: "center",
-                                marginBottom: "10px", // Adjust as needed
                             }}
                         >
-                            {auth.loggedIn && (
-                                <Button
-                                    id="addFieldBtn"
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={handleAddField}
-                                    sx={{
-                                        marginBottom: "10px",
-                                        color: "black",
-                                        bgcolor: theme.palette.secondary.main,
-                                    }}
-                                >
-                                    + Add Field
-                                </Button>
-                            )}
-
-                            <Box
+                            <Accordion
                                 sx={{
-                                    display: "flex",
-                                    alignItems: "center",
+                                    width: "100%",
+                                    bgcolor: theme.palette.secondary.main,
                                 }}
                             >
-                                <Typography sx={{ m: "10px" }}>
-                                    {store.currentMap &&
-                                        store.currentMap.mapType}{" "}
-                                    by:
-                                </Typography>
-                                <Box sx={{ textAlign: "right" }}>
-                                    <Button
-                                        onClick={handleChoroplethClick}
-                                        variant="contained"
+                                <AccordionSummary expandIcon={<ExpandMore />}>
+                                    <Typography>
+                                        Advanced Editing Features
+                                    </Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <List
+                                        component="nav"
+                                        aria-label="Device settings"
                                         sx={{
-                                            color: "black",
-                                            width: "150px",
                                             bgcolor:
-                                                theme.palette.secondary.main,
+                                                theme.palette.background
+                                                    .default,
+                                            borderRadius: 2,
                                         }}
                                     >
-                                        <Box
-                                            sx={{
-                                                display: "flex",
-                                                justifyContent: "space-between",
-                                                width: "100%",
-                                            }}
+                                        <ListItem
+                                            aria-expanded={
+                                                handleChoroplethClick
+                                                    ? "true"
+                                                    : undefined
+                                            }
+                                            onClick={handleChoroplethClick}
                                         >
-                                            <span>
-                                                {store.byFeature &&
-                                                    store.byFeature}
-                                            </span>
-                                            <KeyboardArrowDown />
-                                        </Box>
-                                    </Button>
+                                            <ListItemText
+                                                primary="Select heat map by"
+                                                secondary={selectedItem}
+                                            />
+                                        </ListItem>
+                                    </List>
                                     <Menu
                                         anchorEl={anchorElChoropleth}
                                         open={Boolean(anchorElChoropleth)}
@@ -1007,11 +1068,14 @@ function MapViewingPage() {
                                                     return (
                                                         <MenuItem
                                                             key={key}
-                                                            onClick={() =>
+                                                            onClick={() => {
                                                                 handleSelectedByFeature(
                                                                     key
-                                                                )
-                                                            }
+                                                                );
+                                                                setSelectedItem(
+                                                                    key
+                                                                );
+                                                            }}
                                                         >
                                                             {key}
                                                         </MenuItem>
@@ -1020,8 +1084,48 @@ function MapViewingPage() {
                                                 return null;
                                             })}
                                     </Menu>
-                                </Box>
-                            </Box>
+                                    {/* <Box
+                                        sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                        }}
+                                    >
+                                        <Typography sx={{ m: "10px" }}>
+                                            {store.currentMap &&
+                                                store.currentMap.mapType}{" "}
+                                            by:
+                                        </Typography>
+                                        <Box sx={{ textAlign: "right" }}>
+                                            <Button
+                                                onClick={handleChoroplethClick}
+                                                variant="contained"
+                                                sx={{
+                                                    color: "black",
+                                                    width: "150px",
+                                                    bgcolor:
+                                                        theme.palette.secondary
+                                                            .main,
+                                                }}
+                                            >
+                                                <Box
+                                                    sx={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                            "space-between",
+                                                        width: "100%",
+                                                    }}
+                                                >
+                                                    <span>
+                                                        {store.byFeature &&
+                                                            store.byFeature}
+                                                    </span>
+                                                    <KeyboardArrowDown />
+                                                </Box>
+                                            </Button>
+                                        </Box>
+                                    </Box> */}
+                                </AccordionDetails>
+                            </Accordion>
                         </Box>
                     </>
                 )}
