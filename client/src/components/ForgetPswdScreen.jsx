@@ -1,57 +1,59 @@
-import React, { useState } from "react";
-import {
-    Box,
-    Button,
-    Container,
-    CssBaseline,
-    Grid,
-    Link,
-    TextField,
-    Typography,
-} from "@mui/material";
-import Logo from "../assets/cyannav_logo_wo_name.png";
-import { useNavigate } from "react-router-dom";
+import * as React from 'react';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import TextField from '@mui/material/TextField';
+import Link from '@mui/material/Link';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import Logo from '../assets/cyannav_logo_wo_name.png'
+import { useState, useRef, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom'
+import AuthContext from '../auth'
 
 export default function ForgetPswdScreen() {
+    const { auth } = useContext(AuthContext);
+    const [step, setStep] = useState('emailStep');
+    const [email, setEmail] = useState('');
+    const [verificationCode, setVerificationCode] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    // Used for displaying error messages
+    const [emailError, setEmailError] = useState('');
+    const [verificationCodeError, setVerificationCodeError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
     const navigate = useNavigate();
 
-    const [step, setStep] = useState("emailStep");
-    const [email, setEmail] = useState("");
-    const [verificationCode, setVerificationCode] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-
-    const [emailError, setEmailError] = useState("");
-    const [verificationCodeError, setVerificationCodeError] = useState("");
-    const [passwordError, setPasswordError] = useState("");
-
-    /**
-     * Handler for when the user inputs their email and clicks Submit
-     * @param {*} event
-     */
-    const handleEmailSubmit = (event) => {
+    const handleEmailSubmit = async (event) => {
         event.preventDefault();
         // const data = new FormData(event.currentTarget);
         console.log("Email submitted: ", email);
-        setStep("verificationStep"); // Move to the next step
-    };
+        const res = await auth.reset(email);
+        const data = await res.data;
+        if(res.status == 200){
+            setStep('verificationStep'); // Move to the next step
+        }
+        else{
+            setEmailError(data.errorMessage);
+        }
+    }
 
-    /**
-     * Handler for when the user inputs their verification code and clicks Submit
-     * @param {*} event
-     */
-    const handleVerificationCodeSubmit = (event) => {
+    const handleVerificationCodeSubmit = async (event) => {
         event.preventDefault();
         // const data = new FormData(event.currentTarget);
-        console.log("Verification code submitted: ", verificationCode);
-        setStep("resetPasswordStep");
+        const res = await auth.verify(email, verificationCode);
+        const data = await res.data;
+        if(res.status == 200){
+            setStep('resetPasswordStep'); // Move to the next step
+        }
+        else{
+            setVerificationCodeError(data.errorMessage);
+        }
     };
 
-    /**
-     * Handler for when the user enters their new password and clicks Submit
-     * @param {*} event
-     */
-    const handleResetPasswordSubmit = (event) => {
+    const handleResetPasswordSubmit = async (event) => {
         event.preventDefault();
         if (password !== confirmPassword) {
             setPasswordError("Passwords do not match");
@@ -59,8 +61,17 @@ export default function ForgetPswdScreen() {
         } else {
             setPasswordError("Password error message test");
         }
-        // TODO: Reset password logic here
-        navigate("/login/");
+
+        const res = await auth.updatePasscodeNotLoggedIn(email, password, confirmPassword);
+        console.log(res)
+        const data = await res.data;
+        if(res.status == 200){
+            await auth.loginUser(email, password);
+            navigate('/login/');
+        }
+        else{
+            setPasswordError(data.errorMessage);
+        }
     };
 
     return (

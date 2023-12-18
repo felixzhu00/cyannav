@@ -10,10 +10,19 @@ const request = require("supertest")
 
 /* Auth API Tests */
 
+describe("updateProfilePic", () => {
+    it("returns 401 since user is unauthorized", async () => {
+        const res = await request(app).get("/auth/updateProfilePic").send({})
+        expect(res.statusCode).toEqual(401)
+        expect(JSON.parse(res.text).errorMessage).toEqual("Unauthorized")
+    })
+})
+
 describe("loggedIn", () => {
-    it("returns 401 if user id not in db", async () => {
+    it("returns 401 since user is not logged in", async () => {
         const res = await request(app).get("/auth/loggedIn").send({})
         expect(res.statusCode).toEqual(401)
+        expect(JSON.parse(res.text).loggedIn).toEqual(false)
     })
 })
 
@@ -23,17 +32,25 @@ describe("login", () => {
             .post("/auth/login")
             .send({ email: "hi@hello.com" })
         expect(res.statusCode).toEqual(400)
+        expect(JSON.parse(res.text).loggedIn).toEqual(false)
+        expect(JSON.parse(res.text).loggedIn).toEqual("Required fields empty.")
     })
     it("returns 400 if no email", async () => {
         const res = await request(app)
             .post("/auth/login")
             .send({ password: "password" })
         expect(res.statusCode).toEqual(400)
+        expect(JSON.parse(res.text).loggedIn).toEqual(false)
+        expect(JSON.parse(res.text).loggedIn).toEqual("Required fields empty.")
     })
-    // it('returns 401 if no user associated with email and password', async () => {
-    //     const res = await request(app).post('/auth/login').send({email: "hi@hello.com", password: "password"});
-    //     expect(res.statusCode).toEqual(401);
-    // });
+    it("returns 400 if no email nor password", async () => {
+        const res = await request(app)
+            .post("/auth/login")
+            .send({})
+        expect(res.statusCode).toEqual(400)
+        expect(JSON.parse(res.text).loggedIn).toEqual(false)
+        expect(JSON.parse(res.text).loggedIn).toEqual("Required fields empty.")
+    })
 })
 
 describe("logout", () => {
@@ -56,38 +73,38 @@ describe("register", () => {
             .send({ password: "hi", passwordVerify: "hi" })
         expect(res.statusCode).toEqual(401)
     })
-    // it('returns ??? ', async () => {
-    //     const res = await request(app).post('/auth/register').send({
-    //         username: "john",
-    //         email: "hello@hi.com",
-    //         password: "password123$$$",
-    //         passwordVerify: "password123$$$"
-    //     });
-    //     expect(res.statusCode).toEqual(500);
-    // });
+    it('returns ??? ', async () => {
+        const res = await request(app).post('/auth/register').send({
+            username: "john",
+            email: "hello@hi.com",
+            password: "password123$$$",
+            passwordVerify: "password123$$$"
+        });
+        expect(res.statusCode).toEqual(500);
+    });
 })
 
-// describe('reset', () => {
-//     it('returns 400 if no id', async () => {
-//         const res = await request(app).get('/auth/reset').send({});
-//         expect(res.statusCode).toEqual(400);
-//     });
-//     it('returns 404 if id does not match map', async () => {
-//         const res = await request(app).get('/auth/reset').send({id: 0});
-//         expect(res.statusCode).toEqual(404);
-//     });
-// });
+describe('reset', () => {
+    it('returns 400 if no id', async () => {
+        const res = await request(app).get('/auth/reset').send({});
+        expect(res.statusCode).toEqual(400);
+    });
+    it('returns 404 if id does not match map', async () => {
+        const res = await request(app).get('/auth/reset').send({id: 0});
+        expect(res.statusCode).toEqual(404);
+    });
+});
 
-// describe('verifyCode', () => {
-//     it('returns 400 if no id', async () => {
-//         const res = await request(app).get('/auth/verifyCode').send({});
-//         expect(res.statusCode).toEqual(400);
-//     });
-//     it('returns 404 if id does not match map', async () => {
-//         const res = await request(app).get('/auth/verifyCode').send({id: 0});
-//         expect(res.statusCode).toEqual(404);
-//     });
-// });
+describe('verifyCode', () => {
+    it('returns 400 if no id', async () => {
+        const res = await request(app).get('/auth/verifyCode').send({});
+        expect(res.statusCode).toEqual(400);
+    });
+    it('returns 404 if id does not match map', async () => {
+        const res = await request(app).get('/auth/verifyCode').send({id: 0});
+        expect(res.statusCode).toEqual(404);
+    });
+});
 
 describe("updateUsername", () => {
     it("returns 400 if no username", async () => {
@@ -122,13 +139,13 @@ describe("deleteAccount", () => {
     })
 })
 
-// describe('updatePass', () => {
-//     it('returns 400 if no id', async () => {
-//         const res = await request(app).get('/auth/updatePass').send({});
-//         expect(res.statusCode).toEqual(400);
-//     });
-//     it('returns 404 if id does not match map', async () => {
-//         const res = await request(app).get('/auth/updatePass').send({id: 0});
-//         expect(res.statusCode).toEqual(404);
-//     });
-// });
+describe('updatePass', () => {
+    it('returns 400 if no id', async () => {
+        const res = await request(app).get('/auth/updatePass').send({});
+        expect(res.statusCode).toEqual(400);
+    });
+    it('returns 404 if id does not match map', async () => {
+        const res = await request(app).get('/auth/updatePass').send({id: 0});
+        expect(res.statusCode).toEqual(404);
+    });
+});

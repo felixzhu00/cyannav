@@ -15,6 +15,13 @@ import MUIPublishMapModal from "./components/modals/MUIPublishMapModal";
 import AuthContext from "./auth";
 import api from "./store-api";
 
+var tj = require("@mapbox/togeojson"),
+    // node doesn't have xml parsing or a dom. use xmldom
+    DOMParser = require("xmldom").DOMParser;
+
+const JSZip = require("jszip");
+import shp from "shpjs";
+
 const geobuf = require("geobuf");
 const Pbf = require("pbf");
 
@@ -86,15 +93,42 @@ function GlobalStoreContextProvider(props) {
 
     store.createMap = async (title, fileType, mapTemplate, file) => {
         const mapFile = file;
-        console.log(mapFile);
+
         // Create a FileReader
         const reader = new FileReader();
 
         // Define the event handler for when the file read is complete
         reader.onloadend = async function (event) {
             if (event.target.readyState === FileReader.DONE) {
-                // event.target.result contains the content of the file
-                const geojson = JSON.parse(event.target.result);
+                var geojson = undefined;
+                var tags = undefined;
+                switch (fileType) {
+                    case "geojson":
+                        geojson = JSON.parse(event.target.result);
+                        break;
+                    case "kml":
+                        var kml = new DOMParser().parseFromString(
+                            event.target.result
+                        );
+                        geojson = tj.kml(kml);
+                        break;
+                    case "shapefiles":
+                        await shp(event.target.result).then(
+                            function (shpgeojson) {
+                                geojson = shpgeojson;
+                            },
+                            function () {
+                                alert("Invalid shapefile zip.");
+                            }
+                        );
+                        break;
+                    case "navjson":
+                        const navjson = JSON.parse(event.target.result);
+                        geojson = navjson.geojson;
+                        mapTemplate = navjson.mapType;
+                        tags = navjson.tags;
+                        break;
+                }
 
                 // Encode the GeoJSON with geobuf
                 const buffer = geobuf.encode(geojson, new Pbf());
@@ -102,15 +136,21 @@ function GlobalStoreContextProvider(props) {
                 const response = await api.createNewMap(
                     title,
                     mapTemplate,
-                    buffer
+                    buffer,
+                    tags
                 );
 
                 return response;
             }
         };
 
-        // Read the content of the file as text
-        reader.readAsText(mapFile);
+        if (fileType == "shapefiles") {
+            // Read the content as array buffer for unzipping
+            reader.readAsArrayBuffer(mapFile);
+        } else {
+            // Read the content of the file as text
+            reader.readAsText(mapFile);
+        }
     };
 
     store.getMyMapCollection = async (userId) => {
