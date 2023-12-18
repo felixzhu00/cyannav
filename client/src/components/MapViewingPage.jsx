@@ -120,10 +120,10 @@ function MapViewingPage() {
                         (response) => ({
                             ...response,
                             hasLikedComment: response.upvotes.includes(
-                                auth.user.userId
+                                (auth.user && auth.user.userId) ? auth.user.userId : "####"
                             ),
                             hasDislikedComment: response.downvotes.includes(
-                                auth.user.userId
+                                (auth.user && auth.user.userId) ? auth.user.userId : "####"
                             ),
                         })
                     );
@@ -778,7 +778,7 @@ function MapViewingPage() {
     };
 
     const editBar = () => {
-        const [selectedItem, setSelectedItem] = useState("");
+        // const [selectedItem, setSelectedItem] = useState("");
 
         const fieldEdit = () => {
             if (store.currentArea === -1) {
