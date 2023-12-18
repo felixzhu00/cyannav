@@ -1,56 +1,58 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import LoginLogo from '../assets/cyannav_logo_wo_name.png'
-import { useNavigate } from 'react-router-dom';
-import { GlobalStoreContext } from '../store'
-import AuthContext from '../auth'
-
+import React, { useState, useEffect, useContext } from "react";
+import CssBaseline from "@mui/material/CssBaseline";
+import {
+    Box,
+    Button,
+    Container,
+    Grid,
+    Link,
+    TextField,
+    Typography,
+} from "@mui/material";
+import LoginLogo from "../assets/cyannav_logo_wo_name.png";
+import { useNavigate } from "react-router-dom";
+import AuthContext from "../auth";
 
 export default function LoginScreen(props) {
-    const [signinButton, setsigninButton] = useState(null);
     const navigate = useNavigate();
     const { auth } = useContext(AuthContext);
-
-    const [errorMessage, setErrorMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
         if (auth.user == null) {
-            console.log(auth.error)
-            setErrorMessage(auth.error)
+            setErrorMessage(auth.error);
         } else {
-            console.log(auth.user, auth.loggedIn)
-            navigate('/browsepage');
+            navigate("/browsepage");
         }
     }, [auth]);
 
+    /**
+     * Handler for the user clicks on the login button
+     * @param {*} event
+     */
     const handleSubmit = async (event) => {
-
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         let input = {
-            email: data.get('email'),
-            password: data.get('password'),
-        }
+            email: data.get("email"),
+            password: data.get("password"),
+        };
         try {
             await auth.loginUser(input.email, input.password);
-            setErrorMessage('');
+            setErrorMessage("");
         } catch (error) {
             console.log(error.message);
             setErrorMessage(error.message);
         }
     };
 
+    /**
+     * Handler for when the user wants to continue to use our site as guest
+     */
     const handleContAsGuest = () => {
-        props.handleGuest(true)
-        navigate('/browsepage');
-    }
+        props.handleGuest(true);
+        navigate("/browsepage");
+    };
 
     return (
         <Container component="main" maxWidth="xs">
@@ -58,17 +60,21 @@ export default function LoginScreen(props) {
             <Box
                 sx={{
                     marginTop: 8,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
                 }}
             >
-                <Box component='img' sx={{ m: 2 }} src={LoginLogo}>
-                </Box>
+                <Box component="img" sx={{ m: 2 }} src={LoginLogo}></Box>
                 <Typography component="h1" variant="h5">
                     Sign in
                 </Typography>
-                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                <Box
+                    component="form"
+                    onSubmit={handleSubmit}
+                    noValidate
+                    sx={{ mt: 1 }}
+                >
                     <TextField
                         margin="normal"
                         fullWidth
@@ -91,13 +97,20 @@ export default function LoginScreen(props) {
                         required
                     />
                     {errorMessage && (
-                        <Typography id="errMsg1" color='red' variant="subtitle2" sx={{ mt: 1 }}>
+                        <Typography
+                            id="errMsg1"
+                            color="red"
+                            variant="subtitle2"
+                            sx={{ mt: 1 }}
+                        >
                             {errorMessage}
                         </Typography>
                     )}
 
                     <Button
-                        onClick={() => { props.handleGuest(false) }}
+                        onClick={() => {
+                            props.handleGuest(false);
+                        }}
                         id="signInBtn"
                         type="submit"
                         fullWidth
@@ -107,7 +120,9 @@ export default function LoginScreen(props) {
                         Sign In
                     </Button>
                     <Button
-                        onClick={() => { handleContAsGuest() }}
+                        onClick={() => {
+                            handleContAsGuest();
+                        }}
                         type="button"
                         fullWidth
                         variant="contained"
@@ -117,12 +132,24 @@ export default function LoginScreen(props) {
                     </Button>
                     <Grid container>
                         <Grid item xs>
-                            <Link onClick={() => { navigate('/forget') }} variant="body2">
+                            <Link
+                                onClick={() => {
+                                    navigate("/forget");
+                                }}
+                                variant="body2"
+                            >
                                 Forgot password?
                             </Link>
                         </Grid>
                         <Grid item>
-                            <Link id="registerLink" onClick={() => { navigate('/register'); auth.updateError("") }} variant="body2">
+                            <Link
+                                id="registerLink"
+                                onClick={() => {
+                                    navigate("/register");
+                                    auth.updateError("");
+                                }}
+                                variant="body2"
+                            >
                                 {"Don't have an account? Sign Up"}
                             </Link>
                         </Grid>
