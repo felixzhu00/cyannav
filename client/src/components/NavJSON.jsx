@@ -158,8 +158,12 @@ function NavJSON({ data, center, zoom }) {
     }
   };
 
-  const setupHeatMapLayer = (radius) => {
-    // console.log("trigger")
+  const setupHeatMapLayer = () => {
+    //preliminary checking
+    const radius = Number(store.geojson.features[0]?.fields?.radius);
+    if (isNaN(radius)) {
+      return;
+    }
     const cfg = {
       radius: radius,
       maxOpacity: 0.8,
@@ -198,24 +202,22 @@ function NavJSON({ data, center, zoom }) {
       return acc;
     }, []);
 
-    
-
-    // Set data for the heatmap layer
     heatmapLayer.setData({ data: heatmapLayerData });
-    console.log(heatmapLayerData)
-
-    // console.log(heatmapLayerData)
-    //Bring the heatmap layer to the front
+    console.log(heatmapLayerData);
     // heatmapLayer._el.style.zIndex = 700;
   };
 
-  const setupPointMapLayer = (radius) => {
-    // console.log("trigger");
+  const setupPointMapLayer = () => {
+    //preliminary checking
+    const radius = Number(store.geojson.features[0]?.fields?.radius);
+    if (isNaN(radius)) {
+      return;
+    }
 
     if (map.current) {
       // Remove existing circles if any
       map.current.eachLayer((layer) => {
-        if (layer instanceof L.CircleMarker) {
+        if (layer instanceof L.Circle) {
           map.current.removeLayer(layer);
         }
       });
@@ -226,38 +228,40 @@ function NavJSON({ data, center, zoom }) {
       const center = turf.centerOfMass(feature);
 
       // Check if the count value is available and not NaN
+      console.log("fields",feature.fields, store.byFeature, feature.fields[store.byFeature])
       const count =
-        feature.fields && feature.fields.count
-          ? parseInt(feature.fields.count, 10)
-          : NaN;
+        feature.fields && (feature.fields[store.byFeature]
+          ? parseInt(feature.fields[store.byFeature], 10)
+          : NaN);
 
+      console.log("coun", count);
       // Only proceed if count is a valid number
       if (!isNaN(count)) {
+        console.log("fields111",feature.fields, store.byFeature, feature.fields[store.byFeature])
         // Create and add circle marker
-        const circle = L.circleMarker(
+        const circle = L.circle(
           [center.geometry.coordinates[1], center.geometry.coordinates[0]],
           {
             radius: count * radius, // Adjust the radius based on the count
-            fillColor: "red", // Customize the fill color
+            fillColor: "gray", // Customize the fill color
             fillOpacity: 0.8,
             color: "black",
             weight: 1,
           }
         ).addTo(map.current);
+        circle.bringToFront();
 
         // You can add additional customization for the circles if needed
       }
     });
 
-    // You can also consider bringing the circles to the front if needed
-    // map.current.eachLayer(layer => {
-    //     if (layer instanceof L.CircleMarker) {
-    //         layer.bringToFront();
-    //     }
-    // });
-
-    // console.log("Circles added");
   };
+
+  const setupDFM = () => {
+    
+  }
+
+
 
   useEffect(() => {
     // Initialize the Leaflet map and store its reference in the map ref
@@ -283,10 +287,6 @@ function NavJSON({ data, center, zoom }) {
 
     geolayer.current = geo;
 
-    const setIntial =
-      map.current.getZoom() == 2 &&
-      map.current.getCenter().lat == 0 &&
-      map.current.getCenter().lng == 0;
     if (map.current && map.current.getBoundsZoom && geolayer.current) {
       // Set the view of the map to fit the GeoJSON bounds
       const geoBounds = geolayer.current.getBounds();
@@ -304,42 +304,18 @@ function NavJSON({ data, center, zoom }) {
 
   // Use another useEffect to set the view after the initial render
   useEffect(() => {
+    setupGeoJSONLayer(data);
     // Possible map templates: 'heatmap', 'distributiveflowmap', 'pointmap', 'choroplethmap', '3drectangle'
-    if (store.currentMap.mapType === 'heatmap') {
-        // Get the radius as a number, or null if it's not a valid number
-        const radius = Number(store.geojson.features[0].fields.radius);
-        console.log("radius", radius)
-        // Check if radius is a valid number
-        if (!isNaN(radius)) {
-            // console.log(radius);
-            console.log("helloo")
-            setupHeatMapLayer(radius);
-        } else {
-            // Handle the case where the radius is not a valid number
-            console.error('Invalid radius:', store.geojson.features[0].fields.radius);
-        }
-    }else if (store.currentMap.mapType === 'pointmap' && store.geojson.features[0]?.fields?.radius) {
-
-        console.log("hello")
-        const radius = Number(store.geojson.features[0]?.fields?.radius);
-
-        // Check if radius is a valid number
-        if (!isNaN(radius)) {
-            // console.log(radius);
-            setupPointMapLayer(radius);
-        } else {
-            // Handle the case where the radius is not a valid number
-            console.error('Invalid radius:', store.geojson.features[0].fields.radius);
-        }
-        setupPointMapLayer();
+    if (store.currentMap.mapType === "heatmap") {
+      setupHeatMapLayer();
+    } else if (store.currentMap.mapType === "pointmap") {
+      setupPointMapLayer();
     }
 
-    setupGeoJSONLayer(data);
   }, [data]);
 
   useEffect(() => {
     setupGeoJSONLayer(data);
-    console.log("current", store.currentMap, store.geojson);
     if (map.current && map.current.getBoundsZoom && geolayer.current) {
       // Set the view of the map to fit the GeoJSON bounds
       const geoBounds = geolayer.current.getBounds();
