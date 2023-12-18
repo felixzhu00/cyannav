@@ -238,7 +238,8 @@ createForkMapById = async (req, res) => {
             return res.status(400).end()
         }
 
-        const srcMap = MapMetadata.findById(id)
+        const srcMap = await MapMetadata.findById(id)
+
         if (!srcMap) {
             return res.status(404).end()
         }

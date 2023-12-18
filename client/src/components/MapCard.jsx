@@ -251,7 +251,13 @@ export default function MapCard({ map }) {
                         >
                             Duplicate
                         </MenuItem>
-                        {/* <MenuItem onClick={() => { handleKebab("fork") }}>Fork</MenuItem> */}
+                        <MenuItem
+                            onClick={() => {
+                                handleKebab("fork")
+                            }}
+                        >
+                            Fork
+                        </MenuItem>
                         <MenuItem
                             onClick={() => {
                                 handleKebab("delete");
