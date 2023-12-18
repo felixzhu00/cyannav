@@ -600,18 +600,21 @@ function MapViewingPage() {
                             },
                         }}
                     >
-                        <Tab
-                            id="editTab"
-                            sx={{ "&.Mui-selected": { color: "black" } }}
-                            onClick={handleEdit}
-                            value="1"
-                            label="Edit"
-                        />
+                        {
+                            (store.currentMap && !store.currentMap.published) ?
+                            <Tab
+                                id="editTab"
+                                sx={{ "&.Mui-selected": { color: "black" } }}
+                                onClick={handleEdit}
+                                value="1"
+                                label="Edit"
+                            /> : ("")
+                        }
                         <Tab
                             id="commentTab"
                             sx={{ "&.Mui-selected": { color: "black" } }}
                             onClick={handleEdit}
-                            value="2"
+                            value={(store.currentMap && !store.currentMap.published) ? "2" : "1"}
                             label="Comment"
                         />
                     </Tabs>
@@ -1184,7 +1187,7 @@ function MapViewingPage() {
             </Box>
 
             <Box sx={{ gridColumn: "2", gridRow: "2" }}>
-                {value === "1" ? editBar() : commentSide()}
+                {value === "1" && store.currentMap && !store.currentMap.published ? editBar() : commentSide()}
             </Box>
             {currentModel === "export" && (
                 <MUIExportMapModal
