@@ -9,15 +9,15 @@
   // Supports UMD. AMD, CommonJS/Node.js and browser context
   if (typeof module !== "undefined" && module.exports) {
     module.exports = factory(
-      require('heatmap.js'),
+      require('heatmapjs'),
       require('leaflet')
     );
   } else if (typeof define === "function" && define.amd) {
-    define(['heatmap.js', 'leaflet'], factory);
+    define(['heatmapjs', 'leaflet'], factory);
   } else {
     // browser globals
     if (typeof window.h337 === 'undefined') {
-      throw new Error('heatmap.js must be loaded before the leaflet heatmap plugin');
+      throw new Error('heatmapjs must be loaded before the leaflet heatmap plugin');
     }
     if (typeof window.L === 'undefined') {
       throw new Error('Leaflet must be loaded before the leaflet heatmap plugin');

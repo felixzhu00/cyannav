@@ -45,6 +45,7 @@ export default function MapCard({ map }) {
         if (map.tags.length != 0) {
             setVisibleChips(map.tags);
         } else {
+            setVisibleChips(null);
             setNoTagMessage("No tags associated with map...");
         }
     };
@@ -274,7 +275,7 @@ export default function MapCard({ map }) {
                         spacing={1}
                         sx={{ mt: "10px", flexWrap: "nowrap" }}
                     >
-                        {visibleChips.map((tag) => {
+                        {visibleChips && visibleChips.map((tag) => {
                             const isLongLabel =
                                 tag.length > MAX_CHIP_LABEL_LENGTH;
                             const displayLabel = isLongLabel

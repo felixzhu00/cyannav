@@ -117,6 +117,7 @@ function GlobalStoreContextProvider(props) {
     store.createMap = async (title, fileType, mapTemplate, file) => {
         const mapFile = file;
 
+        console.log("file",fileType)
         // Create a FileReader
         const reader = new FileReader();
         // Wrap the logic in a Promise
@@ -359,8 +360,8 @@ function GlobalStoreContextProvider(props) {
             sortedArray.sort((a, b) => {
                 if (key === "alphabetical-order") {
                     //'title' field
-                    const valueA = a.title[0].toString().toLowerCase();
-                    const valueB = b.title[0].toString().toLowerCase();
+                    const valueA = a.title.toString().toLowerCase();
+                    const valueB = b.title.toString().toLowerCase();
                     return order === "asc"
                         ? valueA.localeCompare(valueB)
                         : valueB.localeCompare(valueA);

@@ -18,6 +18,7 @@
         "dom-to-image": "^2.6.0",
         "fs": "^0.0.1-security",
         "geobuf": "^3.0.2",
+        "heatmapjs": "^2.0.2",
         "https-browserify": "^1.0.0",
         "leaflet": "1.9.3",
         "mui-color-input": "^2.0.1",

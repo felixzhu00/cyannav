@@ -64,7 +64,7 @@ export default function MUICreateMapModal(props) {
 
     const [open, setOpen] = useState(props.open);
     const [title, setTitle] = useState("Untitled");
-    const [fileType, setFileType] = useState("shapefiles");
+    const [fileType, setFileType] = useState("geojson");
     const [template, setTemplate] = useState("heatmap");
     const [file, setFile] = useState(null);
     const [allowedFileTypes, setAllowedFileTypes] = useState({
