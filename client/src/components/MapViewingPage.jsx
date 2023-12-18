@@ -607,21 +607,18 @@ function MapViewingPage() {
                             },
                         }}
                     >
-                        {
-                            (store.currentMap && !store.currentMap.published) ?
-                            <Tab
-                                id="editTab"
-                                sx={{ "&.Mui-selected": { color: "black" } }}
-                                onClick={handleEdit}
-                                value="1"
-                                label="Edit"
-                            /> : ("")
-                        }
+                        <Tab
+                            id="editTab"
+                            sx={{ "&.Mui-selected": { color: "black" } }}
+                            onClick={handleEdit}
+                            value="1"
+                            label={(store.currentMap && !store.currentMap.published) ? "Edit" : "Values"}
+                        />
                         <Tab
                             id="commentTab"
                             sx={{ "&.Mui-selected": { color: "black" } }}
                             onClick={handleEdit}
-                            value={(store.currentMap && !store.currentMap.published) ? "2" : "1"}
+                            value="2"
                             label="Comment"
                         />
                     </Tabs>
@@ -844,6 +841,7 @@ function MapViewingPage() {
                                 }
                                 onBlur={() => setFocusedField(null)}
                                 sx={{ width: "100%" }}
+                                disabled={store.currentMap && store.currentMap.published}
                             />
                             {/* No delete icon for 'name' */}
                         </Box>
@@ -947,6 +945,7 @@ function MapViewingPage() {
                                                                     null
                                                                 )
                                                             }
+                                                            disabled={store.currentMap && store.currentMap.published}
                                                         />
                                                         <IconButton
                                                             onClick={() =>
@@ -981,6 +980,7 @@ function MapViewingPage() {
                                                                 null
                                                             )
                                                         }
+                                                        disabled={store.currentMap && store.currentMap.published}
                                                     />
                                                 )}
                                             </Box>
@@ -1024,7 +1024,9 @@ function MapViewingPage() {
                                 fontWeight: "bold",
                             }}
                         >
-                            Choose an area to edit
+                            {store.currentMap && store.currentMap.published ?
+                            "Choose an area to view values" :
+                            "Choose an area to edit"}
                         </Typography>
                     </Box>
                 ) : (
@@ -1237,7 +1239,7 @@ function MapViewingPage() {
             </Box>
 
             <Box sx={{ gridColumn: "2", gridRow: "2" }}>
-                {value === "1" && store.currentMap && !store.currentMap.published ? editBar() : commentSide()}
+                {value === "1" ? editBar() : commentSide()}
             </Box>
 
             {currentModel === "export" && (

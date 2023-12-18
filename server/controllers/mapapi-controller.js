@@ -709,9 +709,10 @@ updateMapGeoJson = async (req, res) => {
     try {
         const { id, geoBuf } = req.body // Extract the id from the URL parameter
 
+        var buffer
         if(geoBuf){
             let bufferArray = Object.values(geoBuf)
-            let buffer = Buffer.from(bufferArray)
+            buffer = Buffer.from(bufferArray)
         }
         else{
             return res.status(400).end()
