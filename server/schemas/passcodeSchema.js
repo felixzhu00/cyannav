@@ -2,14 +2,13 @@ const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 
 const passcodeSchema = new Schema({
-    userId: {
-        type: Schema.Types.ObjectId,
-        required: [true, "no user id given"],
-        ref: "userProfile"
+    userEmail: {
+        type: String,
+        required: [true, "no user email given"],
     },
-    creationData: {
-        default: Date.now(),
-        type: Date
+    creationDate: {
+        type: Number,
+        required: [true, "no creation date given"]
     },
     expirationData: {
         default: 600, //time in seconds -> 10 min

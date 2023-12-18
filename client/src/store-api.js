@@ -151,10 +151,15 @@ export const updatePasscode = (
             verificationCode,
         })
         .then(handleResponse)
-        .catch(handleError)
-export const verifyCode = (code) =>
+        .catch(handleError);
+export const verifyCode = (email, passcode) =>
     api
-        .post("/auth/verifyCode", { code })
+        .post("/auth/verifyCode", { email, passcode })
+        .then(handleResponse)
+        .catch(handleError);
+export const updatePasscodeNotLoggedIn = (email, password, confirmPassword) =>
+    api
+        .post("/auth/updatePasscodeNotLoggedIn", { email, password, confirmPassword })
         .then(handleResponse)
         .catch(handleError)
 export const updateUsername = (loginToken, newUsername) =>
@@ -200,6 +205,7 @@ const apis = {
     requestReset,
     updatePasscode,
     verifyCode,
+    updatePasscodeNotLoggedIn,
     updateUsername,
     updateEmail,
     deleteAccount,
