@@ -8,11 +8,12 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Logo from '../assets/cyannav_logo_wo_name.png'
-import { useState } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom'
 import AuthContext from '../auth'
 
 export default function ForgetPswdScreen() {
+    const { auth } = useContext(AuthContext);
     const [step, setStep] = useState('emailStep');
     const [email, setEmail] = useState('');
     const [verificationCode, setVerificationCode] = useState('');
@@ -25,30 +26,52 @@ export default function ForgetPswdScreen() {
     const [passwordError, setPasswordError] = useState('');
     const navigate = useNavigate();
 
-    const handleEmailSubmit = (event) => {
+    const handleEmailSubmit = async (event) => {
         event.preventDefault();
         // const data = new FormData(event.currentTarget);
         console.log("Email submitted: ", email);
-        setStep('verificationStep'); // Move to the next step
-    };
+        const res = await auth.reset(email);
+        const data = await res.data;
+        if(res.status == 200){
+            setStep('verificationStep'); // Move to the next step
+        }
+        else{
+            setEmailError(data.errorMessage);
+        }
+    }
 
-    const handleVerificationCodeSubmit = (event) => {
+    const handleVerificationCodeSubmit = async (event) => {
         event.preventDefault();
         // const data = new FormData(event.currentTarget);
-        console.log("Verification code submitted: ", verificationCode);
-        setStep('resetPasswordStep');
+        const res = await auth.verify(email, verificationCode);
+        const data = await res.data;
+        if(res.status == 200){
+            setStep('resetPasswordStep'); // Move to the next step
+        }
+        else{
+            setVerificationCodeError(data.errorMessage);
+        }
     };
 
-    const handleResetPasswordSubmit = (event) => {
+    const handleResetPasswordSubmit = async (event) => {
         event.preventDefault();
         if (password !== confirmPassword) {
             setPasswordError("Passwords do not match");
             return;
         } else {
-            setPasswordError('Password error message test');
+            setPasswordError("Password error message test");
         }
-        // TODO: Reset password logic here
-        navigate('/login/');
+
+        const res = await auth.updatePasscodeNotLoggedIn(email, password, confirmPassword);
+        console.log(res)
+        const data = await res.data;
+        if(res.status == 200){
+            await auth.loginUser(email, password);
+            navigate('/login/');
+        }
+        else{
+            setPasswordError(data.errorMessage);
+        }
     };
 
     return (
@@ -57,17 +80,28 @@ export default function ForgetPswdScreen() {
             <Box
                 sx={{
                     marginTop: 8,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
                 }}
             >
-                <Box component='img' sx={{ m: 2 }} src={Logo} />
+                <Box component="img" sx={{ m: 2 }} src={Logo} />
                 <Typography component="h1" variant="h5">
-                    {step === 'emailStep' ? 'Forgot Password' : 'Enter Verification Code'}
+                    {step === "emailStep"
+                        ? "Forgot Password"
+                        : "Enter Verification Code"}
                 </Typography>
-                <Box component="form" noValidate onSubmit={step === 'emailStep' ? handleEmailSubmit : handleVerificationCodeSubmit} sx={{ mt: 3, width: '350px' }}>
-                    {step === 'emailStep' && (
+                <Box
+                    component="form"
+                    noValidate
+                    onSubmit={
+                        step === "emailStep"
+                            ? handleEmailSubmit
+                            : handleVerificationCodeSubmit
+                    }
+                    sx={{ mt: 3, width: "350px" }}
+                >
+                    {step === "emailStep" && (
                         <>
                             <TextField
                                 required
@@ -79,12 +113,21 @@ export default function ForgetPswdScreen() {
                                 value={email}
                                 onChange={(e) => {
                                     setEmail(e.target.value);
-                                    setEmailError('');
+                                    setEmailError("");
                                 }}
                             />
-                            {emailError && <Typography color="error" variant="subtitle2" sx={{ mt: 1 }}>{emailError}</Typography>}
-                        </>)}
-                    {step === 'verificationStep' && (
+                            {emailError && (
+                                <Typography
+                                    color="error"
+                                    variant="subtitle2"
+                                    sx={{ mt: 1 }}
+                                >
+                                    {emailError}
+                                </Typography>
+                            )}
+                        </>
+                    )}
+                    {step === "verificationStep" && (
                         <>
                             <TextField
                                 required
@@ -96,13 +139,21 @@ export default function ForgetPswdScreen() {
                                 value={verificationCode}
                                 onChange={(e) => {
                                     setVerificationCode(e.target.value);
-                                    setVerificationCodeError('');
+                                    setVerificationCodeError("");
                                 }}
                             />
-                            {verificationCodeError && <Typography color="error" variant="subtitle2" sx={{ mt: 1 }}>{verificationCodeError}</Typography>}
+                            {verificationCodeError && (
+                                <Typography
+                                    color="error"
+                                    variant="subtitle2"
+                                    sx={{ mt: 1 }}
+                                >
+                                    {verificationCodeError}
+                                </Typography>
+                            )}
                         </>
                     )}
-                    {step === 'resetPasswordStep' && (
+                    {step === "resetPasswordStep" && (
                         <>
                             <TextField
                                 required
@@ -114,8 +165,8 @@ export default function ForgetPswdScreen() {
                                 autoComplete="new-password"
                                 value={password}
                                 onChange={(e) => {
-                                    setPassword(e.target.value)
-                                    setPasswordError('');
+                                    setPassword(e.target.value);
+                                    setPasswordError("");
                                 }}
                                 sx={{ mt: 2 }}
                             />
@@ -128,12 +179,20 @@ export default function ForgetPswdScreen() {
                                 id="confirmPassword"
                                 value={confirmPassword}
                                 onChange={(e) => {
-                                    setConfirmPassword(e.target.value)
-                                    setPasswordError('');
+                                    setConfirmPassword(e.target.value);
+                                    setPasswordError("");
                                 }}
                                 sx={{ mt: 2 }}
                             />
-                            {passwordError && <Typography color="error" variant="subtitle2" sx={{ mt: 1 }}>{passwordError}</Typography>}
+                            {passwordError && (
+                                <Typography
+                                    color="error"
+                                    variant="subtitle2"
+                                    sx={{ mt: 1 }}
+                                >
+                                    {passwordError}
+                                </Typography>
+                            )}
                         </>
                     )}
                     <Button
@@ -141,16 +200,24 @@ export default function ForgetPswdScreen() {
                         fullWidth
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
-                        onClick={step === 'resetPasswordStep' ? handleResetPasswordSubmit : null}
+                        onClick={
+                            step === "resetPasswordStep"
+                                ? handleResetPasswordSubmit
+                                : null
+                        }
                     >
-                        {step === 'emailStep' ? 'Continue' : step === 'verificationStep' ? 'Verify Code' : 'Reset Password'}
+                        {step === "emailStep"
+                            ? "Continue"
+                            : step === "verificationStep"
+                            ? "Verify Code"
+                            : "Reset Password"}
                     </Button>
-                    {step === 'verificationStep' && (
+                    {step === "verificationStep" && (
                         <Button
                             fullWidth
                             variant="text"
                             sx={{ mb: 2 }}
-                            onClick={() => setStep('emailStep')}
+                            onClick={() => setStep("emailStep")}
                         >
                             Back to Email
                         </Button>
@@ -158,19 +225,29 @@ export default function ForgetPswdScreen() {
                 </Box>
                 <Grid container justifyContent="center">
                     <Grid item>
-                        <Link onClick={() => { navigate('/login') }} variant="body2">
+                        <Link
+                            onClick={() => {
+                                navigate("/login");
+                            }}
+                            variant="body2"
+                        >
                             Remember your password? Sign in
                         </Link>
                     </Grid>
                 </Grid>
                 <Grid container justifyContent="center">
                     <Grid item>
-                        <Link onClick={() => { navigate('/register') }} variant="body2">
+                        <Link
+                            onClick={() => {
+                                navigate("/register");
+                            }}
+                            variant="body2"
+                        >
                             Don't have an account? Sign up
                         </Link>
                     </Grid>
                 </Grid>
             </Box>
-        </Container >
+        </Container>
     );
 }

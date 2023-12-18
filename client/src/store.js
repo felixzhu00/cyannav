@@ -15,8 +15,17 @@ import MUIPublishMapModal from "./components/modals/MUIPublishMapModal";
 import AuthContext from "./auth";
 import api from "./store-api";
 
+var tj = require("@mapbox/togeojson"),
+    // node doesn't have xml parsing or a dom. use xmldom
+    DOMParser = require("xmldom").DOMParser;
+
+const JSZip = require("jszip");
+import shp from "shpjs";
+
 const geobuf = require("geobuf");
 const Pbf = require("pbf");
+
+import domtoimage from "dom-to-image";
 
 export const GlobalStoreContext = createContext({});
 
@@ -34,7 +43,6 @@ function GlobalStoreContextProvider(props) {
 
         //reducer states
         currentMap: null,
-        mapNameActive: false,
 
         mapCollection: null, // What to display on mymap and browsepage
         currentModal: null,
@@ -42,7 +50,6 @@ function GlobalStoreContextProvider(props) {
         geojson: null,
         currentArea: -1,
         byFeature: null,
-        // radius: 0,
 
         //Add Field Modal
         fieldString: null,
@@ -54,6 +61,10 @@ function GlobalStoreContextProvider(props) {
         // BrowsePage Sorting params
         sortBy: "recent",
         order: "asc",
+
+        // Comment likes and dislikes
+        commentLikes: 0,
+        commentDislikes: 0,
     });
 
     useEffect(() => {
@@ -103,26 +114,51 @@ function GlobalStoreContextProvider(props) {
         return await api.updateMapTag(mapId, tags);
     };
 
-    store.createMap = async (title, fileType, mapTemplate, files) => {
-        const file = files[0]; // Assuming files is an array with the File object
+    store.createMap = async (title, fileType, mapTemplate, file) => {
+        const mapFile = file;
 
         // Create a FileReader
         const reader = new FileReader();
-
         // Wrap the logic in a Promise
         const readPromise = () => {
             return new Promise((resolve, reject) => {
                 // Define the event handler for when the file read is complete
-                reader.onloadend = function (event) {
+                reader.onloadend = async function (event) {
                     if (event.target.readyState === FileReader.DONE) {
-                        // event.target.result contains the content of the file
-                        const geojson = JSON.parse(event.target.result);
-
+                        var geojson = undefined;
+                        var tags = undefined;
+                        switch (fileType) {
+                            case "geojson":
+                                geojson = JSON.parse(event.target.result);
+                                break;
+                            case "kml":
+                                var kml = new DOMParser().parseFromString(
+                                    event.target.result
+                                );
+                                geojson = tj.kml(kml);
+                                break;
+                            case "shapefiles":
+                                await shp(event.target.result).then(
+                                    function (shpgeojson) {
+                                        geojson = shpgeojson;
+                                    },
+                                    function () {
+                                        alert("Invalid shapefile zip.");
+                                    }
+                                );
+                                break;
+                            case "navjson":
+                                const navjson = JSON.parse(event.target.result);
+                                geojson = navjson.geojson;
+                                mapTemplate = navjson.mapType;
+                                tags = navjson.tags;
+                                break;
+                        }
+        
                         // Encode the GeoJSON with geobuf
                         const buffer = geobuf.encode(geojson, new Pbf());
-
-                        // Resolve the promise with the result
-                        resolve(api.createNewMap(title, mapTemplate, buffer));
+        
+                        resolve(api.createNewMap(title, mapTemplate, buffer, tags));
                     }
                 };
 
@@ -133,8 +169,13 @@ function GlobalStoreContextProvider(props) {
             });
         };
 
-        // Read the content of the file as text
-        reader.readAsText(file);
+        if (fileType == "shapefiles") {
+            // Read the content as array buffer for unzipping
+            reader.readAsArrayBuffer(mapFile);
+        } else {
+            // Read the content of the file as text
+            reader.readAsText(mapFile);
+        }
 
         try {
             // Wait for the Promise to resolve
@@ -195,7 +236,6 @@ function GlobalStoreContextProvider(props) {
 
     store.likeMap = async (id) => {
         const response = await api.likeMap(id);
-        console.log(response);
         if (response.status === 200) {
             setStore((prevStore) => ({
                 ...prevStore,
@@ -286,7 +326,7 @@ function GlobalStoreContextProvider(props) {
         // if (string !== "") {
         if (filter == "mapName") {
             filteredArray = response.filter((item) => {
-                return item.title[0].includes(string);
+                return item.title.includes(string);
             });
         } else if (filter == "username") {
             filteredArray = response.filter((item) => {
@@ -399,14 +439,67 @@ function GlobalStoreContextProvider(props) {
         });
     };
 
-    // store.setRadius = async (byFeatureOption) => {
-    //     setStore((prevStore) => {
-    //         return {
-    //             ...prevStore,
-    //             byFeature: byFeatureOption,
-    //         };
-    //     });
-    // };
+
+    store.exportImage = async () => {
+        const mapElement = Document.getElementById("map");
+
+        // await new Promise((resolve) => tileLayer.on("load", () => resolve()));
+
+        domtoimage
+            .toPng(mapElement)
+            .then(function (dataURL) {
+                // var base64 = dataURL.split("base64,")[1]
+                // var parseFile = new Parse.File(name, { base64: base64 })
+
+                const tempLink = document.createElement("a");
+                tempLink.href = dataURL;
+                tempLink.download = "prettypicture.png";
+                tempLink.click();
+            })
+            .catch(function (err) {
+                console.log("THIS FAILE D WHAHSHASHDH");
+            });
+    };
+
+    store.postComment = async (text, parentCommentId, mapId) => {
+        const response = await api.postComment(text, parentCommentId, mapId);
+        console.log(response);
+        return response;
+    };
+
+    store.getCommentById = async (id) => {
+        const response = await api.getcommentbyid(id);
+        if (response.status === 200) {
+            setStore((prevStore) => ({
+                ...prevStore,
+                commentLikes: response.data.upvotes.length,
+                commentDislikes: response.data.downvotes.length,
+            }));
+        }
+        return response.data;
+    };
+
+    // When the user likes a comment
+    store.likeComment = async (id) => {
+        const response = await api.likeComment(id);
+        console.log(response);
+        if (response.status === 200) {
+            // Return the updated comment data by getting the comments again
+            return;
+        }
+        return null;
+    };
+
+    // When the user dislikes a comment
+    store.dislikeComment = async (id) => {
+        const response = await api.dislikeComment(id);
+        if (response.status === 200) {
+            // Return the updated comment data by getting the comments again
+            return;
+        }
+        return null;
+    };
+
 
     return (
         <GlobalStoreContext.Provider value={{ store }}>

@@ -20,7 +20,6 @@ const {
     getUserMaps,
     getAllPublishedMaps,
     getGeoJsonById,
-    getMapFieldsById,
     createNewMap,
     createDuplicateMapById,
     createForkMapById,
@@ -33,16 +32,6 @@ const {
 
 const MapMetaData = require("../schemas/Map/mapMetadataSchema")
 const GeoJsonSchema = require("../schemas/Map/geoJsonSchema")
-const MapFields = require("../schemas/Map/fieldDataSchema.js")
-
-jest.mock("../schemas/mapGraphicSchema")
-jest.mock("../schemas/tagSchema")
-jest.mock("../schemas/userProfileSchema")
-
-jest.mock("../schemas/Map/commentSchema")
-jest.mock("../schemas/Map/fieldDataSchema")
-jest.mock("../schemas/Map/geoJsonSchema")
-jest.mock("../schemas/Map/mapMetadataSchema")
 
 afterEach(() => {
     jest.clearAllMocks()
@@ -58,7 +47,6 @@ describe("getMapById function", () => {
             mapType: "pointmap",
             published: true,
             geojsonId: buffer,
-            fieldDataId: buffer, //change when field data gets implemented
         })
         const req = { params: { id: 1 } }
         const res = {
@@ -77,7 +65,6 @@ describe("getMapById function", () => {
                 mapType: "pointmap",
                 published: true,
                 geojsonId: buffer,
-                fieldDataId: buffer, //change when field data gets implemented
             },
         })
     })
@@ -92,7 +79,6 @@ describe("getUserMaps function", () => {
             mapType: "pointmap",
             published: true,
             geojsonId: buffer,
-            fieldDataId: buffer, //change when field data gets implemented
         })
         const req = {
             params: {
@@ -118,7 +104,6 @@ describe("getUserMaps function", () => {
                 mapType: "pointmap",
                 published: true,
                 geojsonId: buffer,
-                fieldDataId: buffer, //change when field data gets implemented
             },
         })
     })
@@ -135,7 +120,6 @@ describe("getAllPublishedMaps function", () => {
                     mapType: "pointmap",
                     published: true,
                     geojsonId: buffer,
-                    fieldDataId: buffer,
                 },
             ]),
         })
@@ -163,7 +147,6 @@ describe("getGeoJsonById function", () => {
             mapType: "pointmap",
             published: true,
             geojsonId: buffer,
-            fieldDataId: buffer, //change when field data gets implemented
         })
         const req = {
             params: {
@@ -184,32 +167,6 @@ describe("getGeoJsonById function", () => {
     })
 })
 
-describe("getMapFieldsById function", () => {
-    it("correctly returns mapFields", async () => {
-        MapFields.findById = jest.fn().mockResolvedValueOnce({
-            geoBuf: buffer,
-        })
-        const req = {
-            body: {
-                id: 1,
-            },
-        }
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn(),
-            end: jest.fn(),
-        }
-        await getMapFieldsById(req, res)
-
-        expect(res.status).toHaveBeenCalledWith(200)
-        expect(res.json).toHaveBeenCalledWith({
-            mapFields: {
-                geoBuf: buffer,
-            },
-        })
-    })
-})
-
 //create new map tests
 
 // describe("createDuplicateMap function", () => {
@@ -222,7 +179,6 @@ describe("getMapFieldsById function", () => {
 //                 mapType: 'pointmap',
 //                 published: true,
 //                 geojsonId: buffer,
-//                 fieldDataId: buffer,
 //             }
 //         )
 //         MapMetaData.findById = jest.fn().mockReturnValueOnce({
@@ -234,7 +190,6 @@ describe("getMapFieldsById function", () => {
 //                     mapType: 'pointmap',
 //                     published: true,
 //                     geojsonId: buffer,
-//                     fieldDataId: buffer,
 //                 }
 //             ]),
 //         });
@@ -264,7 +219,6 @@ describe("deleteMapById function", () => {
             mapType: "pointmap",
             published: true,
             geojsonId: buffer,
-            fieldDataId: buffer, //change when field data gets implemented
         })
         MapMetaData.findByIdAndDelete = jest.fn().mockResolvedValueOnce(true)
         const req = { params: { id: 1 } }
@@ -291,7 +245,6 @@ describe("updateMapNameById function", () => {
             mapType: "pointmap",
             published: true,
             geojsonId: buffer,
-            fieldDataId: buffer, //change when field data gets implemented
         })
         MapMetaData.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(true)
         const req = { body: { id: 1, title: "hello" } }
@@ -318,7 +271,6 @@ describe("updateMapPublishStatus function", () => {
             mapType: "pointmap",
             published: true,
             geojsonId: buffer,
-            fieldDataId: buffer, //change when field data gets implemented
         })
         MapMetaData.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(true)
         const req = { body: { id: 1 } }
@@ -341,7 +293,7 @@ describe("mapmetadata/:id", () => {
         const res = await request(app).get("/api/mapmetadata/:id").send({})
         expect(res.statusCode).toEqual(400)
     })
-    it("returns 400 if id does not match map", async () => {
+    it("returns 400 since id is not valid object id", async () => {
         const res = await request(app)
             .get("/api/mapmetadata/:id")
             .send({ id: 0 })
@@ -354,7 +306,7 @@ describe("mapbyuser/:id", () => {
         const res = await request(app).get("/api/mapbyuser/:id").send({})
         expect(res.statusCode).toEqual(400)
     })
-    it("returns code 400 given a userId", async () => {
+    it("returns code 400 since id is not valid object id", async () => {
         const res = await request(app)
             .get("/api/mapbyuser/:id")
             .send({ userId: "cyan boy" })
@@ -362,43 +314,38 @@ describe("mapbyuser/:id", () => {
     })
 })
 
-describe("allpublishedmap", () => {
-    // it("should return code 200", async () => {
-    //     const res = await request(app).get("/api/allpublishedmap").send({})
-    //     expect(res.statusCode).toEqual(200)
-    // })
-})
-
 describe("mapgeojson/:id", () => {
     it("returns code 400 if no id", async () => {
         const res = await request(app).get("/api/mapgeojson/:id").send({})
         expect(res.statusCode).toEqual(400)
     })
-    it("returns code 400 if no map matches id given", async () => {
+    it("returns code 400 since id is not valid object id", async () => {
         const res = await request(app)
             .get("/api/mapgeojson/:id")
             .send({ id: "100298" })
         expect(res.statusCode).toEqual(400)
     })
-    //write test for if id is associated with map
 })
 
 describe("newMap", () => {
     it("returns code 400 if no title and/or json is given", async () => {
         const res = await request(app).post("/api/newmap").send({ type: "map" })
         expect(res.statusCode).toEqual(400)
+        expect(JSON.parse(res.text).errorMessage).toEqual("Invalid request.")
     })
     it("returns code 400 if no json is given", async () => {
         const res = await request(app)
             .post("/api/newmap")
             .send({ title: "US states", type: "map" })
         expect(res.statusCode).toEqual(400)
+        expect(JSON.parse(res.text).errorMessage).toEqual("Invalid request.")
     })
-    it("returns code 400 if type is not heat map", async () => {
+    it("returns code 400 if type is not valid", async () => {
         const res = await request(app)
             .post("/api/newmap")
             .send({ title: "US states", type: "map", json: " " })
         expect(res.statusCode).toEqual(400)
+        expect(JSON.parse(res.text).errorMessage).toEqual("Invalid request.")
     })
     it("returns code 400 since json is empty string", async () => {
         const res = await request(app)
@@ -413,13 +360,12 @@ describe("duplicatemap", () => {
         const res = await request(app).post("/api/duplicatemap").send({})
         expect(res.statusCode).toEqual(400)
     })
-    it("returns code 400 for now", async () => {
+    it("returns code 400 for invalid id", async () => {
         const res = await request(app)
             .post("/api/duplicatemap")
             .send({ id: "1006298" })
         expect(res.statusCode).toEqual(400)
     })
-    //add another tets for if there is map which matches the id sent
 })
 
 describe("forkMap", () => {
@@ -427,11 +373,10 @@ describe("forkMap", () => {
         const res = await request(app).post("/api/forkmap").send({})
         expect(res.statusCode).toEqual(400)
     })
-    // it("returns code 401 if no map matches the id sent", async () => {
-    //     const res = await request(app).post("/api/forkmap").send({ id: 10062909 })
-    //     expect(res.statusCode).toEqual(401)
-    // })
-    //add another tets for if there is map which matches the id sent
+    it("returns code 400 since id is invalid", async () => {
+        const res = await request(app).post("/api/forkmap").send({ id: "1006298" })
+        expect(res.statusCode).toEqual(400)
+    })
 })
 
 describe("deletemap/:id", () => {
@@ -439,133 +384,10 @@ describe("deletemap/:id", () => {
         const res = await request(app).delete("/api/deletemap/:id").send({})
         expect(res.statusCode).toEqual(400)
     })
-    it("returns code 400 if no map matches the id sent", async () => {
+    it("returns code 400 since id is not valid", async () => {
         const res = await request(app)
             .delete("/api/deletemap/:id")
             .send({ id: 100629 })
-        expect(res.statusCode).toEqual(400)
-    })
-})
-
-describe("loggedIn", () => {
-    it("returns 401 if user id not in db", async () => {
-        const res = await request(app).get("/auth/loggedIn").send({})
-        expect(res.statusCode).toEqual(401)
-    })
-})
-
-describe("login", () => {
-    it("returns 400 if no password", async () => {
-        const res = await request(app)
-            .post("/auth/login")
-            .send({ email: "hi@hello.com" })
-        expect(res.statusCode).toEqual(400)
-    })
-    it("returns 400 if no email", async () => {
-        const res = await request(app)
-            .post("/auth/login")
-            .send({ password: "password" })
-        expect(res.statusCode).toEqual(400)
-    })
-    // it('returns 401 if no user associated with email and password', async () => {
-    //     const res = await request(app).post('/auth/login').send({email: "hi@hello.com", password: "password"});
-    //     expect(res.statusCode).toEqual(401);
-    // });
-})
-
-describe("logout", () => {
-    it("shoudl always return 200", async () => {
-        const res = await request(app).post("/auth/logout").send({})
-        expect(res.statusCode).toEqual(200)
-    })
-})
-
-describe("register", () => {
-    it("returns 400 if password does not match passwordVerify", async () => {
-        const res = await request(app)
-            .post("/auth/register")
-            .send({ password: "hi", passwordVerify: "hello" })
-        expect(res.statusCode).toEqual(400)
-    })
-    it("returns 400 if password is not long enough", async () => {
-        const res = await request(app)
-            .post("/auth/register")
-            .send({ password: "hi", passwordVerify: "hi" })
-        expect(res.statusCode).toEqual(400)
-    })
-    // it('returns 401', async () => {
-    //     const res = await request(app).post('/auth/register').send({
-    //         username: "john",
-    //         email: "hello@hi.com",
-    //         password: "password123$$$",
-    //         passwordVerify: "password123$$$"
-    //     });
-    //     expect(res.statusCode).toEqual(401);
-    // });
-})
-
-// describe('reset', () => {
-//     it('returns 400 if no id', async () => {
-//         const res = await request(app).post('/auth/reset').send({});
-//         expect(res.statusCode).toEqual(400);
-//     });
-//     it('returns 404 if id does not match map', async () => {
-//         const res = await request(app).post('/auth/reset').send({id: 0});
-//         expect(res.statusCode).toEqual(404);
-//     });
-// });
-
-// describe('verifyCode', () => {
-//     it('returns 400 if no id', async () => {
-//         const res = await request(app).post('/auth/verifyCode').send({});
-//         expect(res.statusCode).toEqual(400);
-//     });
-//     it('returns 404 if id does not match map', async () => {
-//         const res = await request(app).post('/auth/verifyCode').send({id: "168943"});
-//         expect(res.statusCode).toEqual(404);
-//     });
-// });
-
-describe("updateUsername", () => {
-    it("returns 400 if no username", async () => {
-        const res = await request(app).post("/auth/updateUsername").send({})
-        expect(res.statusCode).toEqual(400)
-    })
-    it("returns 400 for now since no usernames in db", async () => {
-        const res = await request(app)
-            .post("/auth/updateUsername")
-            .send({ username: "hi" })
-        expect(res.statusCode).toEqual(400)
-    })
-})
-
-describe("updateEmail", () => {
-    it("returns 400 if no email", async () => {
-        const res = await request(app).post("/auth/updateEmail").send({})
-        expect(res.statusCode).toEqual(400)
-    })
-    it("returns 400 for now since no emails in db", async () => {
-        const res = await request(app)
-            .post("/auth/updateUsername")
-            .send({ username: "hi" })
-        expect(res.statusCode).toEqual(400)
-    })
-})
-
-describe("deleteAccount", () => {
-    it("returns 400 for now since no users exist yet", async () => {
-        const res = await request(app).post("/auth/deleteAccount").send({})
-        expect(res.statusCode).toEqual(400)
-    })
-})
-
-describe("updatePass", () => {
-    it("returns 400 if no id", async () => {
-        const res = await request(app).post("/auth/updatePass").send({})
-        expect(res.statusCode).toEqual(400)
-    })
-    it("returns 400 if id does not match map", async () => {
-        const res = await request(app).post("/auth/updatePass").send({ id: 0 })
         expect(res.statusCode).toEqual(400)
     })
 })
@@ -574,36 +396,145 @@ describe("mapname", () => {
     it("returns code 400 since no id is being passed", async () => {
         const res = await request(app)
             .post("/api/mapname")
-            .send({ type: "map" })
+            .send({ title: "map" })
         expect(res.statusCode).toEqual(400)
-        //add more tests sending different info to the endpoint
+    })
+    it("returns code 400 since no id is not valid", async () => {
+        const res = await request(app)
+            .post("/api/mapname")
+            .send({ id: '100689', title: "map" })
+        expect(res.statusCode).toEqual(400)
+    })
+    it("returns code 400 since no title is passed and id is invalid", async () => {
+        const res = await request(app)
+            .post("/api/mapname")
+            .send({ id: '100689' })
+        expect(res.statusCode).toEqual(400)
     })
 })
 
 describe("maptag", () => {
-    it("returns code 201 if map added to db, otherwise 404", async () => {
-        const res = await request(app).post("/api/maptag").send({ type: "map" })
-
-        expect(res.statusCode).toEqual(404)
+    it("returns code 400 since id is invalid", async () => {
+        const res = await request(app).post("/api/updatemaptag").send({ id: '100629' })
+        expect(res.statusCode).toEqual(400)
+    })
+    it("returns code 400 since no id is given", async () => {
+        const res = await request(app).post("/api/updatemaptag").send({})
+        expect(res.statusCode).toEqual(400)
     })
 })
 
 describe("mapstatus", () => {
-    it("returns code 201 if map added to db, otherwise 404", async () => {
+    it("returns code 400 since no id given", async () => {
         const res = await request(app)
-            .post("/api/mapstatus")
-            .send({ type: "map" })
-
-        expect(res.statusCode).toEqual(404)
+            .post("/api/publishmap")
+            .send({})
+        expect(res.statusCode).toEqual(400)
+    })
+    it("returns code 400 since id is invalid", async () => {
+        const res = await request(app)
+            .post("/api/publishmap")
+            .send({id: '100629'})
+        expect(res.statusCode).toEqual(400)
     })
 })
 
 describe("mapjson", () => {
-    it("returns code 201 if map added to db, otherwise 404", async () => {
+    it("returns code 400 since no geobuf given and errors out", async () => {
         const res = await request(app)
-            .post("/api/mapjson")
-            .send({ type: "map" })
+            .post("/api/updategeojson")
+            .send({})
+        expect(res.statusCode).toEqual(500)
+    })
+    it("returns code 500 since it errors out not having a geobuf", async () => {
+        const res = await request(app)
+            .post("/api/updategeojson")
+            .send({id: '100629'})
+        expect(res.statusCode).toEqual(500)
+    })
+    it("returns code 400 since valid geobuf but invalid id", async () => {
+        const res = await request(app)
+            .post("/api/updategeojson")
+            .send({id: '100629', geoBuf: buffer})
+        expect(res.statusCode).toEqual(400)
+    })
+})
 
-        expect(res.statusCode).toEqual(404)
+describe("likecomment", () => {
+    it("returns code 400 since id is invalid", async () => {
+        const res = await request(app).post("/api/likecomment").send({ id: '100629' })
+        expect(res.statusCode).toEqual(400)
+    })
+    it("returns code 400 since no id is given", async () => {
+        const res = await request(app).post("/api/likecomment").send({})
+        expect(res.statusCode).toEqual(400)
+    })
+})
+
+describe("dislikecomment", () => {
+    it("returns code 400 since id is invalid", async () => {
+        const res = await request(app).post("/api/dislikecomment").send({ id: '100629' })
+        expect(res.statusCode).toEqual(400)
+    })
+    it("returns code 400 since no id is given", async () => {
+        const res = await request(app).post("/api/dislikecomment").send({})
+        expect(res.statusCode).toEqual(400)
+    })
+})
+
+describe("likemap", () => {
+    it("returns code 400 since id is invalid", async () => {
+        const res = await request(app).post("/api/likemap").send({ id: '100629' })
+        expect(res.statusCode).toEqual(400)
+    })
+    it("returns code 400 since no id is given", async () => {
+        const res = await request(app).post("/api/likemap").send({})
+        expect(res.statusCode).toEqual(400)
+    })
+})
+
+describe("dislikemap", () => {
+    it("returns code 400 since id is invalid", async () => {
+        const res = await request(app).post("/api/dislikemap").send({ id: '100629' })
+        expect(res.statusCode).toEqual(400)
+    })
+    it("returns code 400 since no id is given", async () => {
+        const res = await request(app).post("/api/dislikemap").send({})
+        expect(res.statusCode).toEqual(400)
+    })
+})
+
+describe("postcomment", () => {
+    it("returns code 400 since id is invalid and no text given", async () => {
+        const res = await request(app).post("/api/postcomment").send({ mapId: '100629' })
+        expect(res.statusCode).toEqual(400)
+    })
+    it("returns code 400 since no id is given", async () => {
+        const res = await request(app).post("/api/postcomment").send({})
+        expect(res.statusCode).toEqual(400)
+    })
+    it("returns code 400 since no text is given", async () => {
+        const res = await request(app).post("/api/postcomment").send({
+            mapId: "5f63f8d8e740dbd28d8c822e"
+        })
+        expect(res.statusCode).toEqual(400)
+    })
+    it("returns code 400 since no id is invalid", async () => {
+        const res = await request(app).post("/api/postcomment").send({
+            mapId: "100629",
+            text: "hello"
+        })
+        expect(res.statusCode).toEqual(400)
+    })
+})
+
+describe("getcommentbyid", () => {
+    it("returns code 400 since id is invalid", async () => {
+        const res = await request(app).post("/api/getcommentbyid").send({ id: '100629' })
+        expect(res.statusCode).toEqual(400)
+    })
+    it("returns code 400 since no id is given", async () => {
+        const res = await request(app).post("/api/getcommentbyid").send({})
+        expect(res.statusCode).toEqual(400)
     })
 })

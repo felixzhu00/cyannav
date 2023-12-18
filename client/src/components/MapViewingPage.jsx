@@ -27,6 +27,7 @@ import MUIExportMapModal from "./modals/MUIExportMapModal";
 import MUIPublishMapModal from "./modals/MUIPublishMapModal";
 import MUIAddFieldModal from "./modals/MUIAddFieldModal";
 import MUICommentModal from "./modals/MUICommentModal";
+import { MuiColorInput } from "mui-color-input";
 
 import NavJSON from "./NavJSON";
 import { GlobalStoreContext } from "../store";
@@ -38,7 +39,6 @@ function MapViewingPage() {
     const { store } = useContext(GlobalStoreContext);
     const { auth } = useContext(AuthContext);
     const { id } = useParams();
-
     const [value, setValue] = useState("1");
 
     const [currentModel, setCurrentModel] = useState("");
@@ -49,6 +49,19 @@ function MapViewingPage() {
     const [anchorElChoropleth, setAnchorElChoropleth] = useState(null);
 
     const [features, setFeatures] = useState([]);
+
+    const [comments, setComments] = useState([]);
+
+    /**
+     * Like/Dislikes constants and states
+     */
+    const [hasLiked, setHasLiked] = useState(false);
+    const [hasDisliked, setHasDisliked] = useState(false);
+
+    /**
+     * Map published status state
+     */
+    const [isPublished, setIsPublished] = useState(false);
 
     //trigger if textfield is unfocused
     const [focusedField, setFocusedField] = useState(null);
@@ -63,6 +76,43 @@ function MapViewingPage() {
             store.setByFeature(null);
         }
     }, [id]);
+
+    useEffect(() => {
+        if (store.currentMap != null) {
+            setIsPublished(store.currentMap.published);
+            setHasLiked(store.currentMap.like.includes(auth.user.userId));
+            setHasDisliked(store.currentMap.dislike.includes(auth.user.userId));
+        }
+
+        if (store.currentMap && store.currentMap.commentsId) {
+            const fetchComments = async () => {
+                const commentsPromises = store.currentMap.commentsId.map(
+                    (commentId) => store.getCommentById(commentId)
+                );
+                try {
+                    const commentsResponses = await Promise.all(
+                        commentsPromises
+                    );
+                    const fetchedComments = commentsResponses.map(
+                        (response) => ({
+                            ...response,
+                            hasLikedComment: response.upvotes.includes(
+                                auth.user.userId
+                            ),
+                            hasDislikedComment: response.downvotes.includes(
+                                auth.user.userId
+                            ),
+                        })
+                    );
+                    setComments(fetchedComments);
+                } catch (error) {
+                    console.error("Error fetching comments:", error);
+                }
+            };
+            fetchComments();
+        }
+    }, [store.currentMap]);
+
 
     useEffect(() => {
         if (store.geojson && store.geojson.features) {
@@ -146,6 +196,11 @@ function MapViewingPage() {
         focusedFieldRef.current = focusedField;
         setFocusedField(null);
     }, [focusedField, features]);
+        
+    // // Used for Indexing currentArea Feature in geojson array
+    // useEffect(() => {
+    //   console.log("current",store.currentArea)
+    // }, [store.currentArea]);
 
     const areFeaturesEqual = (featuresA, featuresB) => {
         if (featuresA.length !== featuresB.length) {
@@ -192,6 +247,7 @@ function MapViewingPage() {
 
         return true;
     };
+
     useEffect(() => {
         if (store.byFeature !== null) {
             setFocusedField("feature");
@@ -278,20 +334,12 @@ function MapViewingPage() {
         });
     };
 
-    const [comments, setComments] = useState([]); // Used to store comments
-    const addComment = (newCommentText) => {
-        const newComment = {
-            text: newCommentText,
-            timestamp: new Date().toISOString(),
-        };
-        setComments([...comments, newComment]);
-    };
+    
     const commentBubbleStyle = {
         // Comment bubble styling
         margin: theme.spacing(1),
         padding: theme.spacing(1),
-        backgroundColor: theme.palette.background.paper,
-        borderRadius: theme.shape.borderRadius,
+        backgroundColor: theme.palette.background.default,
         boxShadow: theme.shadows[2],
         maxWidth: "90%",
     };
@@ -303,13 +351,6 @@ function MapViewingPage() {
             !isNaN(parseFloat(str))
         ); // ...and ensure strings of whitespace fail
     }
-    /**
-     * Like/Dislikes constants and states
-     */
-
-    const [hasLiked, setHasLiked] = useState(false);
-    const [hasDisliked, setHasDisliked] = useState(false);
-    const [isPublished, setIsPublished] = useState(false);
 
     const handleChoroplethClick = (event) => {
         setAnchorElChoropleth(event.currentTarget);
@@ -342,14 +383,100 @@ function MapViewingPage() {
         setCurrentModel("addfield");
     };
 
+    /**
+     * Handler for when the user clicks on the like map button
+     */
     const handleLike = async () => {
-        // handles likes
-        await store.likeMap(store.currentMap._id);
+        if (hasLiked) {
+            // If already liked, send request to unlike the map
+            await store.likeMap(store.currentMap._id);
+            setHasLiked(false);
+        } else {
+            // If not liked, send request to like the map
+            await store.likeMap(store.currentMap._id);
+            setHasLiked(true);
+            setHasDisliked(false); // Reset dislike state
+        }
     };
 
+    /**
+     * Handler for when the user clicks on the dislike map button
+     */
     const handleDislike = async () => {
-        // handles dislikes
-        await store.dislikeMap(store.currentMap._id);
+        if (hasDisliked) {
+            // If already disliked, send request to undislike the map
+            await store.dislikeMap(store.currentMap._id);
+            setHasDisliked(false);
+        } else {
+            // If not disliked, send request to dislike the map
+            await store.dislikeMap(store.currentMap._id);
+            setHasDisliked(true);
+            setHasLiked(false); // Reset like state
+        }
+    };
+
+    /**
+     * Handler for when the user clicks on like comment. Dynamically updates the votes
+     * @param {*} commentId the id of the comment
+     */
+    const handleLikeComment = async (commentId) => {
+        await store.likeComment(commentId);
+        setComments(
+            comments.map((comment) => {
+                if (comment.id === commentId) {
+                    const hasLiked = comment.upvotes.includes(auth.user.userId);
+                    const hasDisliked = comment.downvotes.includes(
+                        auth.user.userId
+                    );
+                    return {
+                        ...comment,
+                        upvotes: hasLiked
+                            ? comment.upvotes.filter(
+                                  (userId) => userId !== auth.user.userId
+                              )
+                            : [...comment.upvotes, auth.user.userId],
+                        downvotes: hasDisliked
+                            ? comment.downvotes.filter(
+                                  (userId) => userId !== auth.user.userId
+                              )
+                            : comment.downvotes,
+                    };
+                }
+                return comment;
+            })
+        );
+    };
+
+    /**
+     * Handler for when the user clicks on dislike comment. Dynamically updates the votes
+     * @param {*} commentId the id of the comment
+     */
+    const handleDislikeComment = async (commentId) => {
+        const updatedComment = await store.dislikeComment(commentId);
+        setComments(
+            comments.map((comment) => {
+                if (comment.id === commentId) {
+                    const hasLiked = comment.upvotes.includes(auth.user.userId);
+                    const hasDisliked = comment.downvotes.includes(
+                        auth.user.userId
+                    );
+                    return {
+                        ...comment,
+                        upvotes: hasLiked
+                            ? comment.upvotes.filter(
+                                  (userId) => userId !== auth.user.userId
+                              )
+                            : comment.upvotes,
+                        downvotes: hasDisliked
+                            ? comment.downvotes.filter(
+                                  (userId) => userId !== auth.user.userId
+                              )
+                            : [...comment.downvotes, auth.user.userId],
+                    };
+                }
+                return comment;
+            })
+        );
     };
 
     const topLeft = () => {
@@ -432,12 +559,12 @@ function MapViewingPage() {
                     boxSizing: "border-box",
                     display: "flex",
                     justifyContent: "flex-end",
-                    bgcolor: theme.palette.primary.main, // Use theme color
+                    bgcolor: theme.palette.primary.main,
                     padding: "4px",
                     boxShadow: 4,
                     height: "60px",
-                    zIndex: 1, // Increased z-index
-                    position: "relative", // Ensure this element is positioned
+                    zIndex: 1,
+                    position: "relative",
                 }}
             >
                 <Box sx={{ width: "100%", height: "relative" }}>
@@ -446,6 +573,11 @@ function MapViewingPage() {
                         onChange={handleChange}
                         variant="fullWidth"
                         aria-label="edit-comment-tab-bar"
+                        sx={{
+                            ".MuiTabs-indicator": {
+                                backgroundColor: "black",
+                            },
+                        }}
                     >
                         <Tab
                             id="editTab"
@@ -475,7 +607,7 @@ function MapViewingPage() {
                     position: "relative", // Position the container relatively
                     flex: "1",
                     width: "100%",
-                    height: `calc(100vh - 121px)`,
+                    height: `calc(100vh - 125px)`,
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "space-between",
@@ -541,12 +673,17 @@ function MapViewingPage() {
                     flexDirection: "column",
                     justifyContent: "flex-start",
                     padding: "10px",
-                    height: "100%",
                     width: "100%",
+                    height: "100%",
                     bgcolor: theme.palette.background.paper,
                 }}
             >
-                <Box>
+                <Box
+                    sx={{
+                        height: `calc(100vh - 181px)`,
+                        overflow: "auto",
+                    }}
+                >
                     {/* Map through the comments and display them */}
                     {comments.map((comment, index) => (
                         <Paper key={index} sx={commentBubbleStyle}>
@@ -558,28 +695,60 @@ function MapViewingPage() {
                                 sx={{ display: "block", marginTop: "5px" }}
                             >
                                 <Typography variant="caption">
-                                    Username
+                                    Author: {comment.author}
                                 </Typography>
                                 <br></br>
-                                {new Date(comment.timestamp).toLocaleString()}
+                                {new Date(comment.ask_date).toLocaleString()}
+                            </Typography>
+
+                            <IconButton
+                                sx={{
+                                    color: comment.upvotes.includes(
+                                        auth.user.userId
+                                    )
+                                        ? "black"
+                                        : "default",
+                                }}
+                                onClick={() => handleLikeComment(comment.id)}
+                            >
+                                <ThumbUp sx={{ fontSize: "small" }}></ThumbUp>
+                            </IconButton>
+                            <Typography variant="caption">
+                                {comment.upvotes.length}
+                            </Typography>
+                            <IconButton
+                                sx={{
+                                    color: comment.downvotes.includes(
+                                        auth.user.userId
+                                    )
+                                        ? "black"
+                                        : "default",
+                                }}
+                                onClick={() => handleDislikeComment(comment.id)}
+                            >
+                                <ThumbDown
+                                    sx={{ fontSize: "small" }}
+                                ></ThumbDown>
+                            </IconButton>
+                            <Typography variant="caption">
+                                {comment.downvotes.length}
                             </Typography>
                         </Paper>
                     ))}
                 </Box>
-                {auth.loggedIn && (
-                    <Button
-                        variant="contained"
-                        sx={{
-                            mt: "auto", // This ensures the margin is applied to the top, pushing the button to the bottom
-                            width: "100%", // Button takes full width of the sidebar
-                            color: "black",
-                            bgcolor: theme.palette.secondary.main,
-                        }}
-                        onClick={handleComments} // Replace with your own event handler
-                    >
-                        Add Comment
-                    </Button>
-                )}
+
+                <Button
+                    disabled={!auth.loggedIn}
+                    variant="contained"
+                    sx={{
+                        width: "100%",
+                        color: "black",
+                        bgcolor: theme.palette.secondary.main,
+                    }}
+                    onClick={handleComments}
+                >
+                    Add Comment
+                </Button>
             </Box>
         );
     };
@@ -875,6 +1044,7 @@ function MapViewingPage() {
                     gridRow: "1",
                     textAlign: "left",
                     paddingTop: "1px",
+                    zIndex: 1,
                 }}
             >
                 {topLeft()}
@@ -889,7 +1059,10 @@ function MapViewingPage() {
             >
                 {topRight()}
             </Box>
-            <Box sx={{ gridColumn: "1", gridRow: "2" }}>{mapView()}</Box>
+            <Box sx={{ gridColumn: "1", gridRow: "2", zIndex: 0 }}>
+                {mapView()}
+            </Box>
+
             <Box sx={{ gridColumn: "2", gridRow: "2" }}>
                 {value === "1" ? editBar() : commentSide()}
             </Box>
@@ -909,7 +1082,6 @@ function MapViewingPage() {
                 <MUICommentModal
                     open={currentModel === "comment"}
                     onClose={() => setCurrentModel("")}
-                    onAddComment={addComment}
                 />
             )}
             {currentModel === "addfield" && (

@@ -51,9 +51,9 @@ export const getAllMaps = () =>
 export const getGeoJsonById = (id) =>
     api.get(`/api/mapgeojson/${id}`).then(handleResponse).catch(handleError)
 
-export const createNewMap = (title, type, GeoJsonSchemabuf) =>
+export const createNewMap = (title, type, GeoJsonSchemabuf, tags) =>
     api
-        .post("/api/newmap", { title, type, GeoJsonSchemabuf })
+        .post("/api/newmap", { title, type, GeoJsonSchemabuf, tags })
         .then(handleResponse)
         .catch(handleError)
 
@@ -69,9 +69,9 @@ export const createForkMapById = (id) =>
 export const deleteMapById = (id) =>
     api.delete(`/api/deletemap/${id}`).then(handleResponse).catch(handleError)
 export const likeMap = (id) =>
-    api.post(`api/likemap`, { id }).then(handleResponse).catch(handleError)
+    api.post(`/api/likemap`, { id }).then(handleResponse).catch(handleError)
 export const dislikeMap = (id) =>
-    api.post(`api/dislikeMap`, { id }).then(handleResponse).catch(handleError)
+    api.post(`/api/dislikeMap`, { id }).then(handleResponse).catch(handleError)
 export const updateMapNameById = (id, title) =>
     api
         .post(`/api/mapname`, { id, title })
@@ -85,10 +85,30 @@ export const updateMapTag = (id, newTags) =>
         .catch(handleError)
 
 export const updateMapPublishStatus = (id) =>
-    api.post("/api/publishmap", { id }).then(handleResponse).catch(handleError)
+    api.post(`/api/publishmap`, { id }).then(handleResponse).catch(handleError)
 
 export const updateMapGeoJson = (id, geoBuf) =>
-    api.post(`/api/updategeojson`, { id, geoBuf }).then(handleResponse).catch(handleError)
+    api
+        .post(`/api/updategeojson`, { id, geoBuf })
+        .then(handleResponse)
+        .catch(handleError)
+export const postComment = (text, parentCommentId, mapId) =>
+    api
+        .post(`/api/postcomment`, { text, parentCommentId, mapId })
+        .then(handleResponse)
+        .catch(handleError)
+export const getcommentbyid = (id) =>
+    api
+        .post("/api/getcommentbyid", { id })
+        .then(handleResponse)
+        .catch(handleError)
+export const likeComment = (id) =>
+    api.post(`/api/likecomment`, { id }).then(handleResponse).catch(handleError)
+export const dislikeComment = (id) =>
+    api
+        .post(`/api/dislikecomment`, { id })
+        .then(handleResponse)
+        .catch(handleError)
 
 // Auth-related functions
 export const getLoggedIn = () => {
@@ -131,10 +151,15 @@ export const updatePasscode = (
             verificationCode,
         })
         .then(handleResponse)
-        .catch(handleError)
-export const verifyCode = (code) =>
+        .catch(handleError);
+export const verifyCode = (email, passcode) =>
     api
-        .post("/auth/verifyCode", { code })
+        .post("/auth/verifyCode", { email, passcode })
+        .then(handleResponse)
+        .catch(handleError);
+export const updatePasscodeNotLoggedIn = (email, password, confirmPassword) =>
+    api
+        .post("/auth/updatePasscodeNotLoggedIn", { email, password, confirmPassword })
         .then(handleResponse)
         .catch(handleError)
 export const updateUsername = (loginToken, newUsername) =>
@@ -180,10 +205,15 @@ const apis = {
     requestReset,
     updatePasscode,
     verifyCode,
+    updatePasscodeNotLoggedIn,
     updateUsername,
     updateEmail,
     deleteAccount,
     updateProfilePic,
+    postComment,
+    getcommentbyid,
+    likeComment,
+    dislikeComment,
 }
 
 export default apis

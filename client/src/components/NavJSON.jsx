@@ -14,8 +14,9 @@ function NavJSON({ data, center, zoom }) {
     const onEachFeature = (country, layer) => {
         const name1 = country.fields && country.fields.name;
         const name2 = country.properties && country.properties.admin;
+        const name3 = country.properties && country.properties.NAME_0;
 
-        const name = name1 || name2 || "";
+        const name = name1 || name2 || name3 || "";
 
         layer.bindPopup(name);
 
@@ -49,7 +50,6 @@ function NavJSON({ data, center, zoom }) {
                 fillColor: color,
             });
         }
-
         // Control the styling when selecting a certain feature(area)
         layer.on({
             click: toggleSelection,

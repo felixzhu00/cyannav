@@ -1,4 +1,4 @@
-const date = new Date(Date.now())
+// const date = new Date(Date.now())
 
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema
@@ -32,10 +32,15 @@ const commentSchema = new Schema({
     ],
     ask_date: {
         type: Date,
-        default: date,
+        default: () => new Date(Date.now()),
     },
     text: {
         type: String,
+        required: true,
+    },
+    associated_map: {
+        type: Schema.Types.ObjectID,
+        ref: "mapMetadata",
         required: true,
     },
 })

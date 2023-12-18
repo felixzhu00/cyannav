@@ -1,34 +1,42 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
-import { Typography, TextField, InputAdornment, IconButton, Button } from '@mui/material';
-import { AccountCircle, Email, Lock, Edit, DeleteForever } from '@mui/icons-material';
-import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import LoginLogo from '../assets/cyannav_logo_wo_name.png'
-import MUIChangeEmailModal from './modals/MUIChangeEmailModal';
-import MUIChangePasswordModal from './modals/MUIChangePasswordModal';
-import MUIChangeUsernameModal from './modals/MUIChangeUsernameModal';
-import MUIDeleteAccountModal from './modals/MUIDeleteAccountModal';
-import MUIChangeProfilePicModal from './modals/MUIChangeProfilePicModal';
-import AuthContext from '../auth'
-import { DropzoneArea } from 'react-mui-dropzone'
-
-
+import React, { useState, useEffect, useContext } from "react";
+import {
+    Box,
+    Container,
+    CssBaseline,
+    Typography,
+    TextField,
+    InputAdornment,
+    IconButton,
+    Button,
+} from "@mui/material";
+import {
+    AccountCircle,
+    Email,
+    Lock,
+    Edit,
+    DeleteForever,
+} from "@mui/icons-material";
+import LoginLogo from "../assets/cyannav_logo_wo_name.png";
+import MUIChangeEmailModal from "./modals/MUIChangeEmailModal";
+import MUIChangePasswordModal from "./modals/MUIChangePasswordModal";
+import MUIChangeUsernameModal from "./modals/MUIChangeUsernameModal";
+import MUIDeleteAccountModal from "./modals/MUIDeleteAccountModal";
+import MUIChangeProfilePicModal from "./modals/MUIChangeProfilePicModal";
+import AuthContext from "../auth";
 
 export default function ProfileScreen() {
     const { auth } = useContext(AuthContext);
-    const [currentModel, setCurrentModel] = useState('');
+    const [currentModal, setCurrentModal] = useState("");
     const [profilePicUrl, setProfilePicUrl] = useState(null);
-
     useEffect(() => {
         // Convert buffer from auth.user.picture to a Blob
         if (auth.user && auth.user.picture) {
             const arrayBuffer = new Uint8Array(auth.user.picture.data).buffer;
-            let blobType = 'image/jpeg'; // Default to JPEG
+            let blobType = "image/jpeg"; // Default to JPEG
 
             // Check if the buffer is a PNG by checking the first byte
             if (auth.user.picture.data[0] === 137) {
-                blobType = 'image/png';
+                blobType = "image/png";
             }
 
             const blob = new Blob([arrayBuffer], { type: blobType });
@@ -40,7 +48,7 @@ export default function ProfileScreen() {
                 URL.revokeObjectURL(imageUrl);
             };
         } else {
-            setProfilePicUrl(LoginLogo)
+            setProfilePicUrl(LoginLogo);
         }
     }, [auth.user]);
 
@@ -50,52 +58,54 @@ export default function ProfileScreen() {
             <Box
                 sx={{
                     marginTop: 8,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
                 }}
             >
                 <Box
                     id="changeProfilePictureBtn"
                     sx={{
-                        position: 'relative',
+                        position: "relative",
                         m: 5,
                         width: 200,
                         height: 200,
-                        borderRadius: '50%',
-                        cursor: 'pointer',
-                        '&:hover > .overlay': {
-                            display: 'flex',
-                        }
+                        borderRadius: "50%",
+                        cursor: "pointer",
+                        "&:hover > .overlay": {
+                            display: "flex",
+                        },
                     }}
-                    onClick={() => { setCurrentModel("picture") }}
+                    onClick={() => {
+                        setCurrentModal("picture");
+                    }}
                 >
                     <Box
                         component="img"
                         sx={{
                             width: 200,
                             height: 200,
-                            borderRadius: '50%',
-                            objectFit: 'cover',
-                            border: '2px solid',
-                            borderColor: 'primary.main'
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                            border: "2px solid",
+                            borderColor: "primary.main",
                         }}
                         src={profilePicUrl}
                     />
                     <Box
                         className="overlay"
                         sx={{
-                            position: 'absolute',
+                            position: "absolute",
                             top: 0,
                             left: 0,
-                            width: '100%',
-                            height: '100%',
-                            borderRadius: '50%',
-                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                            display: 'none',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: 'white',
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: "50%",
+                            backgroundColor: "rgba(0, 0, 0, 0.5)",
+                            display: "none",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "white",
                         }}
                     >
                         {/* Overlay content, such as an icon or text */}
@@ -120,7 +130,11 @@ export default function ProfileScreen() {
                             readOnly: true,
                             endAdornment: (
                                 <InputAdornment position="end">
-                                    <IconButton onClick={() => { setCurrentModel("username") }} >
+                                    <IconButton
+                                        onClick={() => {
+                                            setCurrentModal("username");
+                                        }}
+                                    >
                                         <Edit id="usernameEditBtn" />
                                     </IconButton>
                                 </InputAdornment>
@@ -143,7 +157,11 @@ export default function ProfileScreen() {
                             readOnly: true,
                             endAdornment: (
                                 <InputAdornment position="end">
-                                    <IconButton onClick={() => { setCurrentModel("email") }}>
+                                    <IconButton
+                                        onClick={() => {
+                                            setCurrentModal("email");
+                                        }}
+                                    >
                                         <Edit id="emailEditBtn" />
                                     </IconButton>
                                 </InputAdornment>
@@ -156,7 +174,7 @@ export default function ProfileScreen() {
                     <TextField
                         id="password"
                         label="Password"
-                        value={'************'}
+                        value={"************"}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
@@ -166,7 +184,11 @@ export default function ProfileScreen() {
                             readOnly: true,
                             endAdornment: (
                                 <InputAdornment position="end">
-                                    <IconButton onClick={() => { setCurrentModel("password") }}>
+                                    <IconButton
+                                        onClick={() => {
+                                            setCurrentModal("password");
+                                        }}
+                                    >
                                         <Edit id="passwordEditBtn" />
                                     </IconButton>
                                 </InputAdornment>
@@ -177,38 +199,53 @@ export default function ProfileScreen() {
                         margin="normal"
                         type="password"
                     />
-
                 </Box>
                 <Button
                     id="deleteAccountBtn"
                     sx={{
                         color: "red",
-                        mt: "15px"
+                        mt: "15px",
                     }}
                     startIcon={<DeleteForever />}
-                    onClick={() => { setCurrentModel("delete") }}
+                    onClick={() => {
+                        setCurrentModal("delete");
+                    }}
                 >
                     Delete your account
                 </Button>
 
-                {currentModel === 'email' && <MUIChangeEmailModal
-                    open={currentModel === 'email'}
-                    onClose={() => setCurrentModel("")} />}
-                {currentModel === 'password' && <MUIChangePasswordModal
-                    open={currentModel === 'password'}
-                    onClose={() => setCurrentModel("")} />}
-                {currentModel === 'username' && <MUIChangeUsernameModal
-                    open={currentModel === 'username'}
-                    onClose={() => setCurrentModel("")} />}
-                {currentModel === 'delete' && <MUIDeleteAccountModal
-                    open={currentModel === 'delete'}
-                    onClose={() => setCurrentModel("")} />}
-                {currentModel === 'picture' && <MUIChangeProfilePicModal
-                    open={currentModel === 'picture'}
-                    onClose={() => setCurrentModel("")}
-                    onSave={(newUrl) => setProfilePicUrl(newUrl)}
-                />}
+                {currentModal === "email" && (
+                    <MUIChangeEmailModal
+                        open={currentModal === "email"}
+                        onClose={() => setCurrentModal("")}
+                    />
+                )}
+                {currentModal === "password" && (
+                    <MUIChangePasswordModal
+                        open={currentModal === "password"}
+                        onClose={() => setCurrentModal("")}
+                    />
+                )}
+                {currentModal === "username" && (
+                    <MUIChangeUsernameModal
+                        open={currentModal === "username"}
+                        onClose={() => setCurrentModal("")}
+                    />
+                )}
+                {currentModal === "delete" && (
+                    <MUIDeleteAccountModal
+                        open={currentModal === "delete"}
+                        onClose={() => setCurrentModal("")}
+                    />
+                )}
+                {currentModal === "picture" && (
+                    <MUIChangeProfilePicModal
+                        open={currentModal === "picture"}
+                        onClose={() => setCurrentModal("")}
+                        onSave={(newUrl) => setProfilePicUrl(newUrl)}
+                    />
+                )}
             </Box>
-        </Container >
+        </Container>
     );
 }
