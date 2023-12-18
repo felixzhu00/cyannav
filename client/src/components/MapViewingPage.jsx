@@ -70,9 +70,16 @@ function MapViewingPage() {
      */
     const [isPublished, setIsPublished] = useState(false);
 
-    //trigger if textfield is unfocused
+    /**
+     * Trigger if textfield is unfocused
+     */
     const [focusedField, setFocusedField] = useState(null);
     const focusedFieldRef = useRef(null);
+
+    /**
+     * Field selection for map type
+     */
+    const [selectedItem, setSelectedItem] = useState("");
 
     // Redirect
     const navigate = useNavigate();
@@ -684,6 +691,32 @@ function MapViewingPage() {
     };
 
     const commentSide = () => {
+        if (!isPublished) {
+            return (
+                <Paper
+                    elevation={1}
+                    sx={{
+                        height: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        bgcolor: theme.palette.background.paper,
+                    }}
+                >
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            textAlign: "center",
+                            color: theme.palette.text.primary,
+                            fontWeight: "bold",
+                            width: "80%",
+                        }}
+                    >
+                        Comments are not available until the map is published.
+                    </Typography>
+                </Paper>
+            );
+        }
         return (
             <Box
                 sx={{
@@ -773,8 +806,6 @@ function MapViewingPage() {
     };
 
     const editBar = () => {
-        const [selectedItem, setSelectedItem] = useState("");
-
         const fieldEdit = () => {
             if (store.currentArea === -1) {
                 return null;
@@ -971,7 +1002,26 @@ function MapViewingPage() {
                 }}
             >
                 {store.currentArea == -1 ? (
-                    <Typography variant="h6">Choose an area to edit</Typography>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            height: "100%", // Adjust as needed
+                            padding: theme.spacing(2),
+                            textAlign: "center",
+                        }}
+                    >
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                color: theme.palette.text.primary,
+                                fontWeight: "bold",
+                            }}
+                        >
+                            Choose an area to edit
+                        </Typography>
+                    </Box>
                 ) : (
                     <>
                         {auth.loggedIn && (
@@ -1184,6 +1234,7 @@ function MapViewingPage() {
             <Box sx={{ gridColumn: "2", gridRow: "2" }}>
                 {value === "1" ? editBar() : commentSide()}
             </Box>
+
             {currentModel === "export" && (
                 <MUIExportMapModal
                     open={currentModel === "export"}
