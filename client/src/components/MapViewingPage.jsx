@@ -101,8 +101,10 @@ function MapViewingPage() {
 
         if (store.currentMap != null) {
             setIsPublished(store.currentMap.published);
-            setHasLiked(store.currentMap.like.includes(auth.user.userId));
-            setHasDisliked(store.currentMap.dislike.includes(auth.user.userId));
+            if (auth.user && auth.user.userId) {
+                setHasLiked(store.currentMap.like.includes(auth.user.userId));
+                setHasDisliked(store.currentMap.dislike.includes(auth.user.userId));    
+            }
         }
 
         if (store.currentMap && store.currentMap.commentsId) {
@@ -723,7 +725,7 @@ function MapViewingPage() {
                             <IconButton
                                 sx={{
                                     color: comment.upvotes.includes(
-                                        auth.user.userId
+                                        (auth.user && auth.user.userId) ? auth.user.userId : "####"
                                     )
                                         ? "black"
                                         : "default",
@@ -738,7 +740,7 @@ function MapViewingPage() {
                             <IconButton
                                 sx={{
                                     color: comment.downvotes.includes(
-                                        auth.user.userId
+                                        (auth.user && auth.user.userId) ? auth.user.userId : "####"
                                     )
                                         ? "black"
                                         : "default",
