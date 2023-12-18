@@ -117,7 +117,7 @@ function GlobalStoreContextProvider(props) {
     store.createMap = async (title, fileType, mapTemplate, file) => {
         const mapFile = file;
 
-        console.log("file",fileType)
+        console.log("file", fileType);
         // Create a FileReader
         const reader = new FileReader();
         // Wrap the logic in a Promise
@@ -155,11 +155,13 @@ function GlobalStoreContextProvider(props) {
                                 tags = navjson.tags;
                                 break;
                         }
-        
+
                         // Encode the GeoJSON with geobuf
                         const buffer = geobuf.encode(geojson, new Pbf());
-        
-                        resolve(api.createNewMap(title, mapTemplate, buffer, tags));
+
+                        resolve(
+                            api.createNewMap(title, mapTemplate, buffer, tags)
+                        );
                     }
                 };
 
@@ -220,7 +222,9 @@ function GlobalStoreContextProvider(props) {
 
     store.renameMap = async (mapId, newName) => {
         // Call to backend API to update the map name
-        await api.updateMapNameById(mapId, newName);
+        const response = await api.updateMapNameById(mapId, newName);
+
+        return response;
     };
 
     store.deleteMap = async (mapId) => {
@@ -440,7 +444,6 @@ function GlobalStoreContextProvider(props) {
         });
     };
 
-
     store.exportImage = async () => {
         const mapElement = Document.getElementById("map");
 
@@ -500,7 +503,6 @@ function GlobalStoreContextProvider(props) {
         }
         return null;
     };
-
 
     return (
         <GlobalStoreContext.Provider value={{ store }}>
