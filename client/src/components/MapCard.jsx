@@ -39,6 +39,9 @@ export default function MapCard({ map }) {
     const [visibleChips, setVisibleChips] = useState([]);
     const [noTagMessage, setNoTagMessage] = useState("");
 
+    // States for renaming error
+    const [renameError, setRenameError] = useState("");
+
     // Define the maximum length for a chip label
     const MAX_CHIP_LABEL_LENGTH = 10;
     const showChips = () => {
@@ -79,9 +82,19 @@ export default function MapCard({ map }) {
         setNewName(event.target.value);
     };
 
-    const handleSubmitName = () => {
-        setIsEditing(false);
-        store.renameMap(map._id, newName);
+    const handleSubmitName = async () => {
+        if (newName == map.title) {
+            setIsEditing(false);
+            return;
+        }
+        const response = await store.renameMap(map._id, newName);
+        if (response.status !== 200) {
+            setRenameError(response.data.errorMessage);
+        } else {
+            setIsEditing(false);
+            // Sets the map.title instead of requerying api
+            map.title = newName;
+        }
     };
 
     const handleKebab = async (option) => {
@@ -204,6 +217,8 @@ export default function MapCard({ map }) {
                                     handleSubmitName();
                                 }
                             }}
+                            error={renameError !== ""}
+                            helperText={renameError}
                         />
                     ) : (
                         <Typography
@@ -253,7 +268,7 @@ export default function MapCard({ map }) {
                         </MenuItem>
                         <MenuItem
                             onClick={() => {
-                                handleKebab("fork")
+                                handleKebab("fork");
                             }}
                         >
                             Fork
@@ -281,27 +296,31 @@ export default function MapCard({ map }) {
                         spacing={1}
                         sx={{ mt: "10px", flexWrap: "nowrap" }}
                     >
-                        {visibleChips && visibleChips.map((tag) => {
-                            const isLongLabel =
-                                tag.length > MAX_CHIP_LABEL_LENGTH;
-                            const displayLabel = isLongLabel
-                                ? `${tag.substring(
-                                      0,
-                                      MAX_CHIP_LABEL_LENGTH
-                                  )}...`
-                                : tag;
+                        {visibleChips &&
+                            visibleChips.map((tag) => {
+                                const isLongLabel =
+                                    tag.length > MAX_CHIP_LABEL_LENGTH;
+                                const displayLabel = isLongLabel
+                                    ? `${tag.substring(
+                                          0,
+                                          MAX_CHIP_LABEL_LENGTH
+                                      )}...`
+                                    : tag;
 
-                            return (
-                                <Tooltip
-                                    key={tag}
-                                    title={tag}
-                                    placement="top"
-                                    arrow
-                                >
-                                    <Chip label={displayLabel} size="small" />
-                                </Tooltip>
-                            );
-                        })}
+                                return (
+                                    <Tooltip
+                                        key={tag}
+                                        title={tag}
+                                        placement="top"
+                                        arrow
+                                    >
+                                        <Chip
+                                            label={displayLabel}
+                                            size="small"
+                                        />
+                                    </Tooltip>
+                                );
+                            })}
                     </Stack>
                 </Box>
 

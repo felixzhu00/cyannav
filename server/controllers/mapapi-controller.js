@@ -342,7 +342,9 @@ updateMapNameById = async (req, res) => {
             return res.status(404).end()
         }
         if (toBeUpdated.user.toString() !== res.locals.userId) {
-            return res.status(401).end()
+            return res.status(401).json({
+                errorMessage: "You're not authorized to change this map's name",
+            })
         }
 
         // Checks if this title already exists for the current user.
