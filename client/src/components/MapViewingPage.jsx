@@ -28,7 +28,7 @@ import {
     ThumbUp,
     ThumbDown,
 } from "@mui/icons-material";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import MUIExportMapModal from "./modals/MUIExportMapModal";
 import MUIPublishMapModal from "./modals/MUIPublishMapModal";
@@ -74,6 +74,9 @@ function MapViewingPage() {
     const [focusedField, setFocusedField] = useState(null);
     const focusedFieldRef = useRef(null);
 
+    // Redirect
+    const navigate = useNavigate();
+
     //Runs on initial load
     useEffect(() => {
         if (id != null) {
@@ -85,6 +88,17 @@ function MapViewingPage() {
     }, [id]);
 
     useEffect(() => {
+        if (store.currentMap == "Unauthorized") {
+            alert("You do not permission to access this map")
+            navigate("/browsepage")
+            return
+        }
+        if (store.currentMap == "Notfound") {
+            alert("Map not found")
+            navigate("/browsepage")
+            return
+        }
+
         if (store.currentMap != null) {
             setIsPublished(store.currentMap.published);
             setHasLiked(store.currentMap.like.includes(auth.user.userId));

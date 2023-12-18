@@ -424,6 +424,22 @@ function GlobalStoreContextProvider(props) {
                 likes: response.data.metadata.like.length,
                 dislikes: response.data.metadata.dislike.length,
             }));
+        } else {
+            switch (response.status) {
+                case 401:
+                    setStore((prevStore) => ({
+                        ...prevStore,
+                        currentMap: "Unauthorized"
+                    }))
+                    break
+                case 400:
+                case 404:
+                    setStore((prevStore) => ({
+                        ...prevStore,
+                        currentMap: "Notfound"
+                    }))
+                    break
+            }
         }
     };
 
