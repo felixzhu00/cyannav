@@ -241,11 +241,11 @@ logout = async (req, res) => {
         .send();
 };
 
-// TODO: To be implemented once email service is setup.
-
 resetRequest = async (req, res) => {
     try {
         const { email } = req.body
+
+        currentTime = Date.now()
 
         if(!email){
             return res.status(400).json({
@@ -260,6 +260,19 @@ resetRequest = async (req, res) => {
             return res.status(401).json({
                 user: null,
                 errorMessage: "Email is not associated with a user",
+            })
+        }
+
+        const targetPasscode = await Passcode.findOne({ userEmail: email })
+        //user already has verification code but it is expired
+        if (targetPasscode && ((currentTime - targetPasscode.creationDate)/1000 > targetPasscode.expirationData)) {
+            await Passcode.deleteOne({ _id: targetPasscode._id });
+        }
+        //user already has verification code and it is NOT expired
+        else if(targetPasscode && !((currentTime - targetPasscode.creationDate)/1000 > targetPasscode.expirationData)){
+            return res.status(401)
+            .json({
+                errorMessage: "User already has a verification code.",
             })
         }
 
@@ -347,7 +360,7 @@ verifyCode = async (req, res) => {
         }
 
         const result = await Passcode.findByIdAndDelete({_id: targetPasscode._id})
-        if(passcode == currpasscode && result ){
+        if(passcode == currpasscode && result){
             return res.status(200)
             .json({
                     email: targetPasscode.userEmail,

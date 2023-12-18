@@ -58,8 +58,6 @@ export default function ForgetPswdScreen() {
         if (password !== confirmPassword) {
             setPasswordError("Passwords do not match");
             return;
-        } else {
-            setPasswordError("Password error message test");
         }
 
         const res = await auth.updatePasscodeNotLoggedIn(email, password, confirmPassword);
