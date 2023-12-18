@@ -68,7 +68,12 @@ function GlobalStoreContextProvider(props) {
     });
 
     useEffect(() => {
-        if (store && store.geojson !== null && store.currentMap && !store.currentMap.published) {
+        if (
+            store &&
+            store.geojson !== null &&
+            store.currentMap &&
+            !store.currentMap.published
+        ) {
             store.updateMapGeoJson();
         }
     }, [store.geojson]);
@@ -429,16 +434,16 @@ function GlobalStoreContextProvider(props) {
                 case 401:
                     setStore((prevStore) => ({
                         ...prevStore,
-                        currentMap: "Unauthorized"
-                    }))
-                    break
+                        currentMap: "Unauthorized",
+                    }));
+                    break;
                 case 400:
                 case 404:
                     setStore((prevStore) => ({
                         ...prevStore,
-                        currentMap: "Notfound"
-                    }))
-                    break
+                        currentMap: "Notfound",
+                    }));
+                    break;
             }
         }
     };
@@ -483,7 +488,6 @@ function GlobalStoreContextProvider(props) {
 
     store.postComment = async (text, parentCommentId, mapId) => {
         const response = await api.postComment(text, parentCommentId, mapId);
-        console.log(response);
         return response;
     };
 
