@@ -44,8 +44,6 @@ jest.mock('../schemas/Map/mapMetadataSchema');
 jest.mock('../schemas/Map/geoJsonSchema');
 jest.mock('../schemas/Map/commentSchema');
 
-
-
 afterEach(() => {
     jest.clearAllMocks()
 })
@@ -870,7 +868,7 @@ describe("updateMapGeoJson function", () => {
             geojsonId: buffer,
         })
         MapMetaData.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(true)
-        const req = { body: { id: 1 } }
+        const req = { body: { id: 1, geoBuf: {key1: '0'} } }
         const res = {
             locals: {
                 userId: "rob",
@@ -1041,13 +1039,13 @@ describe("mapjson", () => {
         const res = await request(app)
             .post("/api/updategeojson")
             .send({})
-        expect(res.statusCode).toEqual(500)
+        expect(res.statusCode).toEqual(400)
     })
-    it("returns code 500 since it errors out not having a geobuf", async () => {
+    it("returns code 400 since it errors out not having a geobuf", async () => {
         const res = await request(app)
             .post("/api/updategeojson")
             .send({id: '100629'})
-        expect(res.statusCode).toEqual(500)
+        expect(res.statusCode).toEqual(400)
     })
     it("returns code 400 since valid geobuf but invalid id", async () => {
         const res = await request(app)

@@ -35,7 +35,6 @@ export default function MUIChangePasswordModal(props) {
      * Handler for saving the new email
      */
     const handleSave = async () => {
-        console.log(currPassword);
         if (
             currPassword !== "" &&
             newPassword !== "" &&
