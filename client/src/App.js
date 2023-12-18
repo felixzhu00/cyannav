@@ -2,7 +2,7 @@ import "./App.css";
 import AppBanner from "./components/AppBanner.jsx";
 import LoginScreen from "./components/LoginScreen.jsx";
 import RegisterScreen from "./components/RegisterScreen.jsx";
-import { BrowserRouter, Route, Routes, Router, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Router, Switch, Navigate } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material";
 import ForgetPswdScreen from "./components/ForgetPswdScreen.jsx";
 import ProfileScreen from "./components/ProfileScreen.jsx";
@@ -90,6 +90,7 @@ const App = () => {
               <Route path="/profile/" element={<ProfileScreen />} />
               <Route path="/browsepage/" element={<BrowsePage />} />
               <Route path="/mapview/:id" element={<MapViewingPage />} />
+              <Route path="/mapview" element={<Navigate to="/browsepage"/>} />
             </Routes>
           </BrowserRouter>
         </GlobalStoreContextProvider>
