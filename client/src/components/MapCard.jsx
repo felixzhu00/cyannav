@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react"
+import { useState, useContext, useEffect } from "react";
 import {
     Box,
     Card,
@@ -15,106 +15,103 @@ import {
     Stack,
     Tooltip,
     Divider,
-} from "@mui/material"
-import { MoreVert, Publish, ThumbUp, ThumbDown } from "@mui/icons-material"
-import { Link } from "react-router-dom"
-import usgeojsonpng from "../assets/usgeojson.png"
-import { GlobalStoreContext } from "../store"
-import AuthContext from "../auth"
-import { useNavigate } from "react-router-dom"
+} from "@mui/material";
+import { MoreVert, Publish, ThumbUp, ThumbDown } from "@mui/icons-material";
+import { Link } from "react-router-dom";
+import usgeojsonpng from "../assets/usgeojson.png";
+import { GlobalStoreContext } from "../store";
+import AuthContext from "../auth";
+import { useNavigate } from "react-router-dom";
 
 export default function MapCard({ map }) {
-    const { store } = useContext(GlobalStoreContext)
-    const { auth } = useContext(AuthContext)
-    const navigate = useNavigate()
+    const { store } = useContext(GlobalStoreContext);
+    const { auth } = useContext(AuthContext);
+    const navigate = useNavigate();
 
-    const [anchorEl, setAnchorEl] = useState(null)
-    const open = Boolean(anchorEl)
-    const theme = useTheme()
-    const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"))
-    const [isEditing, setIsEditing] = useState(false)
-    const [newName, setNewName] = useState(map.title || "Unnamed Map")
-    const [isPublished, setIsPublished] = useState(map.published)
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+    const theme = useTheme();
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+    const [isEditing, setIsEditing] = useState(false);
+    const [newName, setNewName] = useState(map.title || "Unnamed Map");
+    const [isPublished, setIsPublished] = useState(map.published);
     // States for managing chips
-    const [visibleChips, setVisibleChips] = useState([])
-    const [noTagMessage, setNoTagMessage] = useState("")
+    const [visibleChips, setVisibleChips] = useState([]);
+    const [noTagMessage, setNoTagMessage] = useState("");
 
     // Define the maximum length for a chip label
-    const MAX_CHIP_LABEL_LENGTH = 10
-    console.log(map)
+    const MAX_CHIP_LABEL_LENGTH = 10;
     const showChips = () => {
         if (map.tags.length != 0) {
-            setVisibleChips(map.tags)
+            setVisibleChips(map.tags);
         } else {
-            setNoTagMessage("No tags associated with map...")
+            setNoTagMessage("No tags associated with map...");
         }
-    }
+    };
 
     // Effect to calculate chips on mount and when map changes
     useEffect(() => {
-        showChips()
-    }, [map.tags, isSmallScreen])
+        showChips();
+    }, [map.tags, isSmallScreen]);
 
     useEffect(() => {
-        setIsPublished(map.published)
-    }, [map.published])
+        setIsPublished(map.published);
+    }, [map.published]);
 
     const handleClick = (event) => {
-        setAnchorEl(event.currentTarget)
-    }
+        setAnchorEl(event.currentTarget);
+    };
 
     const handleClose = () => {
-        setAnchorEl(null)
-    }
+        setAnchorEl(null);
+    };
 
     const handleDoubleClick = () => {
-        // TODO: Implement this so that one can only open the textbox of own map.
-
         if (map.published === false) {
-            setIsEditing(true)
+            setIsEditing(true);
         } else {
-            setIsEditing(false)
+            setIsEditing(false);
         }
-    }
+    };
 
     const handleChangeName = (event) => {
-        setNewName(event.target.value)
-    }
+        setNewName(event.target.value);
+    };
 
     const handleSubmitName = () => {
-        setIsEditing(false)
-        store.renameMap(map._id, newName)
-    }
+        setIsEditing(false);
+        store.renameMap(map._id, newName);
+    };
 
     const handleKebab = async (option) => {
         switch (option) {
             case "addTag":
-                await store.setCurrentModal("AddTagModal", map._id)
-                break
+                await store.setCurrentModal("AddTagModal", map._id);
+                break;
             case "publish":
-                await store.setCurrentModal("PublishMapModal", map._id)
-                break
+                await store.setCurrentModal("PublishMapModal", map._id);
+                break;
             case "duplicate":
-                await store.duplicateMap(map._id)
-                await store.getMyMapCollection(auth.user.userId)
-                break
+                await store.duplicateMap(map._id);
+                await store.getMyMapCollection(auth.user.userId);
+                break;
             case "fork":
-                await store.forkMap(map._id)
-                break
+                await store.forkMap(map._id);
+                break;
             case "delete":
-                await store.setCurrentModal("DeleteMapModal", map._id)
-                break
+                await store.setCurrentModal("DeleteMapModal", map._id);
+                break;
             default:
-                console.log(`${option} is incorrect`)
+                console.log(`${option} is incorrect`);
         }
-        setAnchorEl(null)
-    }
+        setAnchorEl(null);
+    };
 
     const handleNavToMap = async () => {
-        console.log(map)
-        await store.setCurrentMap(map)
-        navigate(`/mapview/${map._id}`)
-    }
+        console.log(map);
+        await store.setCurrentMap(map);
+        navigate(`/mapview/${map._id}`);
+    };
 
     return (
         <Card
@@ -203,7 +200,7 @@ export default function MapCard({ map }) {
                             onBlur={handleSubmitName}
                             onKeyPress={(e) => {
                                 if (e.key === "Enter") {
-                                    handleSubmitName()
+                                    handleSubmitName();
                                 }
                             }}
                         />
@@ -233,7 +230,7 @@ export default function MapCard({ map }) {
                         <MenuItem
                             disabled={isPublished}
                             onClick={() => {
-                                handleKebab("addTag")
+                                handleKebab("addTag");
                             }}
                         >
                             Add Tag
@@ -241,14 +238,14 @@ export default function MapCard({ map }) {
                         <MenuItem
                             disabled={isPublished}
                             onClick={() => {
-                                handleKebab("publish")
+                                handleKebab("publish");
                             }}
                         >
                             Publish
                         </MenuItem>
                         <MenuItem
                             onClick={() => {
-                                handleKebab("duplicate")
+                                handleKebab("duplicate");
                             }}
                         >
                             Duplicate
@@ -256,7 +253,7 @@ export default function MapCard({ map }) {
                         {/* <MenuItem onClick={() => { handleKebab("fork") }}>Fork</MenuItem> */}
                         <MenuItem
                             onClick={() => {
-                                handleKebab("delete")
+                                handleKebab("delete");
                             }}
                         >
                             Delete
@@ -279,13 +276,13 @@ export default function MapCard({ map }) {
                     >
                         {visibleChips.map((tag) => {
                             const isLongLabel =
-                                tag.length > MAX_CHIP_LABEL_LENGTH
+                                tag.length > MAX_CHIP_LABEL_LENGTH;
                             const displayLabel = isLongLabel
                                 ? `${tag.substring(
                                       0,
                                       MAX_CHIP_LABEL_LENGTH
                                   )}...`
-                                : tag
+                                : tag;
 
                             return (
                                 <Tooltip
@@ -296,7 +293,7 @@ export default function MapCard({ map }) {
                                 >
                                     <Chip label={displayLabel} size="small" />
                                 </Tooltip>
-                            )
+                            );
                         })}
                     </Stack>
                 </Box>
@@ -306,5 +303,5 @@ export default function MapCard({ map }) {
                 )}
             </CardContent>
         </Card>
-    )
+    );
 }

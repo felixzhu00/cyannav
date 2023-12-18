@@ -1,88 +1,109 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
-import IconButton from '@mui/material/IconButton';
-import { Close } from '@mui/icons-material';
-import { TextField } from '@mui/material';
-import { useTheme } from '@emotion/react';
-import AuthContext from '../../auth.js';
-import { useNavigate } from 'react-router-dom';
-import { useContext } from 'react';
+import React, { useContext, useState } from "react";
+import {
+    Alert,
+    Box,
+    Button,
+    IconButton,
+    Modal,
+    Typography,
+    TextField,
+} from "@mui/material";
+import { Close } from "@mui/icons-material";
+import { useTheme } from "@emotion/react";
+import AuthContext from "../../auth.js";
+import { useNavigate } from "react-router-dom";
 
-
+/**
+ * Modal box style
+ */
 const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
     width: 500,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
+    bgcolor: "background.paper",
     boxShadow: 24,
     p: 4,
 };
 
-export default function MUIDeleteAccountModal() {
+export default function MUIDeleteAccountModal(props) {
     const theme = useTheme();
     const navigate = useNavigate();
     const { auth } = useContext(AuthContext);
+    const [errorMessage, setErrorMessage] = useState("");
 
-    const [open, setOpen] = React.useState(true);
-    const handleClose = () => setOpen(false);
-
-    const [errorMessage, setErrorMessage] = React.useState('');
-
+    /**
+     * Handler to check all the fields are correct and deletes the account
+     * @param {*} event
+     */
     const handleDelete = async (event) => {
         event.preventDefault();
-        const formElement = document.getElementById('deleteAccountForm');
+        const formElement = document.getElementById("deleteAccountForm");
         const data = new FormData(formElement);
         const input = {
-            username: data.get('username'),
-            email: data.get('email'),
-            password: data.get('password')
-        }
-        if (input.username != '' || input.email != '' || input.password != '') {
+            username: data.get("username"),
+            email: data.get("email"),
+            password: data.get("password"),
+        };
+        if (input.username != "" && input.email != "" && input.password != "") {
             try {
-                await auth.deleteAccount(input.username, input.email, input.password);
-                handleClose();
+                await auth.deleteAccount(
+                    input.username,
+                    input.email,
+                    input.password
+                );
+                props.onClose();
                 await auth.logoutUser();
-                navigate('/login')
+                navigate("/login");
             } catch (error) {
                 console.log(error.message);
                 setErrorMessage(error.message);
             }
         } else {
-            setErrorMessage('All fields are required!');
+            setErrorMessage("All fields are required!");
         }
-    }
+    };
 
     return (
         <div>
             <Modal
-                open={open}
+                open={props.open}
                 aria-labelledby="delete-account-modal-title"
                 aria-describedby="delete-account-modal-description"
             >
                 <Box sx={style}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography id="delete-account-modal-title" variant="h6" component="h2">
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Typography
+                            id="delete-account-modal-title"
+                            variant="h6"
+                            component="h2"
+                        >
                             Delete Your Account
                         </Typography>
-                        <IconButton onClick={handleClose}>
+                        <IconButton onClick={props.onClose}>
                             <Close />
                         </IconButton>
                     </Box>
-                    <Typography id="delete-account-modal-description" variant="body1">
-                        Fill in the information below to delete your account.<br></br>
+                    <Typography
+                        id="delete-account-modal-description"
+                        variant="body1"
+                    >
+                        Fill in the information below to delete your account.
+                        <br></br>
                         Note: All your maps will be permanently removed.
                     </Typography>
                     <Box
                         component="form"
                         id="deleteAccountForm"
                         sx={{
-                            '& .MuiTextField-root': { m: 1, width: '95%' },
+                            "& .MuiTextField-root": { m: 1, width: "95%" },
                             mt: 2,
                         }}
                         noValidate
@@ -90,7 +111,7 @@ export default function MUIDeleteAccountModal() {
                     >
                         <TextField
                             margin="normal"
-                            onChange={() => setErrorMessage('')}
+                            onChange={() => setErrorMessage("")}
                             required
                             fullWidth
                             name="username"
@@ -100,7 +121,7 @@ export default function MUIDeleteAccountModal() {
                         />
                         <TextField
                             margin="normal"
-                            onChange={() => setErrorMessage('')}
+                            onChange={() => setErrorMessage("")}
                             required
                             fullWidth
                             name="email"
@@ -110,7 +131,7 @@ export default function MUIDeleteAccountModal() {
                         />
                         <TextField
                             margin="normal"
-                            onChange={() => setErrorMessage('')}
+                            onChange={() => setErrorMessage("")}
                             required
                             fullWidth
                             name="password"
@@ -119,24 +140,31 @@ export default function MUIDeleteAccountModal() {
                             id="password"
                         />
                         {errorMessage && (
-                            <Typography color="error" variant='subtitle2' sx={{ mt: 1, ml: 1 }}>
+                            <Alert severity="error" sx={{ mt: "10px" }}>
                                 {errorMessage}
-                            </Typography>
+                            </Alert>
                         )}
-                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                mt: 2,
+                                mr: 2,
+                            }}
+                        >
                             <Button
                                 onClick={handleDelete}
                                 variant="contained"
                                 sx={{
                                     backgroundColor: "red",
                                     color: "black",
-                                    mr: '10px'
+                                    mr: "10px",
                                 }}
                             >
                                 DELETE
                             </Button>
                             <Button
-                                onClick={handleClose}
+                                onClick={props.onClose}
                                 variant="outlined"
                                 sx={{
                                     color: "black",
@@ -148,6 +176,6 @@ export default function MUIDeleteAccountModal() {
                     </Box>
                 </Box>
             </Modal>
-        </div >
+        </div>
     );
 }

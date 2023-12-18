@@ -1,24 +1,24 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
-import IconButton from '@mui/material/IconButton';
-import { Close } from '@mui/icons-material';
-import { TextField } from '@mui/material';
-import { useTheme } from '@emotion/react';
-import { useState, useContext } from 'react';
-import AuthContext from '../../auth.js';
-
+import React, { useState, useContext } from "react";
+import {
+    Alert,
+    Box,
+    Button,
+    Typography,
+    Modal,
+    IconButton,
+    TextField,
+} from "@mui/material";
+import { Close } from "@mui/icons-material";
+import { useTheme } from "@emotion/react";
+import AuthContext from "../../auth.js";
 
 const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
     width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
+    bgcolor: "background.paper",
     boxShadow: 24,
     p: 4,
 };
@@ -26,34 +26,56 @@ const style = {
 export default function MUIChangePasswordModal(props) {
     const theme = useTheme();
     const { auth } = useContext(AuthContext);
-    const [open, setOpen] = React.useState(props.open);
-    const [currPassword, setCurrPassword] = useState('')
-    const [newPassword, setNewPassword] = useState('')
-    const [newVerifyPassword, setNewVerifyPassword] = useState('')
-    const [errorMessage, setErrorMessage] = React.useState('');
+    const [currPassword, setCurrPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [newVerifyPassword, setNewVerifyPassword] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
-    const handleClose = () => {
-        setOpen(false)
-        props.onClose()
-    };
-
+    /**
+     * Handler for saving the new email
+     */
     const handleSave = async () => {
-        try {
-            await auth.updatePassword(currPassword, newPassword, newVerifyPassword);
-            handleClose()
-        } catch (error) {
-            setErrorMessage(error.message);
+        console.log(currPassword);
+        if (
+            currPassword !== "" &&
+            newPassword !== "" &&
+            newVerifyPassword !== ""
+        ) {
+            try {
+                await auth.updatePassword(
+                    currPassword,
+                    newPassword,
+                    newVerifyPassword
+                );
+                props.onClose();
+            } catch (error) {
+                setErrorMessage(error.message);
+            }
+        } else {
+            setErrorMessage("Fill in all required fields.");
         }
     };
 
+    /**
+     * Handler for when the user inputs a new password
+     * @param {*} event new password
+     */
     const handlePasswordChange = (event) => {
         setNewPassword(event.target.value);
     };
 
+    /**
+     * Handler for user inputting the verify password
+     * @param {*} event verify new password
+     */
     const handleVerifyPasswordChange = (event) => {
         setNewVerifyPassword(event.target.value);
     };
 
+    /**
+     * Handler for user inputting their current password
+     * @param {*} event old password
+     */
     const handleCurrPasswordChange = (event) => {
         setCurrPassword(event.target.value);
     };
@@ -61,23 +83,33 @@ export default function MUIChangePasswordModal(props) {
     return (
         <div>
             <Modal
-                open={open}
+                open={props.open}
                 aria-labelledby="change-password-modal-title"
                 aria-describedby="change-password-modal-description"
             >
                 <Box sx={style}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography id="change-email-password-title" variant="h6" component="h2">
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Typography
+                            id="change-email-password-title"
+                            variant="h6"
+                            component="h2"
+                        >
                             Change Password
                         </Typography>
-                        <IconButton onClick={handleClose}>
+                        <IconButton onClick={props.onClose}>
                             <Close />
                         </IconButton>
                     </Box>
                     <Box
                         component="form"
                         sx={{
-                            '& .MuiTextField-root': { m: 1, width: '95%' },
+                            "& .MuiTextField-root": { m: 1, width: "95%" },
                             mt: 2,
                         }}
                         noValidate
@@ -94,7 +126,7 @@ export default function MUIChangePasswordModal(props) {
                             autoComplete="current-password"
                             onChange={(event) => {
                                 handleCurrPasswordChange(event);
-                                setErrorMessage('');
+                                setErrorMessage("");
                             }}
                         />
                         <TextField
@@ -107,7 +139,7 @@ export default function MUIChangePasswordModal(props) {
                             id="new-password"
                             onChange={(event) => {
                                 handlePasswordChange(event);
-                                setErrorMessage('');
+                                setErrorMessage("");
                             }}
                         />
                         <TextField
@@ -120,17 +152,41 @@ export default function MUIChangePasswordModal(props) {
                             id="verify-new-password"
                             onChange={(event) => {
                                 handleVerifyPasswordChange(event);
-                                setErrorMessage('');
+                                setErrorMessage("");
                             }}
                         />
                         {errorMessage && (
-                            <Typography color="error" variant='subtitle2' sx={{ mt: 1, ml: 1 }}>
+                            <Alert severity="error" sx={{ mt: "10px" }}>
                                 {errorMessage}
-                            </Typography>
+                            </Alert>
                         )}
-                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mr: 2 }}>
-                            <Button onClick={handleSave} variant="contained" sx={{ bgcolor: theme.palette.primary.main, color: "black", mr: '10px', width: "90px" }}>Save</Button>
-                            <Button onClick={handleClose} variant="outlined" sx={{ color: "black" }}>Cancel</Button>
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                mt: 2,
+                                mr: 2,
+                            }}
+                        >
+                            <Button
+                                onClick={handleSave}
+                                variant="contained"
+                                sx={{
+                                    bgcolor: theme.palette.primary.main,
+                                    color: "black",
+                                    mr: "10px",
+                                    width: "90px",
+                                }}
+                            >
+                                Save
+                            </Button>
+                            <Button
+                                onClick={props.onClose}
+                                variant="outlined"
+                                sx={{ color: "black" }}
+                            >
+                                Cancel
+                            </Button>
                         </Box>
                     </Box>
                 </Box>
