@@ -155,8 +155,8 @@ register = async (req, res) => {
             return res.status(401).json({
                 loggedIn: false,
                 user: null,
-                errorMessage: "Passwords does not match",
-            });
+                errorMessage: "Passwords do not match",
+            })
         }
 
         // TODO: go over concrete to stay consistent with front-end.
@@ -244,19 +244,6 @@ logout = async (req, res) => {
 // TODO: To be implemented once email service is setup.
 
 resetRequest = async (req, res) => {
-    // Get info from req
-    // Send to auth manager
-    // Return status
-    // send email
-    // add verification code to database
-};
-
-verifyCode = async (req, res) => {
-    // Get code from req
-    // Send to auth manager
-    // Return status
-    // check code against databse
-    // if yes, then ask
     try {
         const { email } = req.body
 

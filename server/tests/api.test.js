@@ -25,13 +25,26 @@ const {
     createForkMapById,
     deleteMapById,
     updateMapNameById,
-    // updateMapTag,
+    updateMapTag,
     updateMapPublishStatus,
-    // updateMapJson,
+    updateMapGeoJson,
+    postComment,
+    getCommentById,
+    likeMap,
+    dislikeMap,
+    likeComment,
+    dislikeComment,
 } = require("../controllers/mapapi-controller.js")
 
 const MapMetaData = require("../schemas/Map/mapMetadataSchema")
 const GeoJsonSchema = require("../schemas/Map/geoJsonSchema")
+const commentSchema = require("../schemas/Map/commentSchema")
+
+jest.mock('../schemas/Map/mapMetadataSchema');
+jest.mock('../schemas/Map/geoJsonSchema');
+jest.mock('../schemas/Map/commentSchema');
+
+
 
 afterEach(() => {
     jest.clearAllMocks()
@@ -67,6 +80,40 @@ describe("getMapById function", () => {
                 geojsonId: buffer,
             },
         })
+    })
+    it("no target map in the db", async () => {
+        MapMetaData.findOne = jest.fn().mockResolvedValueOnce(false)
+        const req = { params: { id: 1 } }
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await getMapById(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(404)
+    })
+    it("tests not published, not owned maps", async () => {
+        MapMetaData.findOne = jest.fn().mockResolvedValueOnce({
+            _id: 1,
+            title: "test",
+            user: "rob",
+            mapType: "pointmap",
+            published: false,
+            geojsonId: buffer,
+        })
+        const req = { params: { id: 1 } }
+        const res = {
+            locals: {
+                userId: 0
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await getMapById(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
     })
 })
 
@@ -136,6 +183,47 @@ describe("getAllPublishedMaps function", () => {
 })
 
 describe("getGeoJsonById function", () => {
+    it("returns 404 if no mapmetadata is found in db", async () => {
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce(false)
+        const req = {
+            params: {
+                id: 1,
+            },
+        }
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await getGeoJsonById(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(404)
+    })
+    it("returns 404 if no geojsonschema is found in db", async () => {
+        GeoJsonSchema.findById = jest.fn().mockResolvedValueOnce(false)
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce({
+            _id: 1,
+            title: "test",
+            user: "rob",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+        })
+        const req = {
+            params: {
+                id: 1,
+            },
+        }
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await getGeoJsonById(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(404)
+    })
+    
     it("correctly returns a geojson", async () => {
         GeoJsonSchema.findById = jest.fn().mockResolvedValueOnce({
             geoBuf: buffer,
@@ -167,50 +255,263 @@ describe("getGeoJsonById function", () => {
     })
 })
 
-//create new map tests
+describe("createNewMap function", () => {
+    it("returns 400 if a user's map with this title already exists", async () => {
+        MapMetaData.countDocuments = jest.fn().mockResolvedValueOnce(1)
 
-// describe("createDuplicateMap function", () => {
-//     it("correctly duplicates a map", async () => {
-//         MapMetaData.findById = jest.fn().mockResolvedValueOnce(
-//             {
-//                 _id: 1,
-//                 title: 'test',
-//                 user: 'rob',
-//                 mapType: 'pointmap',
-//                 published: true,
-//                 geojsonId: buffer,
-//             }
-//         )
-//         MapMetaData.findById = jest.fn().mockReturnValueOnce({
-//             toObject: jest.fn().mockResolvedValueOnce([
-//                 {
-//                     _id: 1,
-//                     title: 'test',
-//                     user: 'rob',
-//                     mapType: 'pointmap',
-//                     published: true,
-//                     geojsonId: buffer,
-//                 }
-//             ]),
-//         });
-//         MapMetaData.countDocuments = jest.fn().mockReturnValueOnce(1)
-//         MapMetaData.save = jest.fn().mockReturnValueOnce(1)
-//         const req = {body: { id: 1 }}
-//         const res = {
-//             locals: {
-//                 userId: "rob"
-//             },
-//             status: jest.fn().mockReturnThis(),
-//             json: jest.fn(),
-//             end: jest.fn(),
-//         };
-//         await createDuplicateMapById(req, res)
+        const req = { 
+            body: {
+                title: "title",
+                type: "heatmap",
+                GeoJsonSchemabuf: testMap,
+                tags: []
+            }}
 
-//         expect(res.status).toHaveBeenCalledWith(200);
-//     })
-// })
+        const res = {
+            locals:{
+                userId: 0
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await createNewMap(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({
+            errorMessage: "Map with title already exists."
+        })
+    })
+    it("returns 500 if geojson schema does not save", async () => {
+        MapMetaData.countDocuments = jest.fn().mockResolvedValueOnce(0)
+        const mockGeoJsonSchemaInstance = {
+            geoBuf: buffer,
+            save: jest.fn().mockResolvedValueOnce(false),
+          };
+        GeoJsonSchema.mockImplementationOnce(() => mockGeoJsonSchemaInstance);
+
+        const req = { 
+            body: {
+                title: "title",
+                type: "heatmap",
+                GeoJsonSchemabuf: buffer,
+                tags: []
+            }}
+
+        const res = {
+            locals: {
+                userId: 0
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await createNewMap(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(500)
+    })
+    it("returns 500 if mapmetadata schema does not save", async () => {
+        MapMetaData.countDocuments = jest.fn().mockResolvedValueOnce(0)
+        const mockGeoJsonSchemaInstance = {
+            geoBuf: buffer,
+            save: jest.fn().mockResolvedValueOnce(buffer),
+          };
+        GeoJsonSchema.mockImplementationOnce(() => mockGeoJsonSchemaInstance);
+        const mockMapMetaDataSchemaInstance = {
+            _id: 1,
+            title: "test",
+            user: "rob",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+            save: jest.fn().mockResolvedValueOnce(false),
+          };
+        MapMetaData.mockImplementationOnce(() => mockMapMetaDataSchemaInstance);
+        const req = { 
+            body: {
+                title: "title",
+                type: "heatmap",
+                GeoJsonSchemabuf: buffer,
+                tags: []
+            }}
+
+        const res = {
+            locals: {
+                userId: 0
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await createNewMap(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(500)
+    })
+    it("returns 200 if everything works", async () => {
+        MapMetaData.countDocuments = jest.fn().mockResolvedValueOnce(0)
+        const mockGeoJsonSchemaInstance = {
+            geoBuf: buffer,
+            save: jest.fn().mockResolvedValueOnce(buffer),
+          };
+        GeoJsonSchema.mockImplementationOnce(() => mockGeoJsonSchemaInstance);
+        const mockMapMetaDataSchemaInstance = {
+            _id: 1,
+            title: "test",
+            user: "rob",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+            save: jest.fn().mockResolvedValueOnce(
+                {
+                    _id: 1,
+                    title: "test",
+                    user: "rob",
+                    mapType: "pointmap",
+                    published: true,
+                    geojsonId: buffer
+                }),
+          };
+        MapMetaData.mockImplementationOnce(() => mockMapMetaDataSchemaInstance);
+        const req = { 
+            body: {
+                title: "title",
+                type: "heatmap",
+                GeoJsonSchemabuf: buffer,
+                tags: []
+            }}
+
+        const res = {
+            locals: {
+                userId: 0
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await createNewMap(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(200)
+        expect(res.json).toHaveBeenCalledWith({id: 1})
+
+    })
+})
+
+describe("createDuplicateMap function", () => {
+    it("srcMap user does not match current user", async () => {
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce(
+            {
+                _id: 1,
+                title: 'test',
+                user: "rob",
+                mapType: 'pointmap',
+                published: true,
+                geojsonId: buffer,
+            }
+        )
+        const req = {body: { id: 1 }}
+        const res = {
+            locals: {
+                userId: "robbie"
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        };
+        await createDuplicateMapById(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401);
+    })
+    it("srcMap is not found", async () => {
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce(false)
+        
+        const req = {body: { id: 1 }}
+        const res = {
+            locals: {
+                userId: "robbie"
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        };
+        await createDuplicateMapById(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(404);
+    })
+})
+
+describe("createForkMap function", () => {
+    it("srcMap is not published", async () => {
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce(
+            {
+                _id: 1,
+                title: 'test',
+                user: "rob",
+                mapType: 'pointmap',
+                published: false,
+                geojsonId: buffer,
+            }
+        )
+        const req = {body: { id: 1 }}
+        const res = {
+            locals: {
+                userId: "robbie"
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        };
+        await createForkMapById(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401);
+    })
+})
 
 describe("deleteMapById function", () => {
+    it("returns 401 if no mapmetadata match", async () => {
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce({
+            _id: 1,
+            title: "test",
+            user: "robbie",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+        })
+        const req = { params: { id: 1 } }
+        const res = {
+            locals: {
+                userId: "rob",
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await deleteMapById(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+    })
+    it("returns 500 if there was an error during deletion", async () => {
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce({
+            _id: 1,
+            title: "test",
+            user: "rob",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+        })
+        MapMetaData.findByIdAndDelete = jest.fn().mockResolvedValueOnce(false)
+        const req = { params: { id: 1 } }
+        const res = {
+            locals: {
+                userId: "rob",
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await deleteMapById(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(500)
+    })
     it("correctly deletes a map", async () => {
         MapMetaData.findById = jest.fn().mockResolvedValueOnce({
             _id: 1,
@@ -221,6 +522,8 @@ describe("deleteMapById function", () => {
             geojsonId: buffer,
         })
         MapMetaData.findByIdAndDelete = jest.fn().mockResolvedValueOnce(true)
+        commentSchema.deleteMany = jest.fn().mockResolvedValueOnce(true)
+        GeoJsonSchema.findByIdAndDelete = jest.fn().mockResolvedValueOnce(true)
         const req = { params: { id: 1 } }
         const res = {
             locals: {
@@ -237,6 +540,248 @@ describe("deleteMapById function", () => {
 })
 
 describe("updateMapNameById function", () => {
+    it("returns 401 if mapmetadata name does not match user", async () => {
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce({
+            _id: 1,
+            title: "test",
+            user: "robbie",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+        })
+        const req = { body: { id: 1, title: "hello" } }
+        const res = {
+            locals: {
+                userId: "rob",
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updateMapNameById(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+    })
+    it("returns 400 if user has a map with the same name already", async () => {
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce({
+            _id: 1,
+            title: "test",
+            user: "rob",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+        })
+        MapMetaData.countDocuments = jest.fn().mockResolvedValueOnce(1)
+        const req = { body: { id: 1, title: "hello" } }
+        const res = {
+            locals: {
+                userId: "rob",
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updateMapNameById(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(400)
+        expect(res.json).toHaveBeenCalledWith({
+            errorMessage: "Map with title already exists."
+        })
+    })
+    it("returns 500 if error when updating map", async () => {
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce({
+            _id: 1,
+            title: "test",
+            user: "rob",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+        })
+        MapMetaData.countDocuments = jest.fn().mockResolvedValueOnce(0)
+        MapMetaData.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(false)
+        const req = { body: { id: 1, title: "hello" } }
+        const res = {
+            locals: {
+                userId: "rob",
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updateMapNameById(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(500)
+    })
+    it("returns 200 if correctly updated map", async () => {
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce({
+            _id: 1,
+            title: "test",
+            user: "rob",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+        })
+        MapMetaData.countDocuments = jest.fn().mockResolvedValueOnce(0)
+        MapMetaData.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(true)
+        const req = { body: { id: 1, title: "hello" } }
+        const res = {
+            locals: {
+                userId: "rob",
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updateMapNameById(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(200)
+    })
+})
+
+describe("updateMapPublishStatus function", () => {
+    it("returns 401 if user does not match currrent user", async () => {
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce({
+            _id: 1,
+            title: "test",
+            user: "robbie",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+        })
+        const req = { body: { id: 1 } }
+        const res = {
+            locals: {
+                userId: "rob",
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updateMapPublishStatus(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+    })
+    it("returns 500 if error when updating map", async () => {
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce({
+            _id: 1,
+            title: "test",
+            user: "rob",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+        })
+        MapMetaData.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(false)
+        const req = { body: { id: 1 } }
+        const res = {
+            locals: {
+                userId: "rob",
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updateMapPublishStatus(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(500)
+    })
+    it("correctly updates a map publish status", async () => {
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce({
+            _id: 1,
+            title: "test",
+            user: "rob",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+        })
+        MapMetaData.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(true)
+        const req = { body: { id: 1 } }
+        const res = {
+            locals: {
+                userId: "rob",
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updateMapPublishStatus(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(200)
+    })
+})
+
+describe("likeComment function", () => {
+    it("returns 404 if comment is not in db", async () => {
+        commentSchema.findById = jest.fn().mockResolvedValueOnce(false)
+        const req = { body: { id: 1 } }
+        const res = {
+            locals: {
+                userId: "rob",
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await likeComment(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(404)
+    })
+})
+
+describe("dislikeComment function", () => {
+    it("returns 404 if comment is not in db", async () => {
+        commentSchema.findById = jest.fn().mockResolvedValueOnce(false)
+        const req = { body: { id: 1 } }
+        const res = {
+            locals: {
+                userId: "rob",
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await dislikeComment(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(404)
+    })
+})
+
+describe("likeMap function", () => {
+    it("returns 404 if comment is not in db", async () => {
+        commentSchema.findById = jest.fn().mockResolvedValueOnce(false)
+        const req = { body: { id: 1 } }
+        const res = {
+            locals: {
+                userId: "rob",
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await likeMap(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(404)
+    })
+})
+
+describe("dislikeMap function", () => {
+    it("returns 404 if comment is not in db", async () => {
+        commentSchema.findById = jest.fn().mockResolvedValueOnce(false)
+        const req = { body: { id: 1 } }
+        const res = {
+            locals: {
+                userId: "rob",
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await dislikeMap(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(404)
+    })
+})
+
+describe("postComment function", () => {
     it("correctly updates a mapname", async () => {
         MapMetaData.findById = jest.fn().mockResolvedValueOnce({
             _id: 1,
@@ -262,7 +807,59 @@ describe("updateMapNameById function", () => {
     })
 })
 
-describe("updateMapPublishStatus function", () => {
+describe("getCommentById function", () => {
+    it("correctly updates a mapname", async () => {
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce({
+            _id: 1,
+            title: "test",
+            user: "rob",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+        })
+        MapMetaData.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(true)
+        const req = { body: { id: 1, title: "hello" } }
+        const res = {
+            locals: {
+                userId: "rob",
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updateMapNameById(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(200)
+    })
+})
+
+describe("updateMapTag function", () => {
+    it("correctly updates a map publish status", async () => {
+        MapMetaData.findById = jest.fn().mockResolvedValueOnce({
+            _id: 1,
+            title: "test",
+            user: "rob",
+            mapType: "pointmap",
+            published: true,
+            geojsonId: buffer,
+        })
+        MapMetaData.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(true)
+        const req = { body: { id: 1 } }
+        const res = {
+            locals: {
+                userId: "rob",
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updateMapPublishStatus(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(200)
+    })
+})
+
+describe("updateMapGeoJson function", () => {
     it("correctly updates a map publish status", async () => {
         MapMetaData.findById = jest.fn().mockResolvedValueOnce({
             _id: 1,
