@@ -22,7 +22,9 @@ export default function RegisterScreen() {
         if (auth.user == null) {
             setErrorMessage(auth.error);
         } else {
-            navigate("/browsepage");
+            if (auth.loggedIn) {
+                navigate("/browsepage");
+            }
         }
     }, [auth]);
 
