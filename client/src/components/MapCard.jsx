@@ -39,6 +39,9 @@ export default function MapCard({ map }) {
     const [visibleChips, setVisibleChips] = useState([]);
     const [noTagMessage, setNoTagMessage] = useState("");
 
+    // States for renaming error
+    const [renameError, setRenameError] = useState("");
+
     // Define the maximum length for a chip label
     const MAX_CHIP_LABEL_LENGTH = 10;
     const showChips = () => {
@@ -79,9 +82,19 @@ export default function MapCard({ map }) {
         setNewName(event.target.value);
     };
 
-    const handleSubmitName = () => {
-        setIsEditing(false);
-        store.renameMap(map._id, newName);
+    const handleSubmitName = async () => {
+        if (newName == map.title) {
+            setIsEditing(false);
+            return;
+        }
+        const response = await store.renameMap(map._id, newName);
+        if (response.status !== 200) {
+            setRenameError(response.data.errorMessage);
+        } else {
+            setIsEditing(false);
+            // Sets the map.title instead of requerying api
+            map.title = newName;
+        }
     };
 
     const handleKebab = async (option) => {
@@ -203,6 +216,8 @@ export default function MapCard({ map }) {
                                     handleSubmitName();
                                 }
                             }}
+                            error={renameError !== ""}
+                            helperText={renameError}
                         />
                     ) : (
                         <Typography

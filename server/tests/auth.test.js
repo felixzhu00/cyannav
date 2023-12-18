@@ -7,8 +7,643 @@ process.env.JWT_SECRET = "testing"
 
 const app = require("../index.js")
 const request = require("supertest")
+const auth = require("../auth") // This is the auth manager, so some code should be abstracted to this file.
+const bcrypt = require("bcrypt");
+
+const {
+    loggedIn,
+    login,
+    logout,
+    register,
+    resetRequest,
+    verifyCode,
+    updatePasscodeNotLoggedIn,
+    updatePasscode,
+    updateUsername,
+    updateEmail,
+    deleteAccount,
+    updateProfilePic,
+} = require("../controllers/auth-controller.js")
+
+const mapGraphicSchema = require("../schemas/mapGraphicSchema")
+const passcodeSchema = require("../schemas/passcodeSchema")
+const tagSchema = require("../schemas/tagSchema")
+const userProfileSchema = require("../schemas/userProfileSchema")
+
+jest.mock('../schemas/mapGraphicSchema');
+jest.mock('../schemas/passcodeSchema');
+jest.mock('../schemas/tagSchema');
+jest.mock('../schemas/userProfileSchema');
+jest.mock("bcrypt")
+
+afterEach(() => {
+    jest.clearAllMocks()
+})
 
 /* Auth API Tests */
+
+describe("loggedIn function", () => {
+    jest.mock('../auth');
+
+    it("returns 401 if auth cannot verify user", async () => {
+        auth.verifyUser = jest.fn().mockReturnValueOnce(false)
+        const req = { email: "test", password: "pass" }
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await loggedIn(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({
+            loggedIn: false,
+            user: null,
+        })
+    })
+    it("returns 404 if no user matching userId", async () => {
+        auth.verifyUser = jest.fn().mockReturnValueOnce(1)
+        userProfileSchema.findOne=jest.fn().mockResolvedValueOnce(false)
+        const req = { email: "test", password: "pass" }
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await loggedIn(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(404)
+        expect(res.json).toHaveBeenCalledWith({
+            loggedIn: false,
+            user: null,
+        })
+    })
+    it("returns 200 if user is logged in", async () => {
+        auth.verifyUser = jest.fn().mockReturnValueOnce(1)
+        userProfileSchema.findOne=jest.fn().mockResolvedValueOnce({
+            username: "username",
+            email: "email",
+            picture: [], // TODO: figure out profile picture
+            userId: 1,
+        })
+        const req = { email: "test", password: "pass" }
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await loggedIn(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(200)
+        expect(res.json).toHaveBeenCalledWith({
+            loggedIn: true,
+            user: {
+                username: "username",
+                email: "email",
+                picture: [], // TODO: figure out profile picture
+                userId: 1,
+            },
+        })
+    })
+})
+
+describe("login function", () => {
+    jest.mock('../auth');
+
+    it("returns 401 if auth cannot login user", async () => {
+        userProfileSchema.findOne=jest.fn().mockResolvedValueOnce(false)
+        const req = { body: {email: "test", password: "pass"} }
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await login(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({
+            loggedIn: false,
+            user: null,
+            errorMessage: "Wrong email or password",
+        })
+    })
+    it("returns 200 if auth can login user", async () => {
+        userProfileSchema.findOne=jest.fn().mockResolvedValueOnce({
+            username: "username",
+            email: "email",
+            picture: null, // TODO: figure out profile picture
+            password: "pass",
+        })
+        bcrypt.compare = jest.fn().mockResolvedValueOnce(true)
+        auth.signToken = jest.fn().mockReturnValueOnce(1)
+
+        const req = { body: {email: "test", password: "pass"} }
+        const res = {
+            cookie: jest.fn().mockReturnThis(),
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await login(req, res)
+
+        expect(res.cookie).toHaveBeenCalledWith("access_token", 1, {
+            httpOnly: true, // TODO: HTTPS: change this later when HTTPS is introduced.
+            secure: false,
+            // withCredentials: true,
+            sameSite: true,
+        })
+        expect(res.status).toHaveBeenCalledWith(200)
+        expect(res.json).toHaveBeenCalledWith({
+            loggedIn: true,
+                user: {
+                    username: "username",
+                    email: "email",
+                    picture: null, // TODO: figure out profile picture
+                },
+        })
+    })
+})
+
+describe("register function", () => {
+    jest.mock('../auth');
+
+    it("returns 401 if no user found", async () => {
+        userProfileSchema.findOne=jest.fn().mockResolvedValueOnce(true)
+
+        const req = { body: {
+            email: "test",
+            username: "user",
+            password: "11223344$$",
+            passwordVerify: "11223344$$"
+        }}
+        const res = {
+            cookie: jest.fn().mockReturnThis(),
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await register(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({
+            loggedIn: false,
+            user: null,
+            errorMessage: "Email is already in use.",
+        })
+    })
+    it("returns 500 if cannot save user to db", async () => {
+        userProfileSchema.findOne=jest.fn().mockResolvedValueOnce(false)
+        const mockUserProfileSchemaInstance = {
+            username: "username",
+            email: "email",
+            picture: null, // TODO: figure out profile picture
+            password: "pass",
+            save: jest.fn().mockResolvedValueOnce(false),
+          };
+        userProfileSchema.mockImplementationOnce(() => mockUserProfileSchemaInstance);
+        bcrypt.hash = jest.fn().mockResolvedValueOnce(true)
+        auth.signToken = jest.fn().mockReturnValueOnce(1)
+
+        const req = { body: {
+            email: "test",
+            username: "user",
+            password: "11223344$$",
+            passwordVerify: "11223344$$"
+        }}
+        const res = {
+            cookie: jest.fn().mockReturnThis(),
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await register(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(500)
+    })
+    it("returns 200 if auth can register user", async () => {
+        userProfileSchema.findOne=jest.fn().mockResolvedValueOnce(false)
+        const mockUserProfileSchemaInstance = {
+            username: "username",
+            email: "email",
+            picture: null, // TODO: figure out profile picture
+            password: "pass",
+            save: jest.fn().mockResolvedValueOnce({
+                username: "username",
+                email: "email",
+                picture: null, // TODO: figure out profile picture
+                password: "pass"
+            }),
+        };
+        userProfileSchema.mockImplementationOnce(() => mockUserProfileSchemaInstance);
+        bcrypt.hash = jest.fn().mockResolvedValueOnce(true)
+        auth.signToken = jest.fn().mockReturnValueOnce(1)
+
+        const req = { body: {
+            email: "test",
+            username: "user",
+            password: "11223344$$",
+            passwordVerify: "11223344$$"
+        }}
+        const res = {
+            cookie: jest.fn().mockReturnThis(),
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await register(req, res)
+
+        expect(res.cookie).toHaveBeenCalledWith("access_token", 1, {
+            httpOnly: true, // TODO: change this later when HTTPS is introduced.
+            secure: false,
+            sameSite: true,
+        })
+        expect(res.status).toHaveBeenCalledWith(200)
+        expect(res.json).toHaveBeenCalledWith({
+            loggedIn: true,
+                user: {
+                    username: "username",
+                    email: "email",
+                    picture: null, // TODO: figure out profile picture
+                },
+        })
+    })
+})
+
+describe("resetRequest function", () => {
+    jest.mock('../auth');
+
+    it("returns 401 if no user found", async () => {
+        userProfileSchema.findOne=jest.fn().mockResolvedValueOnce(false)
+
+        const req = { body: {email: "test"} }
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await resetRequest(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({
+            user: null,
+            errorMessage: "Email is not associated with a user",
+        })
+    })
+    it("returns 401 if verification code already exists in db and isnt expired", async () => {
+        userProfileSchema.findOne=jest.fn().mockResolvedValueOnce({
+            username: "username",
+            email: "email",
+            picture: null, // TODO: figure out profile picture
+            password: "11223344$$",
+        })
+        passcodeSchema.findOne = jest.fn().mockResolvedValueOnce({
+            userEmail: "email",
+            creationDate: Date.now(),
+            expirationData: 600,
+            passcode: "123456"
+        })
+
+        const req = { body: {email: "test"} }
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await resetRequest(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({
+            errorMessage: "User already has a verification code.",
+        })
+    })
+    it("returns 500 if passcode cannot save", async () => {
+        userProfileSchema.findOne=jest.fn().mockResolvedValueOnce({
+            username: "username",
+            email: "email",
+            picture: null, // TODO: figure out profile picture
+            password: "11223344$$",
+        })
+        passcodeSchema.findOne = jest.fn().mockResolvedValueOnce(false)
+        const mockPasscodeSchemaInstance = {
+            username: "username",
+            email: "email",
+            picture: null, // TODO: figure out profile picture
+            password: "11223344$$",
+            save: jest.fn().mockResolvedValueOnce(false),
+        };
+        passcodeSchema.mockImplementationOnce(() => mockPasscodeSchemaInstance);
+
+        const req = { body: {email: "test"} }
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await resetRequest(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(500)
+    })
+})
+
+describe("verifyCode function", () => {
+    jest.mock('../auth');
+
+    it("returns 401 if no passcode associated with email", async () => {
+        passcodeSchema.findOne = jest.fn().mockResolvedValueOnce(false)
+
+        const req = { body: {email: "test", passcode: "123456"} }
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await verifyCode(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({
+            errorMessage: "No verification code associated with this email",
+        })
+    })
+    it("returns 500 if old passcode does not delete", async () => {
+        passcodeSchema.findOne = jest.fn().mockResolvedValueOnce({
+            userEmail: "email",
+            creationDate: Date.now(),
+            expirationData: 600,
+            passcode: "123456"
+        })
+        passcodeSchema.findByIdAndDelete = jest.fn().mockResolvedValueOnce(false)
+
+        const req = { body: {email: "test", passcode: "123456"} }
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await verifyCode(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(500)
+    })
+    it("returns 200 if verifyCode was successful", async () => {
+        passcodeSchema.findOne = jest.fn().mockResolvedValueOnce({
+            userEmail: "email",
+            creationDate: Date.now(),
+            expirationData: 600,
+            passcode: "123456"
+        })
+        passcodeSchema.findByIdAndDelete = jest.fn().mockResolvedValueOnce(true)
+
+        const req = { body: {email: "test", passcode: "123456"} }
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await verifyCode(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(200)
+        expect(res.json).toHaveBeenCalledWith({
+            email: "email",
+        })
+    })
+})
+
+describe("updatePasscodeNotLoggedIn function", () => {
+    jest.mock('../auth');
+
+    it("returns 401 if no user associated with email", async () => {
+        userProfileSchema.findOne = jest.fn().mockResolvedValueOnce(false)
+
+        const req = { body: {
+            email: "test",
+            password: "11223344$$",
+            confirmPassword: "11223344$$"
+        }}
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updatePasscodeNotLoggedIn(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({
+            errorMessage: "No user with this email exists",
+        })
+    })
+    it("returns 500 if error when hashing password", async () => {
+        userProfileSchema.findOne = jest.fn().mockResolvedValueOnce({
+            username: "username",
+            email: "email",
+            picture: null, // TODO: figure out profile picture
+            password: "11223344$$",
+        })
+        bcrypt.hash=jest.fn().mockResolvedValueOnce(false)
+
+        const req = { body: {
+            email: "test",
+            password: "11223344$$",
+            confirmPassword: "11223344$$"
+        }}
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updatePasscodeNotLoggedIn(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(500)
+    })
+    it("returns 500 if user failed to update", async () => {
+        userProfileSchema.findOne = jest.fn().mockResolvedValueOnce({
+            username: "username",
+            email: "email",
+            picture: null, // TODO: figure out profile picture
+            password: "11223344$$",
+        })
+        bcrypt.hash=jest.fn().mockResolvedValueOnce(true)
+        userProfileSchema.findByIdAndUpdate=jest.fn().mockResolvedValueOnce(false)
+
+        const req = { body: {
+            email: "test",
+            password: "11223344$$",
+            confirmPassword: "11223344$$"
+        }}
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updatePasscodeNotLoggedIn(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(500)
+    })
+    it("returns 200 if updating password was successful", async () => {
+        userProfileSchema.findOne = jest.fn().mockResolvedValueOnce({
+            username: "username",
+            email: "email",
+            picture: null, // TODO: figure out profile picture
+            password: "11223344$$",
+        })
+        bcrypt.hash=jest.fn().mockResolvedValueOnce(true)
+        userProfileSchema.findByIdAndUpdate=jest.fn().mockResolvedValueOnce(true)
+
+        const req = { body: {
+            email: "test",
+            password: "11223344$$",
+            confirmPassword: "11223344$$"
+        }}
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updatePasscodeNotLoggedIn(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(200)
+        expect(res.json).toHaveBeenCalledWith({
+            email: "test",
+        })
+    })
+})
+
+describe("updatePasscode function", () => {
+    jest.mock('../auth');
+
+    it("returns 401 if user is not logged in", async () => {
+
+        const req = { body: {
+            originalPassword: "11223344$$",
+            password: "11223344&&",
+            passwordVerify: "11223344&&"
+        }}
+        const res = {
+            locals: {
+                userId: false
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updatePasscode(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({
+            errorMessage: "User is not logged in."        
+        })
+    })
+    it("returns 401 if password entered is incorrect", async () => {
+        userProfileSchema.findById = jest.fn().mockResolvedValueOnce({
+            username: "username",
+            email: "email",
+            picture: null, // TODO: figure out profile picture
+            password: "11223344$$",
+        })
+        bcrypt.compare=jest.fn().mockResolvedValueOnce(false)
+
+        const req = { body: {
+            originalPassword: "11223344$$",
+            password: "11223344&&",
+            passwordVerify: "11223344&&"
+        }}
+        const res = {
+            locals: {
+                userId: true
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updatePasscode(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({
+            errorMessage: "Incorrect original password."
+        })
+    })
+    it("returns 500 if error in bcrypt for hashing", async () => {
+        userProfileSchema.findById = jest.fn().mockResolvedValueOnce({
+            username: "username",
+            email: "email",
+            picture: null, // TODO: figure out profile picture
+            password: "11223344$$",
+        })
+        bcrypt.compare=jest.fn().mockResolvedValueOnce(true)
+        bcrypt.hash=jest.fn().mockResolvedValueOnce(false)
+
+        const req = { body: {
+            originalPassword: "11223344$$",
+            password: "11223344&&",
+            passwordVerify: "11223344&&"
+        }}
+        const res = {
+            locals: {
+                userId: true
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updatePasscode(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(500)
+    })
+    it("returns 500 if user could not be updated", async () => {
+        userProfileSchema.findById = jest.fn().mockResolvedValueOnce({
+            username: "username",
+            email: "email",
+            picture: null, // TODO: figure out profile picture
+            password: "11223344$$",
+        })
+        bcrypt.compare=jest.fn().mockResolvedValueOnce(true)
+        bcrypt.hash=jest.fn().mockResolvedValueOnce(true)
+        userProfileSchema.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(false)
+
+        const req = { body: {
+            originalPassword: "11223344$$",
+            password: "11223344&&",
+            passwordVerify: "11223344&&"
+        }}
+        const res = {
+            locals: {
+                userId: true
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updatePasscode(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(500)
+    })
+    it("returns 200 if passcode updated successfully", async () => {
+        userProfileSchema.findById = jest.fn().mockResolvedValueOnce({
+            username: "username",
+            email: "email",
+            picture: null, // TODO: figure out profile picture
+            password: "11223344$$",
+        })
+        bcrypt.compare=jest.fn().mockResolvedValueOnce(true)
+        bcrypt.hash=jest.fn().mockResolvedValueOnce(true)
+        userProfileSchema.findByIdAndUpdate = jest.fn().mockResolvedValueOnce(true)
+
+        const req = { body: {
+            originalPassword: "11223344$$",
+            password: "11223344&&",
+            passwordVerify: "11223344&&"
+        }}
+        const res = {
+            locals: {
+                userId: true
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updatePasscode(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(200)
+    })
+})
 
 describe("updateProfilePic", () => {
     it("returns 401 since user is unauthorized", async () => {

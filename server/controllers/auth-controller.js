@@ -17,7 +17,6 @@ updateProfilePic = async (req, res) => {
         if (!user) {
             return res.status(404).json({ errorMessage: "User not found" })
         }
-        console.log(req.files.file)
         if (req.files.file) {
             const { data, mimetype } = req.files.file
 
@@ -142,8 +141,7 @@ login = async (req, res) => {
 
 register = async (req, res) => {
     try {
-        const { email, username, password, passwordVerify } = req.body
-        console.log(req.body)
+        const { email, username, password, passwordVerify } = req.body;
         if (!email || !username || !password || !passwordVerify) {
             return res.status(400).json({
                 loggedIn: false,
@@ -221,6 +219,7 @@ register = async (req, res) => {
                     username: saved.username,
                     email: saved.email,
                     picture: null, // Since new user have no profile picture.
+                    userId: saved._id,
                 },
             })
     } catch (err) {
@@ -265,6 +264,7 @@ resetRequest = async (req, res) => {
         }
 
         const targetPasscode = await Passcode.findOne({ userEmail: email })
+
         //user already has verification code but it is expired
         if (
             targetPasscode &&
@@ -408,6 +408,18 @@ updatePasscodeNotLoggedIn = async (req, res) => {
             })
         }
 
+        if (
+            password.length < 9 ||
+            [...password.matchAll(/[0-9]/g)].length == 0 || // numbers
+            [...password.matchAll(/\W/g)].length < 2 // Special characters
+        ) {
+            return res.status(401).json({
+                loggedIn: false,
+                user: null,
+                errorMessage: "Password fails security requirement.",
+            })
+        }
+
         const targetUser = await User.findOne({ email: email })
         if (!targetUser) {
             return res.status(401).json({
@@ -427,14 +439,11 @@ updatePasscodeNotLoggedIn = async (req, res) => {
         if (!success) {
             return res.status(500).end()
         }
-        return res
-            .status(200)
-            .json({
-                email: email,
-            })
-            .end()
+        return res.status(200).json({
+            email: email,
+        })
     } catch (err) {
-        console.error("auth-controller::updatePassword")
+        console.error("auth-controller::updatePasscodeNotLoggedIn")
         console.error(err)
 
         return res.status(500).end()
@@ -481,6 +490,18 @@ updatePasscode = async (req, res) => {
                     .status(401)
                     .json({ errorMessage: "Incorrect original password." })
             }
+        }
+
+        if (
+            password.length < 9 ||
+            [...password.matchAll(/[0-9]/g)].length == 0 || // numbers
+            [...password.matchAll(/\W/g)].length < 2 // Special characters
+        ) {
+            return res.status(401).json({
+                loggedIn: false,
+                user: null,
+                errorMessage: "Password fails security requirement.",
+            })
         }
 
         const hashed_password = await bcrypt.hash(password, saltRounds)
