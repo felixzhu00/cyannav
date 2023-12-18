@@ -31,6 +31,7 @@ import MUICommentModal from "./modals/MUICommentModal";
 import NavJSON from "./NavJSON";
 import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
+import * as turf from "@turf/turf";
 
 function MapViewingPage() {
   const theme = useTheme();
@@ -59,6 +60,7 @@ function MapViewingPage() {
       store.getMapById(id);
       store.getGeojson(id);
       store.setCurrentArea(-1);
+      store.setByFeature(null);
     }
   }, [id]);
 
@@ -66,9 +68,27 @@ function MapViewingPage() {
     if (store.geojson && store.geojson.features) {
       const updatedFeatures = store.geojson.features.map((feature) => {
         const originalFields = { ...feature.fields };
+
+        //Set name field if name doesnt exist
         if (originalFields.name === undefined) {
           originalFields.name = feature.properties.admin;
         }
+
+        //Set center if center doesnt exist
+        if (
+          originalFields.center_longitude === undefined &&
+          originalFields.center_latitude === undefined
+        ) {
+          const coordinates = turf.centerOfMass(feature).geometry.coordinates;
+          const roundedCoordinates = coordinates.map((coord) =>
+            parseFloat(coord).toFixed(3)
+          );
+          const [lng, lat] = roundedCoordinates
+          originalFields.center_longitude = String(lng);
+          originalFields.center_latitude = String(lat);
+        }
+
+        // Add required radius field for heatmap and pointmap
         if (
           originalFields.radius === undefined &&
           (store.currentMap.mapType === "heatmap" ||
@@ -76,6 +96,15 @@ function MapViewingPage() {
         ) {
           originalFields.radius = 0;
         }
+
+        // Add required scale field for distributiveflowmap
+        if (
+          originalFields.scale === undefined &&
+          store.currentMap.mapType === "distributiveflowmap"
+        ) {
+          originalFields.scale = 0;
+        }
+
         return {
           ...feature,
           fields: originalFields,
@@ -88,7 +117,6 @@ function MapViewingPage() {
         store.geojson.features[0].fields &&
         store.geojson.features[0].fields._byFeature
       ) {
-        console.log("feature");
         const currentFeature = store.geojson.features[0].fields._byFeature;
         if (store.geojson.features[0].fields.hasOwnProperty(currentFeature)) {
           store.setByFeature(store.geojson.features[0].fields._byFeature);
@@ -99,6 +127,7 @@ function MapViewingPage() {
 
   useEffect(() => {
     // Compare current focusedField with the previous one
+    console.log(features);
     if (
       features.length !== 0 &&
       focusedFieldRef.current !== focusedField &&
@@ -107,7 +136,7 @@ function MapViewingPage() {
       store.setGeoJsonFeatures(features);
     }
     focusedFieldRef.current = focusedField;
-    setFocusedField(null)
+    setFocusedField(null);
   }, [focusedField, features]);
 
   const areFeaturesEqual = (featuresA, featuresB) => {
@@ -157,7 +186,7 @@ function MapViewingPage() {
   };
   useEffect(() => {
     if (store.byFeature !== null) {
-      setFocusedField("feature")
+      setFocusedField("feature");
       addField("_byFeature", store.byFeature);
     }
   }, [store.byFeature]);
@@ -210,6 +239,8 @@ function MapViewingPage() {
     setFocusedField(key);
     setFeatures((prevFeatures) => {
       if (!updateAll) {
+        console.log("setting indiv", key, newValue);
+
         if (store.currentArea === -1) {
           // Feature not found, do nothing or handle accordingly
           return prevFeatures;
@@ -549,6 +580,7 @@ function MapViewingPage() {
         return null;
       }
       const selectedFeature = features[store.currentArea];
+
       return (
         <>
           <Box
@@ -605,7 +637,9 @@ function MapViewingPage() {
                         marginRight: "10px",
                       }}
                     >
-                      <Typography>{key}:</Typography>
+                      <Typography>
+                        {key.charAt(0).toUpperCase() + key.slice(1)}:
+                      </Typography>
                     </Box>
                     <Box
                       sx={{
@@ -614,26 +648,36 @@ function MapViewingPage() {
                         alignSelf: "flex-end",
                       }}
                     >
-                      {key !== "radius" ? (
-                        <TextField
-                          value={value}
-                          onChange={(e) =>
-                            changeFieldValue(key, e.target.value)
-                          }
-                          onBlur={() => setFocusedField(null)}
-                        />
+                      {!(
+                        key == "scale" ||
+                        key == "radius" ||
+                        key == "center_longitude" ||
+                        key == "center_latitude"
+                      ) ? (
+                        <>
+                          <TextField
+                            value={value}
+                            onChange={(e) =>
+                              changeFieldValue(key, e.target.value)
+                            }
+                            onBlur={() => setFocusedField(null)}
+                          />
+                          <IconButton onClick={() => removeField(key)}>
+                            <Delete />
+                          </IconButton>
+                        </>
                       ) : (
                         <TextField
                           value={value}
-                          onChange={(e) =>
-                            changeFieldValue(key, e.target.value, true)
-                          }
+                          onChange={(e) => {
+                            key == "center_longitude" ||
+                            key == "center_latitude"
+                              ? changeFieldValue(key, e.target.value)
+                              : changeFieldValue(key, e.target.value, true);
+                          }}
                           onBlur={() => setFocusedField(null)}
                         />
                       )}
-                      <IconButton onClick={() => removeField(key)}>
-                        <Delete />
-                      </IconButton>
                     </Box>
                   </Box>
                 )

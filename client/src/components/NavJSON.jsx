@@ -1,22 +1,11 @@
 import L from "leaflet";
-import shp from "shpjs";
-// import omnivore from "@mapbox/leaflet-omnivore";
-// const tj = require('togeojson'); // Import the togeojson library
 import { interpolateRgb } from "d3-interpolate";
-import h337 from "heatmapjs";
-
-// import "leaflet.heat"
-import { heatLayer } from "leaflet-heat-es";
-
-// import "leaflet-webgl-heatmap"
-
 import HeatmapOverlay from "../leaflet-heatmap.js";
 import * as turf from "@turf/turf";
-// import simpleheat from 'simpleheat';
-
 import { useRef, useEffect, useState, useContext } from "react";
 import { GlobalStoreContext } from "../store";
-import heatmapMin from "heatmapjs";
+
+
 function NavJSON({ data, center, zoom }) {
   const { store } = useContext(GlobalStoreContext);
   const geolayer = useRef(null);
@@ -131,11 +120,13 @@ function NavJSON({ data, center, zoom }) {
 
     data.features.forEach((feature) => {
       const value = parseInt(feature.fields[store.byFeature], 10);
-      if (value < min) {
-        min = value;
-      }
-      if (value > max) {
-        max = value;
+      if (value !== undefined && !isNaN(value)) {
+        if (value < min) {
+          min = value;
+        }
+        if (value > max) {
+          max = value;
+        }
       }
     });
 
@@ -203,7 +194,6 @@ function NavJSON({ data, center, zoom }) {
     }, []);
 
     heatmapLayer.setData({ data: heatmapLayerData });
-    console.log(heatmapLayerData);
     // heatmapLayer._el.style.zIndex = 700;
   };
 
@@ -227,17 +217,14 @@ function NavJSON({ data, center, zoom }) {
     store.geojson.features.forEach((feature) => {
       const center = turf.centerOfMass(feature);
 
-      // Check if the count value is available and not NaN
-      console.log("fields",feature.fields, store.byFeature, feature.fields[store.byFeature])
       const count =
-        feature.fields && (feature.fields[store.byFeature]
+        feature.fields &&
+        (feature.fields[store.byFeature]
           ? parseInt(feature.fields[store.byFeature], 10)
           : NaN);
 
-      console.log("coun", count);
       // Only proceed if count is a valid number
       if (!isNaN(count)) {
-        console.log("fields111",feature.fields, store.byFeature, feature.fields[store.byFeature])
         // Create and add circle marker
         const circle = L.circle(
           [center.geometry.coordinates[1], center.geometry.coordinates[0]],
@@ -254,21 +241,148 @@ function NavJSON({ data, center, zoom }) {
         // You can add additional customization for the circles if needed
       }
     });
+  };
 
+  const setup3D = () => {
+    // Preliminary checking
+    const scale = Number(store.geojson.features[0]?.fields?.scale);
+    if (isNaN(scale)) {
+      return;
+    }
+
+    if (map.current) {
+      // Remove existing icon markers if any
+      map.current.eachLayer((layer) => {
+        if (layer instanceof L.Marker) {
+          map.current.removeLayer(layer);
+        }
+      });
+    }
+
+    // Extract cube data from store.geojson
+    store.geojson.features.forEach((feature) => {
+      const center = turf.centerOfMass(feature);
+
+      // Check if the count value is available and not NaN
+      const count =
+        feature.fields &&
+        (feature.fields[store.byFeature]
+          ? parseInt(feature.fields[store.byFeature], 10)
+          : NaN);
+
+      // Only proceed if count is a valid number
+      if (!isNaN(count)) {
+        // Create and add cube marker
+
+        console.log("count", count, feature.fields);
+        const cubeSize = 50; // Adjust the size as needed
+        const marker = L.marker(
+          [center.geometry.coordinates[1], center.geometry.coordinates[0]],
+          {
+            icon: createCubeIcon(cubeSize, count),
+          }
+        ).addTo(map.current);
+      }
+    });
   };
 
   const setupDFM = () => {
-    
+    // Preliminary checking
+    const weight = Number(store.geojson.features[0]?.fields?.weight);
+    if (isNaN(weight)) {
+      return;
+    }
+
+    if (map.current) {
+      // Remove existing icon markers if any
+      map.current.eachLayer((layer) => {
+        if (layer instanceof L.Polyline) {
+          map.current.removeLayer(layer);
+        }
+      });
+    }
+
+    // Extract cube data from store.geojson
+    store.geojson.features.forEach((feature) => {
+      const center = [
+        feature.fields.center_longitude,
+        feature.fields.center_latitude,
+      ];
+
+      feature.fields.lines.forEach((lines) => {
+        [country_index, line_weight] = lines;
+        const target_country = store.geojson.features[country_index].fields;
+        const target_center = [target_country.center_longitude, target_country.center_latitude]
+        
+        const count = line_weight ? parseInt(line_weight, 10) : NaN;
+
+        let polyline = L.polyline([center , target_center], {
+          color: 'red',
+          weight: count,
+          opacity: 0.5,
+          smoothFactor: 1
+          }).addTo(map);
+
+      });
+
+      // Check if the count value is available and not NaN
+      // const count =
+      //   feature.fields &&
+      //   (feature.fields[store.byFeature]
+      //     ? parseInt(feature.fields[store.byFeature], 10)
+      //     : NaN);
+
+      // Only proceed if count is a valid number
+      if (!isNaN(count)) {
+        // Create and add cube marker
+
+        console.log("count", count, feature.fields);
+        const cubeSize = 50; // Adjust the size as needed
+        const marker = L.marker(
+          [center.geometry.coordinates[1], center.geometry.coordinates[0]],
+          {
+            icon: createCubeIcon(cubeSize, count),
+          }
+        ).addTo(map.current);
+      }
+    });
+  };
+
+  function createCubeIcon(cubeSize, numCubes) {
+    let iconHtml = "<div class='container'>";
+
+    for (let i = 0; i < numCubes; i++) {
+      // Calculate the offset for the right face
+
+      // Add inline styles for each left and right face
+
+      iconHtml += `
+        <div class='left' style="transform: translateY(-${
+          i * 100
+        }%) rotate(90deg) skewX(-30deg) scaleY(0.864);"></div>
+        <div class='right' style="transform: translateY(-${
+          i * 100
+        }%) rotate(-30deg) skewX(-30deg) scaleY(0.864);"></div>
+      `;
+    }
+
+    // Add the common top face
+    iconHtml +=
+      "<div class='top' style='bottom: " + numCubes * 200 + "%'></div>";
+    iconHtml += "</div>";
+
+    return L.divIcon({
+      className: "custom-icon",
+      html: iconHtml,
+      iconSize: [cubeSize, cubeSize],
+      iconAnchor: [0, cubeSize * numCubes],
+    });
   }
-
-
 
   useEffect(() => {
     // Initialize the Leaflet map and store its reference in the map ref
-
     const mapInstance = L.map("map").setView([0, 0], 2);
     map.current = mapInstance;
-    console.log("effect ran once", map.current.getCenter());
 
     // Create and add the tile layer
     const OpenStreetMap_DE = L.tileLayer(
@@ -292,6 +406,7 @@ function NavJSON({ data, center, zoom }) {
       const geoBounds = geolayer.current.getBounds();
       map.current.setView(
         geoBounds.getCenter(),
+
         map.current.getBoundsZoom(geoBounds) + 1
       );
     }
@@ -310,8 +425,11 @@ function NavJSON({ data, center, zoom }) {
       setupHeatMapLayer();
     } else if (store.currentMap.mapType === "pointmap") {
       setupPointMapLayer();
+    } else if (store.currentMap.mapType === "distributiveflowmap") {
+      setupDFM();
+    } else if (store.currentMap.mapType === "3drectangle") {
+      setup3D();
     }
-
   }, [data]);
 
   useEffect(() => {
