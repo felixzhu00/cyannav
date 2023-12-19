@@ -42,6 +42,7 @@ import AuthContext from "../auth";
 import * as turf from "@turf/turf";
 
 import UndoRedo from "./UndoRedo";
+import { useHotkeys } from "react-hotkeys-hook";
 
 function MapViewingPage() {
     const theme = useTheme();
@@ -607,6 +608,16 @@ function MapViewingPage() {
     const handleEdit = () => {
         // Handle edit logic
     };
+    useHotkeys("ctrl+z, ctrl+y", (_, handler) => {
+        switch (handler.keys.join("")) {
+            case "z":
+                handleUndo();
+                break;
+            case "y":
+                handleRedo();
+                break;
+        }
+    });
     const handleUndo = () => {
         const step = getUndo();
 
