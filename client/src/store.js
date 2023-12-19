@@ -1,5 +1,5 @@
 //temp global store
-import { createContext, useState, useContext, useEffect } from "react";
+import { createContext, useState, useContext, useEffect} from "react";
 import MUIAddFieldModal from "./components/modals/MUIAddFieldModal";
 import MUIAddTagModal from "./components/modals/MUIAddTagModal";
 import MUIChangeEmailModal from "./components/modals/MUIChangeEmailModal";
@@ -65,6 +65,10 @@ function GlobalStoreContextProvider(props) {
         // Comment likes and dislikes
         commentLikes: 0,
         commentDislikes: 0,
+
+        // used in DFM to pick area to draw line to 
+        isPickingDFM: false,
+        selectedArea: -1,
     });
 
     useEffect(() => {
@@ -83,6 +87,20 @@ function GlobalStoreContextProvider(props) {
             store.sortMapBy(store.sortBy, store.order);
         }
     }, [store.sortBy, store.order]);
+
+    store.setIsPickingDFM =  async (value) => {
+        setStore((prevStore) => ({
+            ...prevStore,
+            isPickingDFM: value,
+        }));
+    };
+
+    store.setSelectedArea =  async (value) => {
+        setStore((prevStore) => ({
+            ...prevStore,
+            selectedArea: value,
+        }));
+    };
 
     store.setSortBy = async (sortBy) => {
         setStore((prevStore) => ({
@@ -289,13 +307,21 @@ function GlobalStoreContextProvider(props) {
 
     store.setCurrentArea = (value) => {
         setStore((prevStore) => {
-            const updatedStore = {
-                ...prevStore,
-                currentArea: value,
-            };
-
+            let updatedStore = {}
+            if(prevStore.isPickingDFM){
+                updatedStore = {
+                    ...prevStore,
+                    selectedArea: value,
+                };
+            }else{
+                updatedStore = {
+                    ...prevStore,
+                    currentArea: value,
+                };
+            }
             return updatedStore;
         });
+
     };
 
     store.setField = async (value) => {

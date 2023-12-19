@@ -198,11 +198,13 @@ function MapViewingPage() {
                     originalFields.immutable.scale = 0;
                 } else if (
                     originalFields?.immutable?.color === undefined &&
-                    store.currentMap.mapType === "choroplethmap"
+                    (store.currentMap.mapType === "choroplethmap" ||
+                        store.currentMap.mapType === "pointmap" ||
+                        store.currentMap.mapType === "3drectangle")
                 ) {
                     originalFields.immutable.color = {};
-                    originalFields.immutable.color.colorA = "#FFEDA0";
-                    originalFields.immutable.color.colorB = "#800026";
+                    originalFields.immutable.color.colorA = "#808080";
+                    originalFields.immutable.color.colorB = "#000000";
                 }
 
                 return {
@@ -307,6 +309,8 @@ function MapViewingPage() {
         setFocusedField(null);
     }, [focusedField, features]);
 
+    useEffect(() => {}, [store.isPickingDFM]);
+
     const areFeaturesEqual = (featuresA, featuresB) => {
         if (featuresA.length !== featuresB.length) {
             return false;
@@ -373,6 +377,31 @@ function MapViewingPage() {
         }
     }, [store.byFeature]);
 
+    useEffect(() => {
+        if (
+            store.currentArea !== -1 &&
+            store.selectedArea !== -1 &&
+            store.selectedArea !== store.currentArea &&
+            store.geojson.features[store.currentArea]?.fields?.mutable &&
+            !Object.keys(
+                store.geojson.features[store.currentArea]?.fields?.mutable
+            ).some((key) => {
+                const match = key.match(/^(\d+)_(.+)/);
+                return match && Number(match[1]) === store.selectedArea;
+            })
+        ) {
+            console.log("trigger when not");
+            const name =
+                store.selectedArea +
+                "_" +
+                store.geojson.features[store.selectedArea].fields.immutable
+                    .name;
+
+            addField(name, 0, false);
+            handleAddLineDone();
+        }
+    }, [store.currentArea, store.selectedArea]);
+
     // Temp way for now to add field, need a better way
     useEffect(() => {
         if (store && store.fieldString) {
@@ -382,40 +411,66 @@ function MapViewingPage() {
     }, [store.fieldString]);
 
     // Handler to add a new field to the selected feature
-    const addField = (key, value) => {
+    const addField = (key, value, applyAll = true) => {
         setFocusedField(key);
         setFeatures((prevFeatures) => {
-            const updatedFeatures = prevFeatures.map((feature) => {
-                const isImmutable = [
-                    "radius",
-                    "scale",
-                    "longitude",
-                    "latitude",
-                    "byFeature",
-                ].includes(key);
+            if (applyAll) {
+                const updatedFeatures = prevFeatures.map((feature) => {
+                    const isImmutable = [
+                        "radius",
+                        "scale",
+                        "longitude",
+                        "latitude",
+                        "byFeature",
+                    ].includes(key);
 
-                const updatedFields = {
-                    immutable: isImmutable
-                        ? { ...feature.fields.immutable, [key]: value }
-                        : { ...feature.fields.immutable },
-                    mutable: !isImmutable
-                        ? { ...feature.fields.mutable, [key]: value }
-                        : { ...feature.fields.mutable },
-                };
+                    const updatedFields = {
+                        immutable: isImmutable
+                            ? { ...feature.fields.immutable, [key]: value }
+                            : { ...feature.fields.immutable },
+                        mutable: !isImmutable
+                            ? { ...feature.fields.mutable, [key]: value }
+                            : { ...feature.fields.mutable },
+                    };
 
-                return {
-                    ...feature,
-                    fields: updatedFields,
-                };
-            });
+                    return {
+                        ...feature,
+                        fields: updatedFields,
+                    };
+                });
 
-            return updatedFeatures;
+                return updatedFeatures;
+            } else {
+                // Apply changes only to prevFeatures[store.currentArea]
+                const updatedFeatures = prevFeatures.map((feature, index) => {
+                    if (index === store.currentArea) {
+                        const updatedFields = {
+                            immutable: { ...feature.fields.immutable },
+                            mutable: {
+                                ...feature.fields.mutable,
+                                [key]: value,
+                            },
+                        };
+
+                        return {
+                            ...feature,
+                            fields: updatedFields,
+                        };
+                    } else {
+                        return feature;
+                    }
+                });
+
+                return updatedFeatures;
+            }
         });
     };
 
-    const removeField = (key) => {
+    const removeField = (key, applyAll = true) => {
+        setFocusedField(key);
+
         setFeatures((prevFeatures) => {
-            const updatedFeatures = prevFeatures.map((feature) => {
+            const updatedFeatures = prevFeatures.map((feature, index) => {
                 const isImmutable = [
                     "radius",
                     "scale",
@@ -435,10 +490,16 @@ function MapViewingPage() {
                     delete updatedFields.mutable[key];
                 }
 
-                return {
-                    ...feature,
-                    fields: updatedFields,
-                };
+                if (!applyAll) {
+                    return index === store.currentArea
+                        ? { ...feature, fields: updatedFields }
+                        : feature;
+                } else {
+                    return {
+                        ...feature,
+                        fields: updatedFields,
+                    };
+                }
             });
 
             return updatedFeatures;
@@ -472,18 +533,37 @@ function MapViewingPage() {
 
                 let updatedFeature = {};
 
-                if (key == "longitude" || key == "latitude") {
+                if (
+                    key === "longitude" ||
+                    key === "latitude" ||
+                    key === "colorA"
+                ) {
+                    let targetKeyValue = {};
+                    if (key === "longitude" || key === "latitude") {
+                        targetKeyValue = {
+                            center: {
+                                ...updatedFeatures[store.currentArea].fields
+                                    .immutable.center,
+                                [key]: newValue,
+                            },
+                        };
+                    } else {
+                        targetKeyValue = {
+                            color: {
+                                ...updatedFeatures[store.currentArea].fields
+                                    .immutable.color,
+                                [key]: newValue,
+                            },
+                        };
+                    }
+
                     updatedFeature = {
                         ...updatedFeatures[store.currentArea],
                         fields: {
                             immutable: {
                                 ...updatedFeatures[store.currentArea].fields
                                     .immutable,
-                                center: {
-                                    ...updatedFeatures[store.currentArea].fields
-                                        .immutable.center,
-                                    [key]: newValue,
-                                },
+                                ...targetKeyValue,
                             },
                             mutable: {
                                 ...updatedFeatures[store.currentArea].fields
@@ -693,6 +773,16 @@ function MapViewingPage() {
     };
     const handleAddField = () => {
         setCurrentModel("addfield");
+    };
+
+    const handleAddLine = () => {
+        console.log(store.isPickingDFM);
+        store.setIsPickingDFM(true);
+    };
+    const handleAddLineDone = () => {
+        store.setIsPickingDFM(false);
+        store.setSelectedArea(-1);
+        store.setCurrentArea(-1);
     };
 
     /**
@@ -1143,10 +1233,28 @@ function MapViewingPage() {
                                     <Box key={key} sx={{ display: "flex" }}>
                                         <TextField
                                             type="number"
-                                            label={
-                                                key.charAt(0).toUpperCase() +
-                                                key.slice(1)
-                                            }
+                                            label={(() => {
+                                                const match =
+                                                    key.match(/^(\d+)_(.+)/);
+                                                if (match) {
+                                                    const [, , secondPart] =
+                                                        match;
+                                                    return (
+                                                        secondPart
+                                                            .charAt(0)
+                                                            .toUpperCase() +
+                                                        secondPart.slice(1)
+                                                    );
+                                                } else {
+                                                    return (
+                                                        key
+                                                            .charAt(0)
+                                                            .toUpperCase() +
+                                                        key.slice(1)
+                                                    ); // or provide a default label
+                                                }
+                                            })()}
+                                            
                                             // defaultValue="Enter A Value"
                                             value={value}
                                             onChange={(e) =>
@@ -1164,8 +1272,17 @@ function MapViewingPage() {
                                         />
                                         <IconButton
                                             onClick={() => {
-                                                removeField(key);
-                                                addUndo([-2, key]);
+                                                const match =
+                                                    key.match(/^(\d+)_(.+)/);
+                                                if (match) {
+                                                    removeField(key, false);
+                                                    addUndo([-2, key]);
+                                                    // TODO: Add this additional field that was added without any 
+                                                    // notification to the undo/redo system.
+                                                } else {
+                                                    removeField(key);
+                                                    addUndo([-2, key]);
+                                                }
                                             }}
                                         >
                                             <Delete />
@@ -1177,65 +1294,6 @@ function MapViewingPage() {
                 </>
             );
         };
-
-        // <Box
-        //   key={key}
-        //   sx={{
-        //     display: "flex",
-        //     alignItems: "center",
-        //     justifyContent: "space-between",
-        //     marginBottom: "10px",
-        //   }}
-        // >
-        //   <Box
-        //     sx={{
-        //       alignSelf: "center",
-        //       marginRight: "10px",
-        //     }}
-        //   >
-        //     <Typography>
-
-        //     </Typography>
-        //   </Box>
-        //   <Box
-        //     sx={{
-        //       display: "flex",
-        //       flexDirection: "row",
-        //       alignSelf: "flex-end",
-        //     }}
-        //   >
-        //     {!(
-        //       key == "scale" ||
-        //       key == "radius" ||
-        //       key == "center_longitude" ||
-        //       key == "center_latitude"
-        //     ) ? (
-        //       <>
-        //         <TextField
-        //           value={value}
-        //           onChange={(e) =>
-
-        //           }
-        //           onBlur={() => {changeFieldValue(key, e.target.value); setFocusedField(null)}}
-        //         />
-        //         <IconButton onClick={() => removeField(key)}>
-        //           <Delete />
-        //         </IconButton>
-        //       </>
-        //     ) : (
-        //       <TextField
-        //         value={value}
-        //         onChange={(e) => {
-        //           key == "center_longitude" ||
-        //           key == "center_latitude"
-        //             ? changeFieldValue(key, e.target.value)
-        //             : changeFieldValue(key, e.target.value, true);
-        //         }}
-        //         onBlur={() => setFocusedField(null)}
-        //       />
-        //     )}
-        //   </Box>
-        // </Box>
 
         return (
             <Box
@@ -1251,29 +1309,84 @@ function MapViewingPage() {
                     bgcolor: theme.palette.background.paper,
                 }}
             >
-                {store.currentArea == -1 ? (
-                    <Box
-                        sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            height: "100%", // Adjust as needed
-                            padding: theme.spacing(2),
-                            textAlign: "center",
-                        }}
-                    >
-                        <Typography
-                            variant="h6"
-                            sx={{
-                                color: theme.palette.text.primary,
-                                fontWeight: "bold",
-                            }}
-                        >
-                            {store.currentMap && store.currentMap.published
-                                ? "Choose an area to view values"
-                                : "Choose an area to edit"}
-                        </Typography>
-                    </Box>
+                {store?.isPickingDFM ? (
+                    store.geojson.features[store.currentArea]?.fields
+                        ?.mutable &&
+                    Object.keys(
+                        store.geojson.features[store.currentArea]?.fields
+                            ?.mutable
+                    ).some((key) => {
+                        const match = key.match(/^(\d+)_(.+)/);
+                        return match && Number(match[1]) === store.selectedArea;
+                    }) ? (
+                        <>
+                            <Typography variant="h6">
+                                You have chosen the area already
+                            </Typography>
+                            <Button
+                                id="chosenAreaBtn"
+                                variant="contained"
+                                color="primary"
+                                onClick={() => {
+                                    handleAddLineDone();
+                                }}
+                                sx={{
+                                    color: "black",
+                                    bgcolor: theme.palette.secondary.main,
+                                    width: "100%",
+                                    mb: "10px",
+                                }}
+                            >
+                                Cancel
+                            </Button>
+                        </>
+                    ) : store.selectedArea === store.currentArea ? (
+                        <>
+                            <Typography variant="h6">
+                                Please choose a destination that is not itself
+                            </Typography>
+                            <Button
+                                id="notItselfBtn"
+                                variant="contained"
+                                color="primary"
+                                onClick={() => {
+                                    handleAddLineDone();
+                                }}
+                                sx={{
+                                    color: "black",
+                                    bgcolor: theme.palette.secondary.main,
+                                    width: "100%",
+                                    mb: "10px",
+                                }}
+                            >
+                                Cancel
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <Typography variant="h6">
+                                Choose a destination for your line
+                            </Typography>
+                            <Button
+                                id="destinationBtn"
+                                variant="contained"
+                                color="primary"
+                                onClick={() => {
+                                    handleAddLineDone();
+                                }}
+                                sx={{
+                                    color: "black",
+                                    bgcolor: theme.palette.secondary.main,
+                                    width: "100%",
+                                    mb: "10px",
+                                }}
+                            >
+                                Cancel
+                            </Button>
+                        </>
+                    )
+                ) : store.currentArea === -1 ? (
+                    <Typography variant="h6">Choose an area to edit</Typography>
                 ) : (
                     <>
                         {auth.loggedIn && (
@@ -1400,7 +1513,11 @@ function MapViewingPage() {
                                                 radius: ["pointmap", "heatmap"],
                                                 scale: ["3drectangle"],
                                                 weight: ["distributiveflowmap"],
-                                                color: ["choroplethmap"],
+                                                color: [
+                                                    "choroplethmap",
+                                                    "pointmap",
+                                                    "3drectangle",
+                                                ],
                                             };
 
                                             // Check if the key exists in features[store.currentArea]?.fields?.immutable
@@ -1416,22 +1533,28 @@ function MapViewingPage() {
 
                                             // Check if the key has a non-null value based on the map type
                                             const mapType =
-                                                store.currentMap.mapType; // Replace with the actual way you determine the map type
-
+                                                store.currentMap?.mapType;
                                             return (
                                                 keyExists &&
                                                 mapTypes[key]?.includes(
                                                     mapType
                                                 ) && (
                                                     <Box
-                                                        key={key}
+                                                        key={
+                                                            key +
+                                                            store.currentArea
+                                                        }
                                                         sx={{
                                                             display: "flex",
                                                         }}
                                                     >
                                                         {key === "color" &&
-                                                        mapType ===
-                                                            "choroplethmap" ? (
+                                                        (mapType ===
+                                                            "choroplethmap" ||
+                                                            mapType ===
+                                                                "pointmap" ||
+                                                            mapType ===
+                                                                "3drectangle") ? (
                                                             <>
                                                                 <MuiColorInput
                                                                     format="hex"
@@ -1449,13 +1572,19 @@ function MapViewingPage() {
                                                                     }
                                                                     onChange={(
                                                                         e
-                                                                    ) =>
-                                                                        changeFieldValue(
-                                                                            "colorA",
-                                                                            e,
-                                                                            true
-                                                                        )
-                                                                    }
+                                                                    ) => {
+                                                                        mapType !==
+                                                                        "pointmap"
+                                                                            ? changeFieldValue(
+                                                                                  "colorA",
+                                                                                  e,
+                                                                                  true
+                                                                              )
+                                                                            : changeFieldValue(
+                                                                                  "colorA",
+                                                                                  e
+                                                                              );
+                                                                    }}
                                                                     onBlur={() =>
                                                                         setFocusedField(
                                                                             "colorA"
@@ -1481,13 +1610,19 @@ function MapViewingPage() {
                                                                     }
                                                                     onChange={(
                                                                         e
-                                                                    ) =>
-                                                                        changeFieldValue(
-                                                                            "colorB",
-                                                                            e,
-                                                                            true
-                                                                        )
-                                                                    }
+                                                                    ) => {
+                                                                        mapType !==
+                                                                        "pointmap"
+                                                                            ? changeFieldValue(
+                                                                                  "colorA",
+                                                                                  e,
+                                                                                  true
+                                                                              )
+                                                                            : changeFieldValue(
+                                                                                  "colorA",
+                                                                                  e
+                                                                              );
+                                                                    }}
                                                                     onBlur={() =>
                                                                         setFocusedField(
                                                                             "colorB"
@@ -1540,25 +1675,40 @@ function MapViewingPage() {
                                                     </Box>
                                                 )
                                             );
-                                        })}
-                                    <List
-                                        component="nav"
-                                        aria-label="Device settings"
+                                        }
+                                    )}
+                                {store.currentMap?.mapType ===
+                                "distributiveflowmap" ? (
+                                    <Button
+                                        id="addLineBtn"
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={handleAddLine}
                                         sx={{
+                                            color: "black",
                                             bgcolor:
+                                                theme.palette.secondary.main,
+                                            width: "100%",
+                                            mb: "10px",
                                                 theme.palette.background.paper,
                                             borderRadius: 2,
                                             boxShadow: 2,
                                             mt: "10px",
                                         }}
                                     >
-                                        <ListItem
-                                            aria-expanded={
-                                                handleChoroplethClick
-                                                    ? "true"
-                                                    : undefined
-                                            }
-                                            onClick={handleChoroplethClick}
+                                        + Add Line
+                                    </Button>
+                                ) : (
+                                    <AccordionDetails>
+                                        <List
+                                            component="nav"
+                                            aria-label="Device settings"
+                                            sx={{
+                                                bgcolor:
+                                                    theme.palette.background
+                                                        .default,
+                                                borderRadius: 2,
+                                            }}
                                         >
                                             <ListItemText
                                                 primary={`Select ${store.currentMap.mapType} by:`}
@@ -1610,10 +1760,78 @@ function MapViewingPage() {
                                                         </MenuItem>
                                                     );
                                                 }
-                                                return null;
-                                            })}
-                                    </Menu>
-                                </AccordionDetails>
+                                                onClick={handleChoroplethClick}
+                                            >
+                                                <ListItemText
+                                                    primary={`Select ${store.currentMap.mapType} by ${store.byFeature}`}
+                                                    secondary={selectedItem}
+                                                />
+                                            </ListItem>
+                                        </List>
+                                        <Menu
+                                            anchorEl={anchorElChoropleth}
+                                            open={Boolean(anchorElChoropleth)}
+                                            onClose={() => {
+                                                setAnchorElChoropleth(null);
+                                            }}
+                                            anchorOrigin={{
+                                                vertical: "bottom",
+                                                horizontal: "left",
+                                            }}
+                                            transformOrigin={{
+                                                vertical: "top",
+                                                horizontal: "left",
+                                            }}
+                                        >
+                                            {(() => {
+                                                const addedKeys = [];
+                                                return store.geojson?.features.flatMap(
+                                                    (feature) =>
+                                                        Object.entries(
+                                                            feature.fields
+                                                                .mutable
+                                                        ).map(
+                                                            ([key, value]) => {
+                                                                if (
+                                                                    isNumeric(
+                                                                        value
+                                                                    ) &&
+                                                                    !addedKeys.includes(
+                                                                        key
+                                                                    )
+                                                                ) {
+                                                                    addedKeys.push(
+                                                                        key
+                                                                    );
+                                                                    return (
+                                                                        <MenuItem
+                                                                            key={
+                                                                                key
+                                                                            }
+                                                                            onClick={() => {
+                                                                                handleSelectedByFeature(
+                                                                                    key
+                                                                                );
+                                                                                setSelectedItem(
+                                                                                    key
+                                                                                );
+                                                                            }}
+                                                                        >
+                                                                            {
+                                                                                key
+                                                                            }
+                                                                        </MenuItem>
+                                                                    );
+                                                                }
+                                                                return null;
+                                                            }
+                                                        )
+                                                );
+                                            })()}
+                                        </Menu>
+                                        ;
+                                    </AccordionDetails>
+                                )}
                             </Accordion>
                         </Box>
                     </>
