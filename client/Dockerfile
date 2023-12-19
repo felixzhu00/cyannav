@@ -13,8 +13,15 @@ RUN npm run build
 FROM nginx
 EXPOSE 80 443
 
-# COPY /etc/letsencrypt/live/cyannav.tech-0001/fullchain.pem /etc/ssl/cyannav.tech.pem
-# COPY /etc/letsencrypt/live/cyannav.tech-0001/privkey.pem /etc/ssl/cyannav.tech.key
+
+# UNCOMMENT the following if you want a http server
+
+# COPY ./nginx/http-nginx.conf /etc/nginx/conf.d/default.conf
+
+# UNCOMMENT the following if you want a https server
+# REQUIRES certbot with valid certification in /etc/letsencrypt
+# modify default.conf as necessary
 
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+
 COPY --from=builder /app/build /usr/share/nginx/html
