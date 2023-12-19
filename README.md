@@ -22,7 +22,9 @@ Try out our website here: **URL:** [cyannav.tech](http://cyannav.tech)
 
 ## Production
 
-- Create `.env.production` in server
+- Create `.env.production` in server (See other .env for example)
+- Create https certificate with [certbot](https://certbot.eff.org/)
+- Modify client/nginx/default.conf as necessary
 - Run `docker-compose up -d --build`
 
 ## Pages
