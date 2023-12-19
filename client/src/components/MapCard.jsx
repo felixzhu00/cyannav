@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect, useRef } from "react";
+import { useRef, useState, useContext, useEffect } from "react";
 import {
     Box,
     Card,
@@ -54,6 +54,15 @@ export default function MapCard({ map }) {
         }
     };
 
+    // Effect to calculate chips on mount and when map changes
+    useEffect(() => {
+        showChips();
+    }, [map.tags, isSmallScreen]);
+
+    useEffect(() => {
+        setIsPublished(map.published);
+    }, [map.published]);
+
     useEffect(() => {
         if (map && map.picture) {
             const arrayBuffer = new Uint8Array(map.picture.data).buffer;
@@ -75,29 +84,27 @@ export default function MapCard({ map }) {
                 img.src = imageUrl;
             }
 
-            img.onload = () => {
-                const canvas = canvasRef.current;
+            const canvas = canvasRef.current;
+            if (canvas) {
                 const ctx = canvas.getContext("2d");
                 const cropWidth = 400; // Set your desired width for cropping
                 const cropHeight = 300; // Set your desired height for cropping
 
-                // Draw the cropped region onto the canvas
-                ctx.drawImage(img, -30, -30, cropWidth, cropHeight);
+                img.onload = () => {
+                    // Set canvas dimensions
+                    canvas.width = cropWidth;
+                    canvas.height = cropHeight;
 
-                // If you need to do something with the cropped image, you can use
-                // ctx.getImageData(0, 0, cropWidth, cropHeight) to get pixel data.
-            };
+                    // Draw the cropped region onto the canvas
+                    // Adjust the cropping values as needed
+                    ctx.drawImage(img, -30, -30, cropWidth, cropHeight);
+
+                    // If you need to do something with the cropped image, you can use
+                    // ctx.getImageData(0, 0, cropWidth, cropHeight) to get pixel data.
+                };
+            }
         }
     }, [map]);
-
-    // Effect to calculate chips on mount and when map changes
-    useEffect(() => {
-        showChips();
-    }, [map.tags, isSmallScreen]);
-
-    useEffect(() => {
-        setIsPublished(map.published);
-    }, [map.published]);
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -184,23 +191,6 @@ export default function MapCard({ map }) {
                 img.src = imageUrl;
             }
 
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            const cropWidth = 400; // Set your desired width for cropping
-            const cropHeight = 300; // Set your desired height for cropping
-
-            img.onload = () => {
-                // Set canvas dimensions
-                canvas.width = cropWidth;
-                canvas.height = cropHeight;
-
-                // Draw the cropped region onto the canvas
-                ctx.drawImage(img, -30, -30, cropWidth, cropHeight);
-
-                // If you need to do something with the cropped image, you can use
-                // ctx.getImageData(0, 0, cropWidth, cropHeight) to get pixel data.
-            };
-
             return (
                 <Link
                     id="mapImage"
@@ -208,7 +198,7 @@ export default function MapCard({ map }) {
                     style={{ textDecoration: "none" }}
                 >
                     <CardMedia
-                        sx={{ height: 300, cursor: "pointer" }}
+                        sx={{ height: 300, cursor: "pointer",  objectFit: "cover" }}
                         component="canvas"
                         ref={canvasRef}
                     />
@@ -223,7 +213,7 @@ export default function MapCard({ map }) {
                     style={{ textDecoration: "none" }}
                 >
                     <CardMedia
-                        sx={{ height: 300, cursor: "pointer" }}
+                        sx={{ height: 300, cursor: "pointer", objectFit: "contain" }}
                         component="img"
                         src={LoginLogo} // Replace with your default image source
                         alt="Default Image"

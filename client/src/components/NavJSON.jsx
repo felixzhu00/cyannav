@@ -28,12 +28,12 @@ function NavJSON({ data, center, zoom }) {
             weight: 2,
             opacity: 1,
             color: "white",
-            fillOpacity: store.currentMap.mapType == "heatmap" ? 0 : 0.7,
+            fillOpacity: store?.currentMap?.mapType == "heatmap" ? 0 : 0.7,
         });
 
         const colors = country.fields?.immutable?.color;
         // Set the calculated color only when choropleth else its white
-        if (store.currentMap.mapType == "choroplethmap") {
+        if (store?.currentMap?.mapType == "choroplethmap") {
             layer.setStyle({
                 fillColor:
                     store.byFeature == null
@@ -83,7 +83,7 @@ function NavJSON({ data, center, zoom }) {
             opacity: 1,
             color: "white",
             dashArray: "3",
-            fillOpacity: store.currentMap.mapType == "heatmap" ? 0 : 0.7,
+            fillOpacity: store?.currentMap?.mapType == "heatmap" ? 0 : 0.7,
         });
 
         // geolayer.current.resetStyle(e.target);
@@ -110,7 +110,7 @@ function NavJSON({ data, center, zoom }) {
                     opacity: 1,
                     color: "white",
                     fillOpacity:
-                        store.currentMap.mapType == "heatmap" ? 0 : 0.7,
+                        store?.currentMap?.mapType == "heatmap" ? 0 : 0.7,
                 });
             }
         });
@@ -123,7 +123,7 @@ function NavJSON({ data, center, zoom }) {
                 opacity: 1,
                 color: "white",
                 dashArray: "3",
-                fillOpacity: store.currentMap.mapType == "heatmap" ? 0 : 0.7,
+                fillOpacity: store?.currentMap?.mapType == "heatmap" ? 0 : 0.7,
             });
             store.setCurrentArea(-1);
         } else {
@@ -132,7 +132,7 @@ function NavJSON({ data, center, zoom }) {
                 weight: 5,
                 color: "#666",
                 dashArray: "",
-                fillOpacity: store.currentMap.mapType == "heatmap" ? 0 : 0.7,
+                fillOpacity: store?.currentMap?.mapType == "heatmap" ? 0 : 0.7,
             });
             // layer.bringToFront();
             store.setCurrentArea(layerIndex);
@@ -255,7 +255,9 @@ function NavJSON({ data, center, zoom }) {
             store.geojson.features[0]?.fields?.immutable?.color?.colorA;
         const color2 =
             store.geojson.features[0]?.fields?.immutable?.color?.colorB;
-        if (!hexColorPattern.test(color1) && !hexColorPattern.test(color2)) {
+        console.log(color1, color2)
+            if (!hexColorPattern.test(color1) && !hexColorPattern.test(color2)) {
+            
             return;
         }
 
@@ -290,7 +292,7 @@ function NavJSON({ data, center, zoom }) {
                         weight: 1,
                     }
                 ).addTo(map.current);
-                circle.bringToFront();
+                // circle.bringToFront();
 
                 // You can add additional customization for the circles if needed
             }
@@ -451,13 +453,13 @@ function NavJSON({ data, center, zoom }) {
     const updateMap = () => {
         setupGeoJSONLayer(data, store.isPickingDFM);
         // Possible map templates: 'heatmap', 'distributiveflowmap', 'pointmap', 'choroplethmap', '3drectangle'
-        if (store.currentMap.mapType === "heatmap") {
+        if (store?.currentMap?.mapType === "heatmap") {
             setupHeatMapLayer();
-        } else if (store.currentMap.mapType === "pointmap") {
+        } else if (store?.currentMap?.mapType === "pointmap") {
             setupPointMapLayer();
-        } else if (store.currentMap.mapType === "distributiveflowmap") {
+        } else if (store?.currentMap?.mapType === "distributiveflowmap") {
             setupDFM();
-        } else if (store.currentMap.mapType === "3drectangle") {
+        } else if (store?.currentMap?.mapType === "3drectangle") {
             setup3D();
         }
     }

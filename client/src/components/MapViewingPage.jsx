@@ -93,10 +93,10 @@ function MapViewingPage() {
     //Runs on initial load
     useEffect(() => {
         if (id != null) {
+            store.setByFeature(null);
             store.getMapById(id);
             store.getGeojson(id);
             store.setCurrentArea(-1);
-            store.setByFeature(null);
         }
     }, [id]);
 
@@ -154,7 +154,11 @@ function MapViewingPage() {
     }, [store.currentMap]);
 
     useEffect(() => {
-        if (store.geojson && store.geojson.features) {
+        if (
+            store.geojson &&
+            store.geojson.features &&
+            store?.currentMap?.mapType
+        ) {
             const updatedFeatures = store.geojson.features.map((feature) => {
                 const originalFields = feature.fields || { immutable: {} };
 
@@ -376,7 +380,7 @@ function MapViewingPage() {
     };
 
     useEffect(() => {
-        if (store.byFeature !== null) {
+        if (store.byFeature !== null && store.geojson && store.currentMap) {
             addField("byFeature", store.byFeature);
         }
     }, [store.byFeature]);
@@ -540,7 +544,8 @@ function MapViewingPage() {
                 if (
                     key === "longitude" ||
                     key === "latitude" ||
-                    key === "colorA"
+                    key === "colorA" ||
+                    key === "colorB"
                 ) {
                     let targetKeyValue = {};
                     if (key === "longitude" || key === "latitude") {
@@ -616,7 +621,6 @@ function MapViewingPage() {
                     ].includes(key);
 
                     let updatedFeature = {};
-
                     if (key === "colorA" || key === "colorB") {
                         updatedFeature = {
                             ...feature,
@@ -1495,7 +1499,7 @@ function MapViewingPage() {
                                     {features[store.currentArea]?.fields
                                         ?.immutable &&
                                         store.currentMap.mapType !==
-                                        "choroplethmap" &&
+                                            "choroplethmap" &&
                                         features[store.currentArea].fields
                                             .immutable["center"] && (
                                             <Box
@@ -1838,50 +1842,61 @@ function MapViewingPage() {
                                             >
                                                 {(() => {
                                                     const addedKeys = [];
-                                                    return store.geojson?.features.flatMap(
-                                                        (feature) =>
-                                                            Object.entries(
-                                                                feature?.fields
-                                                                    ?.mutable
-                                                            ).map(
-                                                                ([
-                                                                    key,
-                                                                    value,
-                                                                ]) => {
-                                                                    if (
-                                                                        isNumeric(
-                                                                            value
-                                                                        ) &&
-                                                                        !addedKeys.includes(
-                                                                            key
-                                                                        )
-                                                                    ) {
-                                                                        addedKeys.push(
-                                                                            key
-                                                                        );
-                                                                        return (
-                                                                            <MenuItem
-                                                                                key={
+                                                    return (
+                                                        store.geojson?.features?.flatMap(
+                                                            (feature) => {
+                                                                if (
+                                                                    feature
+                                                                        ?.fields
+                                                                        ?.mutable
+                                                                ) {
+                                                                    return Object.entries(
+                                                                        feature
+                                                                            .fields
+                                                                            .mutable
+                                                                    ).flatMap(
+                                                                        ([
+                                                                            key,
+                                                                            value,
+                                                                        ]) => {
+                                                                            if (
+                                                                                isNumeric(
+                                                                                    value
+                                                                                ) &&
+                                                                                !addedKeys.includes(
                                                                                     key
-                                                                                }
-                                                                                onClick={() => {
-                                                                                    handleSelectedByFeature(
-                                                                                        key
-                                                                                    );
-                                                                                    setSelectedItem(
-                                                                                        key
-                                                                                    );
-                                                                                }}
-                                                                            >
-                                                                                {
+                                                                                )
+                                                                            ) {
+                                                                                addedKeys.push(
                                                                                     key
-                                                                                }
-                                                                            </MenuItem>
-                                                                        );
-                                                                    }
-                                                                    return null;
+                                                                                );
+                                                                                return (
+                                                                                    <MenuItem
+                                                                                        key={
+                                                                                            key
+                                                                                        }
+                                                                                        onClick={() => {
+                                                                                            handleSelectedByFeature(
+                                                                                                key
+                                                                                            );
+                                                                                            setSelectedItem(
+                                                                                                key
+                                                                                            );
+                                                                                        }}
+                                                                                    >
+                                                                                        {
+                                                                                            key
+                                                                                        }
+                                                                                    </MenuItem>
+                                                                                );
+                                                                            }
+                                                                            return null;
+                                                                        }
+                                                                    );
                                                                 }
-                                                            )
+                                                                return null;
+                                                            }
+                                                        ) || []
                                                     );
                                                 })()}
                                             </Menu>
