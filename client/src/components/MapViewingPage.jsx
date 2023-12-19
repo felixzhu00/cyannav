@@ -41,6 +41,9 @@ import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
 import * as turf from "@turf/turf";
 
+import UndoRedo from "./UndoRedo";
+import { useHotkeys } from "react-hotkeys-hook";
+
 function MapViewingPage() {
     const theme = useTheme();
     const { store } = useContext(GlobalStoreContext);
@@ -80,6 +83,8 @@ function MapViewingPage() {
      * Field selection for map type
      */
     const [selectedItem, setSelectedItem] = useState("");
+
+    const { addUndo, addRedo, getUndo, getRedo } = UndoRedo();
 
     // Redirect
     const navigate = useNavigate();
@@ -224,15 +229,75 @@ function MapViewingPage() {
     }, [store.geojson]);
 
     useEffect(() => {
-        if (
-            features.length !== 0 &&
-            focusedFieldRef.current !== focusedField
-            // &&
-            // !areFeaturesEqual(features, store.geojson.features)
-        ) {
-            store.setGeoJsonFeatures(features);
+        if (features.length !== 0 && focusedFieldRef.current !== focusedField) {
+            // First load of vanilla geojson, convert to navjson
+            if (store.geojson.features[0].fields == null) {
+                store.geojson.features = features;
+                return;
+            }
+
+            var diffIndex = findFeatureDiffIndex(
+                features,
+                store.geojson.features
+            );
+
+            if (diffIndex !== -1) {
+                store.setGeoJsonFeatures(features);
+
+                // Get the old value and new value of the change.
+                // Special thanks to Felix for making go from 2 lines to this mess.
+                var oldValue, newValue;
+                if (focusedField == "colorA" || focusedField == "colorB") {
+                    oldValue =
+                        store.geojson.features[diffIndex].fields.immutable
+                            .color[focusedField];
+                    newValue =
+                        features[diffIndex].fields.immutable.color[
+                            focusedField
+                        ];
+                } else if (
+                    focusedField == "longitude" ||
+                    focusedField == "latitude"
+                ) {
+                    oldValue =
+                        store.geojson.features[diffIndex].fields.immutable
+                            .center[focusedField];
+                    newValue =
+                        features[diffIndex].fields.immutable.center[
+                            focusedField
+                        ];
+                } else if (focusedField == "byFeature") {
+                    oldValue =
+                        store.geojson.features[diffIndex].fields.immutable[
+                            focusedField
+                        ];
+                    newValue =
+                        features[diffIndex].fields.immutable[focusedField];
+                } else if (focusedField == "name") {
+                    oldValue =
+                        store.geojson.features[diffIndex].fields.immutable[
+                            focusedField
+                        ];
+                    newValue =
+                        features[diffIndex].fields.immutable[focusedField];
+                } else {
+                    oldValue =
+                        store.geojson.features[diffIndex].fields.mutable[
+                            focusedField
+                        ];
+                    newValue = features[diffIndex].fields.mutable[focusedField];
+                }
+
+                const newTransaction = [
+                    diffIndex,
+                    focusedField,
+                    oldValue,
+                    newValue,
+                ];
+
+                addUndo(newTransaction);
+            }
         }
-        focusedFieldRef.current = focusedField;
         setFocusedField(null);
     }, [focusedField, features]);
 
@@ -248,6 +313,21 @@ function MapViewingPage() {
         }
 
         return true;
+    };
+
+    const findFeatureDiffIndex = (featuresA, featuresB) => {
+        if (featuresA.length !== featuresB.length) {
+            return featuresA.length;
+        }
+
+        for (let i = 0; i < featuresA.length; i++) {
+            // Use a deep equality check for the fields property
+            if (!deepEqual(featuresA[i].fields, featuresB[i].fields)) {
+                return i;
+            }
+        }
+
+        return -1;
     };
 
     // Recursive deep equality check
@@ -528,11 +608,57 @@ function MapViewingPage() {
     const handleEdit = () => {
         // Handle edit logic
     };
+    useHotkeys("ctrl+z, ctrl+y", (_, handler) => {
+        switch (handler.keys.join("")) {
+            case "z":
+                handleUndo();
+                break;
+            case "y":
+                handleRedo();
+                break;
+        }
+    });
     const handleUndo = () => {
-        // Handle edit logic
+        const step = getUndo();
+
+        if (step == null) {
+            return;
+        }
+
+        var updatedFeatures = features;
+
+        if (step[1] == "longitude" || step[1] == "latitude") {
+            updatedFeatures[step[0]].fields.immutable.center[step[1]] = step[2];
+        } else if (step[1] == "colorA" || step[1] == "colorB") {
+            updatedFeatures[step[0]].fields.immutable.color[step[1]] = step[2];
+        } else if (step[1] == "byFeature" || step[1] == "name") {
+            updatedFeatures[step[0]].fields.immutable[step[1]] = step[2];
+        } else {
+            updatedFeatures[step[0]].fields.mutable[step[1]] = step[2];
+        }
+
+        setFeatures(updatedFeatures);
     };
     const handleRedo = () => {
-        // Handle edit logic
+        const step = getRedo();
+
+        if (step == null) {
+            return;
+        }
+
+        var updatedFeatures = features;
+
+        if (step[1] == "longitude" || step[1] == "latitude") {
+            updatedFeatures[step[0]].fields.immutable.center[step[1]] = step[3];
+        } else if (step[1] == "colorA" || step[1] == "colorB") {
+            updatedFeatures[step[0]].fields.immutable.color[step[1]] = step[3];
+        } else if (step[1] == "byFeature" || step[1] == "name") {
+            updatedFeatures[step[0]].fields.immutable[step[1]] = step[3];
+        } else {
+            updatedFeatures[step[0]].fields.mutable[step[1]] = step[3];
+        }
+
+        setFeatures(updatedFeatures);
     };
     const handleAddField = () => {
         setCurrentModel("addfield");
