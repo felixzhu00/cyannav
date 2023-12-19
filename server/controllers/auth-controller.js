@@ -293,18 +293,6 @@ resetRequest = async (req, res) => {
             verificationCode += randNum.toString()
         }
 
-        //add passcode to db
-        const newPasscode = new Passcode({
-            userEmail: email,
-            creationDate: Date.now(),
-            passcode: verificationCode,
-        })
-        const saved = await newPasscode.save()
-
-        if (!saved) {
-            return res.status(500).end()
-        }
-
         //send email
         const transporter = nodemailer.createTransport({
             service: "outlook",
@@ -324,6 +312,18 @@ resetRequest = async (req, res) => {
                 "\nThis code expires in 10 minutes.",
         })
 
+        //add passcode to db
+        const newPasscode = new Passcode({
+            userEmail: email,
+            creationDate: Date.now(),
+            passcode: verificationCode,
+        })
+        const saved = await newPasscode.save()
+
+        if (!saved) {
+            return res.status(500).end()
+        }
+
         console.log(info.messageId)
 
         return res.status(200).json({
@@ -335,7 +335,9 @@ resetRequest = async (req, res) => {
         console.error("auth-controllers::resetRequest")
         console.error(err)
 
-        return res.status(500).end()
+        return res.status(500).json({
+            errorMessage: "Internal server error. This is likely not a valid email address"
+        }).end()
     }
 }
 

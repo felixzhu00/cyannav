@@ -297,7 +297,7 @@ export default function MapCard({ map }) {
                     variant="body2"
                     color="text.secondary"
                 >
-                    By {map.user[0].username}
+                    By {map.user.username}
                 </Typography>
                 <Box sx={{ overflowX: "auto", maxWidth: "100%" }}>
                     <Stack

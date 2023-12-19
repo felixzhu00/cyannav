@@ -247,19 +247,7 @@ createForkMapById = async (req, res) => {
             return res.status(401).end()
         }
 
-        var newMapTitle
-        for (let i = 1; i < 9999; i++) {
-            // hard-cap... our app will probably break before this much attempts.
-            newMapTitle = `${srcMap.title} (${i})`
-            let mapExist = await MapMetadata.find({
-                title: newMapTitle,
-                user: res.locals.userId,
-            })
-            if (!mapExist) {
-                break
-            }
-        }
-
+        var newMapTitle = `${srcMap.title} (1)`
         srcMap.parentMapId = srcMap._id
         delete srcMap._id
         srcMap.title = newMapTitle
@@ -267,6 +255,8 @@ createForkMapById = async (req, res) => {
         srcMap.commentsId = []
         srcMap.like = []
         srcMap.dislike = []
+        srcMap.published = false
+        srcMap.dateCreated = Date.now()
 
         const newMap = new MapMetadata(srcMap)
         const saved = await newMap.save()
