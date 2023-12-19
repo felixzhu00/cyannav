@@ -661,6 +661,7 @@ getCommentById = async (req, res) => {
         }
 
         const targetComment = await Comment.findById(id).populate("author")
+        console.log(targetComment.author)
         if (!targetComment) {
             return res.status(404).end()
         }

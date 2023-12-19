@@ -28,7 +28,7 @@ import {
     ThumbUp,
     ThumbDown,
 } from "@mui/icons-material";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import MUIExportMapModal from "./modals/MUIExportMapModal";
 import MUIPublishMapModal from "./modals/MUIPublishMapModal";
@@ -70,9 +70,19 @@ function MapViewingPage() {
      */
     const [isPublished, setIsPublished] = useState(false);
 
-    //trigger if textfield is unfocused
+    /**
+     * Trigger if textfield is unfocused
+     */
     const [focusedField, setFocusedField] = useState(null);
     const focusedFieldRef = useRef(null);
+
+    /**
+     * Field selection for map type
+     */
+    const [selectedItem, setSelectedItem] = useState("");
+
+    // Redirect
+    const navigate = useNavigate();
 
     //Runs on initial load
     useEffect(() => {
@@ -85,10 +95,23 @@ function MapViewingPage() {
     }, [id]);
 
     useEffect(() => {
+        if (store.currentMap == "Unauthorized") {
+            navigate("/unauthorized");
+            return;
+        }
+        if (store.currentMap == "Notfound") {
+            navigate("/notfound");
+            return;
+        }
+
         if (store.currentMap != null) {
             setIsPublished(store.currentMap.published);
-            setHasLiked(store.currentMap.like.includes(auth.user.userId));
-            setHasDisliked(store.currentMap.dislike.includes(auth.user.userId));
+            if (auth.user && auth.user.userId) {
+                setHasLiked(store.currentMap.like.includes(auth.user.userId));
+                setHasDisliked(
+                    store.currentMap.dislike.includes(auth.user.userId)
+                );
+            }
         }
 
         if (store.currentMap && store.currentMap.commentsId) {
@@ -104,14 +127,18 @@ function MapViewingPage() {
                         (response) => ({
                             ...response,
                             hasLikedComment: response.upvotes.includes(
-                                auth.user.userId
+                                auth.user && auth.user.userId
+                                    ? auth.user.userId
+                                    : "####"
                             ),
                             hasDislikedComment: response.downvotes.includes(
-                                auth.user.userId
+                                auth.user && auth.user.userId
+                                    ? auth.user.userId
+                                    : "####"
                             ),
                         })
                     );
-                    setComments(fetchedComments);
+                    setComments(fetchedComments.reverse());
                 } catch (error) {
                     console.error("Error fetching comments:", error);
                 }
@@ -712,7 +739,11 @@ function MapViewingPage() {
                             sx={{ "&.Mui-selected": { color: "black" } }}
                             onClick={handleEdit}
                             value="1"
-                            label="Edit"
+                            label={
+                                store.currentMap && !store.currentMap.published
+                                    ? "Edit"
+                                    : "Values"
+                            }
                         />
                         <Tab
                             id="commentTab"
@@ -793,6 +824,32 @@ function MapViewingPage() {
     };
 
     const commentSide = () => {
+        if (!isPublished) {
+            return (
+                <Paper
+                    elevation={1}
+                    sx={{
+                        height: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        bgcolor: theme.palette.background.paper,
+                    }}
+                >
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            textAlign: "center",
+                            color: theme.palette.text.primary,
+                            fontWeight: "bold",
+                            width: "80%",
+                        }}
+                    >
+                        Comments are not available until the map is published.
+                    </Typography>
+                </Paper>
+            );
+        }
         return (
             <Box
                 sx={{
@@ -832,7 +889,9 @@ function MapViewingPage() {
                             <IconButton
                                 sx={{
                                     color: comment.upvotes.includes(
-                                        auth.user.userId
+                                        auth.user && auth.user.userId
+                                            ? auth.user.userId
+                                            : "####"
                                     )
                                         ? "black"
                                         : "default",
@@ -847,7 +906,9 @@ function MapViewingPage() {
                             <IconButton
                                 sx={{
                                     color: comment.downvotes.includes(
-                                        auth.user.userId
+                                        auth.user && auth.user.userId
+                                            ? auth.user.userId
+                                            : "####"
                                     )
                                         ? "black"
                                         : "default",
@@ -882,8 +943,6 @@ function MapViewingPage() {
     };
 
     const editBar = () => {
-        const [selectedItem, setSelectedItem] = useState("");
-
         const fieldEdit = () => {
             if (store.currentArea === -1) {
                 return null;
@@ -913,6 +972,10 @@ function MapViewingPage() {
                                 }
                                 onBlur={() => setFocusedField("name")}
                                 sx={{ width: "100%" }}
+                                disabled={
+                                    store.currentMap &&
+                                    store.currentMap.published
+                                }
                             />
                         </Box>
 
@@ -1023,7 +1086,28 @@ function MapViewingPage() {
                 }}
             >
                 {store.currentArea == -1 ? (
-                    <Typography variant="h6">Choose an area to edit</Typography>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            height: "100%", // Adjust as needed
+                            padding: theme.spacing(2),
+                            textAlign: "center",
+                        }}
+                    >
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                color: theme.palette.text.primary,
+                                fontWeight: "bold",
+                            }}
+                        >
+                            {store.currentMap && store.currentMap.published
+                                ? "Choose an area to view values"
+                                : "Choose an area to edit"}
+                        </Typography>
+                    </Box>
                 ) : (
                     <>
                         {auth.loggedIn && (
@@ -1383,9 +1467,10 @@ function MapViewingPage() {
                 {mapView()}
             </Box>
 
-            <Box sx={{ gridColumn: "2", gridRow: "2" }}>
+            <Box key={comments.length} sx={{ gridColumn: "2", gridRow: "2" }}>
                 {value === "1" ? editBar() : commentSide()}
             </Box>
+
             {currentModel === "export" && (
                 <MUIExportMapModal
                     open={currentModel === "export"}
@@ -1401,7 +1486,10 @@ function MapViewingPage() {
             {currentModel === "comment" && (
                 <MUICommentModal
                     open={currentModel === "comment"}
-                    onClose={() => setCurrentModel("")}
+                    onClose={() => {
+                        setCurrentModel("");
+                        store.getMapById(store.currentMap._id);
+                    }}
                 />
             )}
             {currentModel === "addfield" && (

@@ -68,7 +68,12 @@ function GlobalStoreContextProvider(props) {
     });
 
     useEffect(() => {
-        if (store && store.geojson !== null && store.currentMap) {
+        if (
+            store &&
+            store.geojson !== null &&
+            store.currentMap &&
+            !store.currentMap.published
+        ) {
             store.updateMapGeoJson();
         }
     }, [store.geojson]);
@@ -424,6 +429,22 @@ function GlobalStoreContextProvider(props) {
                 likes: response.data.metadata.like.length,
                 dislikes: response.data.metadata.dislike.length,
             }));
+        } else {
+            switch (response.status) {
+                case 401:
+                    setStore((prevStore) => ({
+                        ...prevStore,
+                        currentMap: "Unauthorized",
+                    }));
+                    break;
+                case 400:
+                case 404:
+                    setStore((prevStore) => ({
+                        ...prevStore,
+                        currentMap: "Notfound",
+                    }));
+                    break;
+            }
         }
     };
 
@@ -467,7 +488,6 @@ function GlobalStoreContextProvider(props) {
 
     store.postComment = async (text, parentCommentId, mapId) => {
         const response = await api.postComment(text, parentCommentId, mapId);
-        console.log(response);
         return response;
     };
 
