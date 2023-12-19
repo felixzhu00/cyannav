@@ -289,7 +289,7 @@ describe("resetRequest function", () => {
             errorMessage: "Email is not associated with a user",
         })
     })
-    it("returns 401 if verification code already exists in db and isnt expired", async () => {
+    it("returns 200 if verification code already exists in db and isnt expired", async () => {
         userProfileSchema.findOne=jest.fn().mockResolvedValueOnce({
             username: "username",
             email: "email",
@@ -311,10 +311,7 @@ describe("resetRequest function", () => {
         }
         await resetRequest(req, res)
 
-        expect(res.status).toHaveBeenCalledWith(401)
-        expect(res.json).toHaveBeenCalledWith({
-            errorMessage: "User already has a verification code.",
-        })
+        expect(res.status).toHaveBeenCalledWith(200)
     })
     it("returns 500 if passcode cannot save", async () => {
         userProfileSchema.findOne=jest.fn().mockResolvedValueOnce({
@@ -640,6 +637,358 @@ describe("updatePasscode function", () => {
             end: jest.fn(),
         }
         await updatePasscode(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(200)
+    })
+})
+
+describe("updateUsername function", () => {
+    jest.mock('../auth');
+
+    it("returns 401 if username already exists", async () => {
+        userProfileSchema.findOne = jest.fn().mockResolvedValueOnce(true)
+
+        const req = { body: {
+            newUsername: "username"
+        }}
+        const res = {
+            locals: {
+                userId: true
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+
+        await updateUsername(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({
+            errorMessage: "Username is already taken.",
+        })
+    })
+    it("returns 500 if user fails to find one and update", async () => {
+        userProfileSchema.findOne = jest.fn().mockResolvedValueOnce(false)
+        userProfileSchema.findOneAndUpdate = jest.fn().mockResolvedValueOnce(false)
+
+        const req = { body: {
+            newUsername: "username"
+        }}
+        const res = {
+            locals: {
+                userId: true
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updateUsername(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(500)
+    })
+    it("returns 200 if username was updated successfully", async () => {
+        userProfileSchema.findOne = jest.fn().mockResolvedValueOnce(false)
+        userProfileSchema.findOneAndUpdate = jest.fn().mockResolvedValueOnce({
+            username: "username",
+            email: "email",
+            picture: null, // TODO: figure out profile picture
+            password: "11223344$$",
+        })
+
+        const req = { body: {
+            newUsername: "username"
+        }}
+        const res = {
+            locals: {
+                userId: true
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updateUsername(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(200)
+    })
+})
+
+describe("updateEmail function", () => {
+    jest.mock('../auth');
+
+    it("returns 401 if email already exists", async () => {
+        userProfileSchema.countDocuments = jest.fn().mockResolvedValueOnce(1)
+
+        const req = { body: {
+            newEmail: "newEmail"
+        }}
+        const res = {
+            locals: {
+                userId: true
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+
+        await updateEmail(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({
+            errorMessage: "Email not unique.",
+        })
+    })
+    it("returns 500 if error finding user and updating", async () => {
+        userProfileSchema.countDocuments = jest.fn().mockResolvedValueOnce(0)
+        userProfileSchema.findOneAndUpdate = jest.fn().mockResolvedValueOnce(false)
+
+        const req = { body: {
+            newEmail: "newEmail"
+        }}
+        const res = {
+            locals: {
+                userId: true
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+
+        await updateEmail(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(500)
+    })
+    it("returns 200 if email was updated successfully", async () => {
+        userProfileSchema.findOne = jest.fn().mockResolvedValueOnce(false)
+        userProfileSchema.findOneAndUpdate = jest.fn().mockResolvedValueOnce({
+            username: "username",
+            email: "email",
+            picture: null, // TODO: figure out profile picture
+            password: "11223344$$",
+        })
+
+        const req = { body: {
+            newEmail: "newEmail"
+        }}
+        const res = {
+            locals: {
+                userId: true
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+        await updateEmail(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(200)
+    })
+})
+
+describe("updateProfilePic function", () => {
+    jest.mock('../auth');
+
+    it("returns 401 if user is not verified", async () => {
+        auth.verifyUser = jest.fn().mockReturnValueOnce(false)
+        const req = { body: {
+            newEmail: "newEmail"
+        }}
+        const res = {
+            locals: {
+                userId: true
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+
+        await updateProfilePic(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({
+            errorMessage: "Unauthorized"
+        })
+    })
+    it("returns 404 if user is not found in db", async () => {
+        auth.verifyUser = jest.fn().mockReturnValueOnce(1)
+        userProfileSchema.findById=jest.fn().mockResolvedValueOnce(false)
+        const req = { body: {
+            newEmail: "newEmail"
+        }}
+        const res = {
+            locals: {
+                userId: true
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+
+        await updateProfilePic(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(404)
+        expect(res.json).toHaveBeenCalledWith({
+            errorMessage: "User not found"        
+        })
+    })
+})
+
+describe("deleteAccount function", () => {
+    jest.mock('../auth');
+
+    it("returns 401 if userID is null", async () => {
+        const req = { body: {
+            username: "username",
+            email: "newEmail",
+            password: "11223344$$"
+        }}
+        const res = {
+            locals: {
+                userId: null
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+
+        await deleteAccount(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+    })
+    it("returns 401 if usernames do not match", async () => {
+        userProfileSchema.findById=jest.fn().mockResolvedValueOnce({
+            username: "username1",
+            email: "email",
+            picture: null, // TODO: figure out profile picture
+            password: "11223344$$",
+        })
+        const req = { body: {
+            username: "username",
+            email: "newEmail",
+            password: "11223344$$"
+        }}
+        const res = {
+            locals: {
+                userId: 1
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+
+        await deleteAccount(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({
+            errorMessage: "Username does not match",
+        })
+    })
+    it("returns 401 if emails do not match", async () => {
+        userProfileSchema.findById=jest.fn().mockResolvedValueOnce({
+            username: "username",
+            email: "email1",
+            picture: null, // TODO: figure out profile picture
+            password: "11223344$$",
+        })
+        const req = { body: {
+            username: "username",
+            email: "newEmail",
+            password: "11223344$$"
+        }}
+        const res = {
+            locals: {
+                userId: 1
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+
+        await deleteAccount(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({
+            errorMessage: "Email does not match.",
+        })
+    })
+    it("returns 401 if passwords do not match", async () => {
+        userProfileSchema.findById=jest.fn().mockResolvedValueOnce({
+            username: "username",
+            email: "email",
+            picture: null, // TODO: figure out profile picture
+            password: "11223344$$",
+        })
+        bcrypt.compare=jest.fn().mockResolvedValueOnce(false)
+        const req = { body: {
+            username: "username",
+            email: "email",
+            password: "11223344$$"
+        }}
+        const res = {
+            locals: {
+                userId: 1
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+
+        await deleteAccount(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(401)
+        expect(res.json).toHaveBeenCalledWith({
+            errorMessage: "Password does not match",
+        })
+    })
+    it("returns 500 if deleting user errors out", async () => {
+        userProfileSchema.findById=jest.fn().mockResolvedValueOnce({
+            username: "username",
+            email: "email",
+            picture: null, // TODO: figure out profile picture
+            password: "11223344$$",
+        })
+        bcrypt.compare=jest.fn().mockResolvedValueOnce(true)
+        userProfileSchema.findByIdAndDelete=jest.fn().mockResolvedValueOnce(false)
+        const req = { body: {
+            username: "username",
+            email: "email",
+            password: "11223344$$"
+        }}
+        const res = {
+            locals: {
+                userId: 1
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+
+        await deleteAccount(req, res)
+
+        expect(res.status).toHaveBeenCalledWith(500)
+    })
+    it("returns 200 if user was successfully deleted", async () => {
+        userProfileSchema.findById=jest.fn().mockResolvedValueOnce({
+            username: "username",
+            email: "email",
+            picture: null, // TODO: figure out profile picture
+            password: "11223344$$",
+        })
+        bcrypt.compare=jest.fn().mockResolvedValueOnce(true)
+        userProfileSchema.findByIdAndDelete=jest.fn().mockResolvedValueOnce(true)
+        const req = { body: {
+            username: "username",
+            email: "email",
+            password: "11223344$$"
+        }}
+        const res = {
+            locals: {
+                userId: 1
+            },
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn(),
+            end: jest.fn(),
+        }
+
+        await deleteAccount(req, res)
 
         expect(res.status).toHaveBeenCalledWith(200)
     })

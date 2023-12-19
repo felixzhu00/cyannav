@@ -38,6 +38,7 @@ export default function MUIAddFieldModal(props) {
     const handleAdd = async () => {
         if (fieldName != "") {
             await store.setField(fieldName);
+            props.onNew(fieldName);
             props.onClose();
         } else {
             setErrorMessage("Please fill in the required fields.");
@@ -71,11 +72,7 @@ export default function MUIAddFieldModal(props) {
                             <Close />
                         </IconButton>
                     </Box>
-                    <Typography
-                        id="add-field-modal-description"
-                        variant="body1"
-                        component="body1"
-                    >
+                    <Typography id="add-field-modal-description" variant="body">
                         What is the name of the field you would like to add?
                     </Typography>
                     <Box
@@ -91,7 +88,6 @@ export default function MUIAddFieldModal(props) {
                             required
                             id="outlined-required"
                             label="Field"
-                            defaultValue=""
                             fullWidth
                             value={fieldName}
                             onChange={(e) => setFieldName(e.target.value)}

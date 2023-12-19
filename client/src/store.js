@@ -72,8 +72,13 @@ function GlobalStoreContextProvider(props) {
     });
 
     useEffect(() => {
-        if (store && store.geojson !== null && store.currentMap) {
-            store.updateMapGeoJson(); 
+        if (
+            store &&
+            store.geojson !== null &&
+            store.currentMap &&
+            !store.currentMap.published
+        ) {
+            store.updateMapGeoJson();
         }
     }, [store.geojson]);
 
@@ -351,8 +356,6 @@ function GlobalStoreContextProvider(props) {
         }
 
         let filteredArray = [];
-
-        // if (string !== "") {
         if (filter == "mapName") {
             filteredArray = response.filter((item) => {
                 return item.title.includes(string);
@@ -362,10 +365,13 @@ function GlobalStoreContextProvider(props) {
                 return item.user[0].username.includes(string);
             });
         } else if (filter == "tag") {
-            //Need UI implemenation and Backend
-            filteredArray = response.filter((item) => {
-                return item.tag[0].includes(string);
-            });
+            filteredArray = response.filter(
+                (item) =>
+                    item.tags &&
+                    item.tags.some((tag) =>
+                        tag.toLowerCase().includes(string.toLowerCase())
+                    )
+            );
         }
         // }
 
@@ -448,6 +454,22 @@ function GlobalStoreContextProvider(props) {
                 likes: response.data.metadata.like.length,
                 dislikes: response.data.metadata.dislike.length,
             }));
+        } else {
+            switch (response.status) {
+                case 401:
+                    setStore((prevStore) => ({
+                        ...prevStore,
+                        currentMap: "Unauthorized",
+                    }));
+                    break;
+                case 400:
+                case 404:
+                    setStore((prevStore) => ({
+                        ...prevStore,
+                        currentMap: "Notfound",
+                    }));
+                    break;
+            }
         }
     };
 

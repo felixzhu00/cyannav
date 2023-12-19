@@ -122,7 +122,6 @@ export default function MapCard({ map }) {
     };
 
     const handleNavToMap = async () => {
-        console.log(map);
         await store.setCurrentMap(map);
         navigate(`/mapview/${map._id}`);
     };
@@ -243,43 +242,53 @@ export default function MapCard({ map }) {
                         </IconButton>
                     )}
                     <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-                        <MenuItem
-                            disabled={isPublished}
-                            onClick={() => {
-                                handleKebab("addTag");
-                            }}
-                        >
-                            Add Tag
-                        </MenuItem>
-                        <MenuItem
-                            disabled={isPublished}
-                            onClick={() => {
-                                handleKebab("publish");
-                            }}
-                        >
-                            Publish
-                        </MenuItem>
-                        <MenuItem
-                            onClick={() => {
-                                handleKebab("duplicate");
-                            }}
-                        >
-                            Duplicate
-                        </MenuItem>
-                        <MenuItem
-                            onClick={() => {
-                                handleKebab("fork");
-                            }}
-                        >
-                            Fork
-                        </MenuItem>
-                        <MenuItem
-                            onClick={() => {
-                                handleKebab("delete");
-                            }}
-                        >
-                            Delete
-                        </MenuItem>
+                        {store.togglebrowseHome && (
+                            <MenuItem
+                                disabled={isPublished}
+                                onClick={() => {
+                                    handleKebab("addTag");
+                                }}
+                            >
+                                Add Tag
+                            </MenuItem>
+                        )}
+                        {store.togglebrowseHome && (
+                            <MenuItem
+                                disabled={isPublished}
+                                onClick={() => {
+                                    handleKebab("publish");
+                                }}
+                            >
+                                Publish
+                            </MenuItem>
+                        )}
+                        {store.togglebrowseHome && (
+                            <MenuItem
+                                onClick={() => {
+                                    handleKebab("duplicate");
+                                }}
+                            >
+                                Duplicate
+                            </MenuItem>
+                        )}
+                        {!store.togglebrowseHome && (
+                            <MenuItem
+                                onClick={() => {
+                                    handleKebab("fork");
+                                }}
+                            >
+                                Fork
+                            </MenuItem>
+                        )}
+                        {store.togglebrowseHome && (
+                            <MenuItem
+                                onClick={() => {
+                                    handleKebab("delete");
+                                }}
+                            >
+                                Delete
+                            </MenuItem>
+                        )}
                     </Menu>
                 </Box>
 
