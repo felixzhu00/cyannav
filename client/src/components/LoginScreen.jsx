@@ -138,6 +138,7 @@ export default function LoginScreen(props) {
                     <Grid container>
                         <Grid item xs>
                             <Link
+                                id="forgotPassLink"
                                 onClick={() => {
                                     navigate("/forget");
                                 }}
