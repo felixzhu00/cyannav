@@ -21,7 +21,12 @@ export default function MUIPublishMapModal(props) {
     const { store } = useContext(GlobalStoreContext);
     const { auth } = useContext(AuthContext);
 
-    const currentMapId = store.currentMap._id;
+    var currentMapId;
+    if (store.currentModal !== null) {
+        currentMapId = store.currentModalMapId;
+    } else {
+        currentMapId = store.currentMap._id;
+    }
 
     const handlePublish = async () => {
         await store.publishMap(currentMapId);
