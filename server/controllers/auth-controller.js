@@ -337,7 +337,7 @@ resetRequest = async (req, res) => {
 
         return res.status(500).json({
             errorMessage: "Internal server error. This is likely not a valid email address"
-        }).end()
+        })
     }
 }
 
