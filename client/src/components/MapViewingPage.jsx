@@ -83,7 +83,7 @@ function MapViewingPage() {
      */
     const [selectedItem, setSelectedItem] = useState("");
 
-    const { addUndo, addRedo, getUndo, getRedo, printUndoRedo } = UndoRedo();
+    const { addUndo, addRedo, getUndo, getRedo } = UndoRedo();
 
     // Redirect
     const navigate = useNavigate();
@@ -608,10 +608,28 @@ function MapViewingPage() {
         // Handle edit logic
     };
     const handleUndo = () => {
-        // Handle edit logic
+        const step = getUndo();
+
+        if (step == null) {
+            return;
+        }
+
+        var updatedFeatures = features;
+        updatedFeatures[step[0]].fields.mutable[step[1]] = step[2];
+
+        setFeatures(updatedFeatures);
     };
     const handleRedo = () => {
-        // Handle edit logic
+        const step = getRedo();
+
+        if (step == null) {
+            return;
+        }
+
+        var updatedFeatures = features;
+        updatedFeatures[step[0]].fields.mutable[step[1]] = step[3];
+
+        setFeatures(updatedFeatures);
     };
     const handleAddField = () => {
         setCurrentModel("addfield");
