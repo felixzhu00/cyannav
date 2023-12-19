@@ -744,6 +744,44 @@ updateMapGeoJson = async (req, res) => {
     }
 }
 
+
+updateMapPic = async (req, res) => {
+    try {
+        const mapId = req.query.mapId; // Make sure to send the mapId from the frontend
+
+        // Validate if the mapId is valid (you may want to add more validation)
+        if (!mongoose.Types.ObjectId.isValid(mapId)) {
+            return res.status(400).json({ errorMessage: "Invalid mapId" });
+        }
+
+        const map = await MapMetadata.findById(mapId);
+
+        if (!map) {
+            return res.status(404).json({ errorMessage: "Map not found" });
+        }
+
+        if (req.files.file) {
+            const { data, mimetype } = req.files.file;
+            console.log(data, mimetype)
+            // Check if the file is of a valid image type
+            if (!["image/jpeg", "image/png"].includes(mimetype)) {
+                return res.status(400).json({ errorMessage: "Invalid file type" });
+            }
+
+            map.picture = data;
+            await map.save();
+
+            return res.status(200).json({ message: "Map picture updated successfully" });
+        } else {
+            return res.status(400).json({ errorMessage: "No file uploaded" });
+        }
+    } catch (err) {
+        console.error("map-controller::updateMapPic");
+        console.error(err);
+        return res.status(500).end();
+    }
+}
+
 module.exports = {
     getMapById,
     getUserMaps,
@@ -763,4 +801,5 @@ module.exports = {
     dislikeMap,
     likeComment,
     dislikeComment,
+    updateMapPic,
 }

@@ -110,4 +110,10 @@ router.post(
     mapMetadataSchemaController.updateMapGeoJson
 );
 
+router.post(
+    "/updateMapPic",
+    auth.verify,
+    mapMetadataSchemaController.updateMapPic
+);
+
 module.exports = router;

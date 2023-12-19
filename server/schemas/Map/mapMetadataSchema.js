@@ -62,6 +62,7 @@ const mapMetadataSchema = new Schema({
     tags: {
         type: [String],
     },
+    picture: Buffer,
 })
 
 const mapGraphicModel = mongoose.model("mapMetadata", mapMetadataSchema)

@@ -213,6 +213,7 @@ function MapViewingPage() {
             });
             setFocusedField("feature");
             setFeatures(updatedFeatures);
+            store.exportImage();
         }
         //Sets the exisitng map by feature if it exist
         if (store.geojson?.features[0]?.fields?.immutable?.byFeature) {
