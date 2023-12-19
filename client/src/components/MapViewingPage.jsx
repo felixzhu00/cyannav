@@ -233,6 +233,8 @@ function MapViewingPage() {
             if (diffIndex !== -1) {
                 store.setGeoJsonFeatures(features);
 
+                // Get the old value and new value of the change.
+                // Special thanks to Felix for making go from 2 lines to this mess.
                 var oldValue, newValue;
                 if (focusedField == "colorA" || focusedField == "colorB") {
                     oldValue =
@@ -268,13 +270,12 @@ function MapViewingPage() {
                     newValue = features[diffIndex].fields.mutable[focusedField];
                 }
 
-                const newTransaction = `
-                    ${diffIndex},
-                    ${focusedField},
-                    ${oldValue},
-                    ${newValue}
-                `;
-
+                const newTransaction = [
+                    diffIndex,
+                    focusedField,
+                    oldValue,
+                    newValue,
+                ];
                 console.log("New transaction");
                 console.log(newTransaction);
             }
