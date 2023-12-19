@@ -1134,6 +1134,7 @@ function MapViewingPage() {
                             </Typography>
 
                             <IconButton
+                                disabled={!auth.loggedIn}
                                 sx={{
                                     color: comment.upvotes.includes(
                                         auth.user && auth.user.userId
@@ -1151,6 +1152,7 @@ function MapViewingPage() {
                                 {comment.upvotes.length}
                             </Typography>
                             <IconButton
+                                disabled={!auth.loggedIn}
                                 sx={{
                                     color: comment.downvotes.includes(
                                         auth.user && auth.user.userId
