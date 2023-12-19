@@ -160,6 +160,9 @@ function MapViewingPage() {
                 if (!originalFields.immutable) {
                     originalFields.immutable = {};
                 }
+                if (!originalFields.mutable) {
+                    originalFields.mutable = {};
+                }
                 //Set name field if name doesnt exist
                 if (originalFields?.immutable?.name === undefined) {
                     originalFields.immutable.name = feature.properties.admin;
@@ -187,11 +190,6 @@ function MapViewingPage() {
                 ) {
                     originalFields.immutable.radius = 0;
                 } else if (
-                    originalFields?.immutable?.weight === undefined &&
-                    store.currentMap.mapType === "distributiveflowmap"
-                ) {
-                    originalFields.immutable.weight = 0;
-                } else if (
                     originalFields?.immutable?.scale === undefined &&
                     store.currentMap.mapType === "3drectangle"
                 ) {
@@ -206,12 +204,13 @@ function MapViewingPage() {
                     originalFields.immutable.color.colorA = "#808080";
                     originalFields.immutable.color.colorB = "#000000";
                 }
-
+                
                 return {
                     ...feature,
                     fields: originalFields,
                 };
             });
+            setFocusedField("feature");
             setFeatures(updatedFeatures);
         }
         //Sets the exisitng map by feature if it exist
@@ -305,6 +304,7 @@ function MapViewingPage() {
 
                 addUndo(newTransaction);
             }
+            
         }
         setFocusedField(null);
     }, [focusedField, features]);
@@ -397,7 +397,7 @@ function MapViewingPage() {
                 store.geojson.features[store.selectedArea].fields.immutable
                     .name;
 
-            addField(name, 0, false);
+            addField(name, 10, false);
             handleAddLineDone();
         }
     }, [store.currentArea, store.selectedArea]);
@@ -1705,7 +1705,6 @@ function MapViewingPage() {
                                     <AccordionDetails>
                                         <List
                                             component="nav"
-                                            aria-label="Device settings"
                                             sx={{
                                                 bgcolor:
                                                     theme.palette.background
@@ -1745,10 +1744,11 @@ function MapViewingPage() {
                                             {(() => {
                                                 const addedKeys = [];
                                                 return store.geojson?.features.flatMap(
+                                                    
                                                     (feature) =>
                                                         Object.entries(
-                                                            feature.fields
-                                                                .mutable
+                                                            feature?.fields
+                                                                ?.mutable
                                                         ).map(
                                                             ([key, value]) => {
                                                                 if (
@@ -1788,7 +1788,7 @@ function MapViewingPage() {
                                                 );
                                             })()}
                                         </Menu>
-                                        ;
+                                        
                                     </AccordionDetails>
                                 )}
                             </Accordion>
