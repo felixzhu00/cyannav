@@ -288,6 +288,12 @@ function MapViewingPage() {
                     newValue = features[diffIndex].fields.mutable[focusedField];
                 }
 
+                // This simply is when a new field is being set to ''
+                // Or when fields are being deleted
+                if (oldValue == undefined || newValue == undefined) {
+                    return;
+                }
+
                 const newTransaction = [
                     diffIndex,
                     focusedField,
@@ -625,6 +631,18 @@ function MapViewingPage() {
             return;
         }
 
+        console.log(step);
+        // Undo field add
+        if (step[0] == -1) {
+            removeField(step[1]);
+            return;
+        }
+        // Redo field delete
+        if (step[0] == -2) {
+            addField(step[1]);
+            return;
+        }
+
         var updatedFeatures = features;
 
         if (step[1] == "longitude" || step[1] == "latitude") {
@@ -638,11 +656,23 @@ function MapViewingPage() {
         }
 
         setFeatures(updatedFeatures);
+        store.setGeoJsonFeatures(updatedFeatures);
     };
     const handleRedo = () => {
         const step = getRedo();
 
         if (step == null) {
+            return;
+        }
+
+        // Redo field add
+        if (step[0] == -1) {
+            addField(step[1]);
+            return;
+        }
+        // Redo field remove
+        if (step[0] == -2) {
+            removeField(step[1]);
             return;
         }
 
@@ -659,6 +689,7 @@ function MapViewingPage() {
         }
 
         setFeatures(updatedFeatures);
+        store.setGeoJsonFeatures(updatedFeatures);
     };
     const handleAddField = () => {
         setCurrentModel("addfield");
@@ -1132,7 +1163,10 @@ function MapViewingPage() {
                                             }}
                                         />
                                         <IconButton
-                                            onClick={() => removeField(key)}
+                                            onClick={() => {
+                                                removeField(key);
+                                                addUndo([-2, key]);
+                                            }}
                                         >
                                             <Delete />
                                         </IconButton>
@@ -1651,6 +1685,7 @@ function MapViewingPage() {
                 <MUIAddFieldModal
                     open={currentModel === "addfield"}
                     onClose={() => setCurrentModel("")}
+                    onNew={(newField) => addUndo(["-1", newField])}
                 />
             )}
         </Box>

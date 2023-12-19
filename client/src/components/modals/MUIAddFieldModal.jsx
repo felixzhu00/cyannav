@@ -38,6 +38,7 @@ export default function MUIAddFieldModal(props) {
     const handleAdd = async () => {
         if (fieldName != "") {
             await store.setField(fieldName);
+            props.onNew(fieldName);
             props.onClose();
         } else {
             setErrorMessage("Please fill in the required fields.");
