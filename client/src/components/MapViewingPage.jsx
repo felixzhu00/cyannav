@@ -150,43 +150,54 @@ function MapViewingPage() {
     useEffect(() => {
         if (store.geojson && store.geojson.features) {
             const updatedFeatures = store.geojson.features.map((feature) => {
-                const originalFields = { ...feature.fields };
+                const originalFields = feature.fields || { immutable: {} };
 
+                if (!originalFields.immutable) {
+                    originalFields.immutable = {};
+                }
                 //Set name field if name doesnt exist
-                if (originalFields.name === undefined) {
-                    originalFields.name = feature.properties.admin;
+                if (originalFields?.immutable?.name === undefined) {
+                    originalFields.immutable.name = feature.properties.admin;
                 }
 
                 //Set center if center doesnt exist
-                if (
-                    originalFields.center_longitude === undefined &&
-                    originalFields.center_latitude === undefined
-                ) {
+                if (originalFields?.immutable?.center === undefined) {
+                    originalFields.immutable.center = {};
                     const coordinates =
                         turf.centerOfMass(feature).geometry.coordinates;
                     const roundedCoordinates = coordinates.map((coord) =>
                         parseFloat(coord).toFixed(3)
                     );
                     const [lng, lat] = roundedCoordinates;
-                    originalFields.center_longitude = String(lng);
-                    originalFields.center_latitude = String(lat);
+
+                    originalFields.immutable.center.longitude = String(lng);
+                    originalFields.immutable.center.latitude = String(lat);
                 }
 
-                // Add required radius field for heatmap and pointmap
+                // Add required field for map type
                 if (
-                    originalFields.radius === undefined &&
+                    originalFields?.immutable?.radius === undefined &&
                     (store.currentMap.mapType === "heatmap" ||
                         store.currentMap.mapType === "pointmap")
                 ) {
-                    originalFields.radius = 0;
-                }
-
-                // Add required scale field for distributiveflowmap
-                if (
-                    originalFields.scale === undefined &&
+                    originalFields.immutable.radius = 0;
+                } else if (
+                    originalFields?.immutable?.weight === undefined &&
                     store.currentMap.mapType === "distributiveflowmap"
                 ) {
-                    originalFields.scale = 0;
+                    originalFields.immutable.weight = 0;
+                } else if (
+                    originalFields?.immutable?.scale === undefined &&
+                    store.currentMap.mapType === "3drectangle"
+                ) {
+                    originalFields.immutable.scale = 0;
+                } else if (
+                    originalFields?.immutable?.color === undefined &&
+                    store.currentMap.mapType === "choroplethmap"
+                ) {
+                    originalFields.immutable.color = {};
+                    originalFields.immutable.color.colorA = "#FFEDA0";
+                    originalFields.immutable.color.colorB = "#800026";
                 }
 
                 return {
@@ -195,34 +206,29 @@ function MapViewingPage() {
                 };
             });
             setFeatures(updatedFeatures);
-
-            //Sets the exisitng map by feature if it exist
+        }
+        //Sets the exisitng map by feature if it exist
+        if (store.geojson?.features[0]?.fields?.immutable?.byFeature) {
+            const currentFeature =
+                store.geojson.features[0].fields.immutable.byFeature;
             if (
-                store.geojson.features[0].fields &&
-                store.geojson.features[0].fields._byFeature
+                store.geojson.features[0].fields.mutable.hasOwnProperty(
+                    currentFeature
+                )
             ) {
-                const currentFeature =
-                    store.geojson.features[0].fields._byFeature;
-                if (
-                    store.geojson.features[0].fields.hasOwnProperty(
-                        currentFeature
-                    )
-                ) {
-                    store.setByFeature(
-                        store.geojson.features[0].fields._byFeature
-                    );
-                }
+                store.setByFeature(
+                    store.geojson.features[0].fields.immutable.byFeature
+                );
             }
         }
     }, [store.geojson]);
 
     useEffect(() => {
-        // Compare current focusedField with the previous one
-        console.log(features);
         if (
             features.length !== 0 &&
-            focusedFieldRef.current !== focusedField &&
-            !areFeaturesEqual(features, store.geojson.features)
+            focusedFieldRef.current !== focusedField
+            // &&
+            // !areFeaturesEqual(features, store.geojson.features)
         ) {
             store.setGeoJsonFeatures(features);
         }
@@ -230,16 +236,10 @@ function MapViewingPage() {
         setFocusedField(null);
     }, [focusedField, features]);
 
-    // // Used for Indexing currentArea Feature in geojson array
-    // useEffect(() => {
-    //   console.log("current",store.currentArea)
-    // }, [store.currentArea]);
-
     const areFeaturesEqual = (featuresA, featuresB) => {
         if (featuresA.length !== featuresB.length) {
             return false;
         }
-
         for (let i = 0; i < featuresA.length; i++) {
             // Use a deep equality check for the fields property
             if (!deepEqual(featuresA[i].fields, featuresB[i].fields)) {
@@ -283,8 +283,7 @@ function MapViewingPage() {
 
     useEffect(() => {
         if (store.byFeature !== null) {
-            setFocusedField("feature");
-            addField("_byFeature", store.byFeature);
+            addField("byFeature", store.byFeature);
         }
     }, [store.byFeature]);
 
@@ -298,24 +297,58 @@ function MapViewingPage() {
 
     // Handler to add a new field to the selected feature
     const addField = (key, value) => {
+        setFocusedField(key);
         setFeatures((prevFeatures) => {
-            const updatedFeatures = prevFeatures.map((feature) => ({
-                ...feature,
-                fields: {
-                    ...feature.fields,
-                    [key]: value,
-                },
-            }));
+            const updatedFeatures = prevFeatures.map((feature) => {
+                const isImmutable = [
+                    "radius",
+                    "scale",
+                    "longitude",
+                    "latitude",
+                    "byFeature",
+                ].includes(key);
+
+                const updatedFields = {
+                    immutable: isImmutable
+                        ? { ...feature.fields.immutable, [key]: value }
+                        : { ...feature.fields.immutable },
+                    mutable: !isImmutable
+                        ? { ...feature.fields.mutable, [key]: value }
+                        : { ...feature.fields.mutable },
+                };
+
+                return {
+                    ...feature,
+                    fields: updatedFields,
+                };
+            });
+
             return updatedFeatures;
         });
-        // await store.setGeoJsonFeatures(features);
     };
 
     const removeField = (key) => {
         setFeatures((prevFeatures) => {
             const updatedFeatures = prevFeatures.map((feature) => {
-                const updatedFields = { ...feature.fields };
-                delete updatedFields[key];
+                const isImmutable = [
+                    "radius",
+                    "scale",
+                    "longitude",
+                    "latitude",
+                    "byFeature",
+                ].includes(key);
+
+                const updatedFields = {
+                    immutable: { ...feature.fields.immutable },
+                    mutable: { ...feature.fields.mutable },
+                };
+
+                if (isImmutable) {
+                    delete updatedFields.immutable[key];
+                } else {
+                    delete updatedFields.mutable[key];
+                }
+
                 return {
                     ...feature,
                     fields: updatedFields,
@@ -325,43 +358,133 @@ function MapViewingPage() {
             return updatedFeatures;
         });
 
-        //reset byFeature
-        if (store.byFeature == key) {
+        // reset byFeature
+        if (store.byFeature === key) {
             store.setByFeature(null);
         }
     };
 
-    // Handler to change the value of a field in the selected feature
     const changeFieldValue = async (key, newValue, updateAll = false) => {
-        setFocusedField(key);
         setFeatures((prevFeatures) => {
             if (!updateAll) {
-                console.log("setting indiv", key, newValue);
-
                 if (store.currentArea === -1) {
                     // Feature not found, do nothing or handle accordingly
                     return prevFeatures;
                 }
 
+                const isImmutable = [
+                    "radius",
+                    "scale",
+                    "longitude",
+                    "latitude",
+                    "byFeature",
+                    "weight",
+                    "name",
+                ].includes(key);
+
                 const updatedFeatures = [...prevFeatures];
-                const updatedFeature = {
-                    ...updatedFeatures[store.currentArea],
-                    fields: {
-                        ...updatedFeatures[store.currentArea].fields,
-                        [key]: newValue,
-                    },
-                };
+
+                let updatedFeature = {};
+
+                if (key == "longitude" || key == "latitude") {
+                    updatedFeature = {
+                        ...updatedFeatures[store.currentArea],
+                        fields: {
+                            immutable: {
+                                ...updatedFeatures[store.currentArea].fields
+                                    .immutable,
+                                center: {
+                                    ...updatedFeatures[store.currentArea].fields
+                                        .immutable.center,
+                                    [key]: newValue,
+                                },
+                            },
+                            mutable: {
+                                ...updatedFeatures[store.currentArea].fields
+                                    .mutable,
+                            },
+                        },
+                    };
+                } else {
+                    updatedFeature = {
+                        ...updatedFeatures[store.currentArea],
+                        fields: {
+                            immutable: isImmutable
+                                ? {
+                                      ...updatedFeatures[store.currentArea]
+                                          .fields.immutable,
+                                      [key]: newValue,
+                                  }
+                                : {
+                                      ...updatedFeatures[store.currentArea]
+                                          .fields.immutable,
+                                  },
+                            mutable: !isImmutable
+                                ? {
+                                      ...updatedFeatures[store.currentArea]
+                                          .fields.mutable,
+                                      [key]: newValue,
+                                  }
+                                : {
+                                      ...updatedFeatures[store.currentArea]
+                                          .fields.mutable,
+                                  },
+                        },
+                    };
+                }
+
                 updatedFeatures[store.currentArea] = updatedFeature;
                 return updatedFeatures;
             } else {
-                return prevFeatures.map((feature, index) => {
-                    return {
-                        ...feature,
-                        fields: {
-                            ...feature.fields,
-                            [key]: newValue,
-                        },
-                    };
+                return prevFeatures.map((feature) => {
+                    const isImmutable = [
+                        "radius",
+                        "scale",
+                        "longitude",
+                        "latitude",
+                        "byFeature",
+                    ].includes(key);
+
+                    let updatedFeature = {};
+
+                    if (key === "colorA" || key === "colorB") {
+                        updatedFeature = {
+                            ...feature,
+                            fields: {
+                                immutable: {
+                                    ...feature.fields.immutable,
+                                    color: {
+                                        ...feature.fields.immutable.color,
+                                        [key]: newValue,
+                                    },
+                                },
+                                mutable: {
+                                    ...feature.fields.mutable,
+                                },
+                            },
+                        };
+                    } else {
+                        updatedFeature = {
+                            ...feature,
+                            fields: {
+                                immutable: isImmutable
+                                    ? {
+                                          ...feature.fields.immutable,
+                                          [key]: newValue,
+                                      }
+                                    : { ...feature.fields.immutable },
+                                mutable: !isImmutable
+                                    ? {
+                                          ...feature.fields.mutable,
+                                          [key]: newValue,
+                                      }
+                                    : { ...feature.fields.mutable },
+                            },
+                        };
+                    }
+
+                    console.log("updatedFeature", updatedFeature);
+                    return updatedFeature;
                 });
             }
         });
@@ -843,177 +966,110 @@ function MapViewingPage() {
                         >
                             <TextField
                                 label="Name"
-                                value={
-                                    selectedFeature &&
-                                    selectedFeature.fields &&
-                                    selectedFeature.fields.name
-                                }
+                                value={selectedFeature?.fields?.immutable?.name}
                                 onChange={(e) =>
                                     changeFieldValue("name", e.target.value)
                                 }
-                                onBlur={() => setFocusedField(null)}
+                                onBlur={() => setFocusedField("name")}
                                 sx={{ width: "100%" }}
                                 disabled={
                                     store.currentMap &&
                                     store.currentMap.published
                                 }
                             />
-                            {/* No delete icon for 'name' */}
                         </Box>
-
-                        {/* <TextField
-                            label="FIELD WITH NO GARBAGE"
-                            defaultValue="Hello World"
-                        />
-
-                        <Box sx={{ display: "flex" }}>
-                            <TextField
-                                label="FIELD WITH GARBAGE"
-                                defaultValue="Hello World"
-                            />
-                            <IconButton onClick={() => removeField(key)}>
-                                <Delete />
-                            </IconButton>
-                        </Box>
-
-                        <Box
-                            sx={{
-                                display: "flex",
-                            }}
-                        >
-                            <TextField
-                                label="Longitude"
-                                defaultValue="Hello World"
-                                sx={{ mr: "5px" }}
-                            />
-                            <TextField
-                                label="Latitude"
-                                defaultValue="Hello World"
-                                sx={{ ml: "5px" }}
-                            />
-                        </Box>
-
-                        <Box
-                            sx={{
-                                display: "flex",
-                            }}
-                        >
-                            <MuiColorInput sx={{ mr: "5px" }}></MuiColorInput>
-                            <MuiColorInput sx={{ ml: "5px" }}></MuiColorInput>
-                        </Box> */}
 
                         {/* Mapping through other fields */}
-                        {selectedFeature &&
-                            selectedFeature.fields &&
-                            Object.entries(selectedFeature.fields).map(
-                                ([key, value]) =>
-                                    key !== "name" &&
-                                    key !== "_byFeature" && (
-                                        <Box
-                                            key={key}
-                                            sx={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "space-between",
-                                                marginBottom: "10px",
-                                            }}
+                        {selectedFeature?.fields?.mutable &&
+                            Object.entries(selectedFeature.fields.mutable).map(
+                                ([key, value]) => (
+                                    <Box key={key} sx={{ display: "flex" }}>
+                                        <TextField
+                                            label={
+                                                key.charAt(0).toUpperCase() +
+                                                key.slice(1)
+                                            }
+                                            // defaultValue="Enter A Value"
+                                            value={value}
+                                            onChange={(e) =>
+                                                changeFieldValue(
+                                                    key,
+                                                    e.target.value
+                                                )
+                                            }
+                                            onBlur={() => setFocusedField(key)}
+                                        />
+                                        <IconButton
+                                            onClick={() => removeField(key)}
                                         >
-                                            <Box
-                                                sx={{
-                                                    alignSelf: "center",
-                                                    marginRight: "10px",
-                                                }}
-                                            >
-                                                <Typography>
-                                                    {key
-                                                        .charAt(0)
-                                                        .toUpperCase() +
-                                                        key.slice(1)}
-                                                    :
-                                                </Typography>
-                                            </Box>
-                                            <Box
-                                                sx={{
-                                                    display: "flex",
-                                                    flexDirection: "row",
-                                                    alignSelf: "flex-end",
-                                                }}
-                                            >
-                                                {!(
-                                                    key == "scale" ||
-                                                    key == "radius" ||
-                                                    key == "center_longitude" ||
-                                                    key == "center_latitude"
-                                                ) ? (
-                                                    <>
-                                                        <TextField
-                                                            value={value}
-                                                            onChange={(e) =>
-                                                                changeFieldValue(
-                                                                    key,
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                            onBlur={() =>
-                                                                setFocusedField(
-                                                                    null
-                                                                )
-                                                            }
-                                                            disabled={
-                                                                store.currentMap &&
-                                                                store.currentMap
-                                                                    .published
-                                                            }
-                                                        />
-                                                        <IconButton
-                                                            onClick={() =>
-                                                                removeField(key)
-                                                            }
-                                                        >
-                                                            <Delete />
-                                                        </IconButton>
-                                                    </>
-                                                ) : (
-                                                    <TextField
-                                                        value={value}
-                                                        onChange={(e) => {
-                                                            key ==
-                                                                "center_longitude" ||
-                                                            key ==
-                                                                "center_latitude"
-                                                                ? changeFieldValue(
-                                                                      key,
-                                                                      e.target
-                                                                          .value
-                                                                  )
-                                                                : changeFieldValue(
-                                                                      key,
-                                                                      e.target
-                                                                          .value,
-                                                                      true
-                                                                  );
-                                                        }}
-                                                        onBlur={() =>
-                                                            setFocusedField(
-                                                                null
-                                                            )
-                                                        }
-                                                        disabled={
-                                                            store.currentMap &&
-                                                            store.currentMap
-                                                                .published
-                                                        }
-                                                    />
-                                                )}
-                                            </Box>
-                                        </Box>
-                                    )
+                                            <Delete />
+                                        </IconButton>
+                                    </Box>
+                                )
                             )}
                     </Box>
                 </>
             );
         };
+
+        // <Box
+        //   key={key}
+        //   sx={{
+        //     display: "flex",
+        //     alignItems: "center",
+        //     justifyContent: "space-between",
+        //     marginBottom: "10px",
+        //   }}
+        // >
+        //   <Box
+        //     sx={{
+        //       alignSelf: "center",
+        //       marginRight: "10px",
+        //     }}
+        //   >
+        //     <Typography>
+
+        //     </Typography>
+        //   </Box>
+        //   <Box
+        //     sx={{
+        //       display: "flex",
+        //       flexDirection: "row",
+        //       alignSelf: "flex-end",
+        //     }}
+        //   >
+        //     {!(
+        //       key == "scale" ||
+        //       key == "radius" ||
+        //       key == "center_longitude" ||
+        //       key == "center_latitude"
+        //     ) ? (
+        //       <>
+        //         <TextField
+        //           value={value}
+        //           onChange={(e) =>
+
+        //           }
+        //           onBlur={() => {changeFieldValue(key, e.target.value); setFocusedField(null)}}
+        //         />
+        //         <IconButton onClick={() => removeField(key)}>
+        //           <Delete />
+        //         </IconButton>
+        //       </>
+        //     ) : (
+        //       <TextField
+        //         value={value}
+        //         onChange={(e) => {
+        //           key == "center_longitude" ||
+        //           key == "center_latitude"
+        //             ? changeFieldValue(key, e.target.value)
+        //             : changeFieldValue(key, e.target.value, true);
+        //         }}
+        //         onBlur={() => setFocusedField(null)}
+        //       />
+        //     )}
+        //   </Box>
+        // </Box>
 
         return (
             <Box
@@ -1101,6 +1157,201 @@ function MapViewingPage() {
                                         Advanced Editing Features
                                     </Typography>
                                 </AccordionSummary>
+
+                                {features[store.currentArea]?.fields
+                                    ?.immutable &&
+                                    features[store.currentArea].fields
+                                        .immutable["center"] && (
+                                        <Box
+                                            sx={{
+                                                display: "flex",
+                                            }}
+                                        >
+                                            <TextField
+                                                label="Longitude"
+                                                value={
+                                                    features[store.currentArea]
+                                                        .fields.immutable.center
+                                                        .longitude
+                                                }
+                                                onChange={(e) =>
+                                                    changeFieldValue(
+                                                        "longitude",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                onBlur={() =>
+                                                    setFocusedField("longitude")
+                                                }
+                                                sx={{ mr: "5px" }}
+                                            />
+                                            <TextField
+                                                label="Latitude"
+                                                value={
+                                                    features[store.currentArea]
+                                                        .fields.immutable.center
+                                                        .latitude
+                                                }
+                                                onChange={(e) =>
+                                                    changeFieldValue(
+                                                        "latitude",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                onBlur={() =>
+                                                    setFocusedField("latitude")
+                                                }
+                                                sx={{ ml: "5px" }}
+                                            />
+                                        </Box>
+                                    )}
+                                {features[store.currentArea]?.fields
+                                    ?.immutable &&
+                                    ["radius", "scale", "weight", "color"].map(
+                                        (key) => {
+                                            // Define map types for each key
+                                            const mapTypes = {
+                                                radius: ["pointmap", "heatmap"],
+                                                scale: ["3drectangle"],
+                                                weight: ["distributiveflowmap"],
+                                                color: ["choroplethmap"],
+                                            };
+
+                                            // Check if the key exists in features[store.currentArea]?.fields?.immutable
+                                            const keyExists =
+                                                features[store.currentArea]
+                                                    ?.fields?.immutable &&
+                                                features[store.currentArea]
+                                                    .fields.immutable[key] !==
+                                                    undefined &&
+                                                features[store.currentArea]
+                                                    .fields.immutable[key] !==
+                                                    null;
+
+                                            // Check if the key has a non-null value based on the map type
+                                            const mapType =
+                                                store.currentMap.mapType; // Replace with the actual way you determine the map type
+
+                                            return (
+                                                keyExists &&
+                                                mapTypes[key]?.includes(
+                                                    mapType
+                                                ) && (
+                                                    <Box
+                                                        key={key}
+                                                        sx={{
+                                                            display: "flex",
+                                                        }}
+                                                    >
+                                                        {key === "color" &&
+                                                        mapType ===
+                                                            "choroplethmap" ? (
+                                                            <>
+                                                                <MuiColorInput
+                                                                    format="hex"
+                                                                    fallbackValue="#FFEDA0"
+                                                                    value={
+                                                                        features[
+                                                                            store
+                                                                                .currentArea
+                                                                        ]
+                                                                            ?.fields
+                                                                            ?.immutable
+                                                                            ?.color
+                                                                            ?.colorA ||
+                                                                        "#000000"
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        changeFieldValue(
+                                                                            "colorA",
+                                                                            e,
+                                                                            true
+                                                                        )
+                                                                    }
+                                                                    onBlur={() =>
+                                                                        setFocusedField(
+                                                                            "colorA"
+                                                                        )
+                                                                    }
+                                                                    sx={{
+                                                                        mr: "5px",
+                                                                    }}
+                                                                />
+                                                                <MuiColorInput
+                                                                    format="hex"
+                                                                    fallbackValue="#800026"
+                                                                    value={
+                                                                        features[
+                                                                            store
+                                                                                .currentArea
+                                                                        ]
+                                                                            ?.fields
+                                                                            ?.immutable
+                                                                            ?.color
+                                                                            ?.colorB ||
+                                                                        "#000000"
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) =>
+                                                                        changeFieldValue(
+                                                                            "colorB",
+                                                                            e,
+                                                                            true
+                                                                        )
+                                                                    }
+                                                                    onBlur={() =>
+                                                                        setFocusedField(
+                                                                            "colorB"
+                                                                        )
+                                                                    }
+                                                                    sx={{
+                                                                        mr: "5px",
+                                                                    }}
+                                                                />
+                                                            </>
+                                                        ) : (
+                                                            <TextField
+                                                                label={
+                                                                    key
+                                                                        .charAt(
+                                                                            0
+                                                                        )
+                                                                        .toUpperCase() +
+                                                                    key.slice(1)
+                                                                } // Capitalize the first letter of the key
+                                                                value={
+                                                                    features[
+                                                                        store
+                                                                            .currentArea
+                                                                    ].fields
+                                                                        .immutable[
+                                                                        key
+                                                                    ]
+                                                                }
+                                                                onChange={(e) =>
+                                                                    changeFieldValue(
+                                                                        key,
+                                                                        e.target
+                                                                            .value,
+                                                                        true
+                                                                    )
+                                                                }
+                                                                onBlur={() =>
+                                                                    setFocusedField(
+                                                                        key
+                                                                    )
+                                                                }
+                                                            />
+                                                        )}
+                                                    </Box>
+                                                )
+                                            );
+                                        }
+                                    )}
+
                                 <AccordionDetails>
                                     <List
                                         component="nav"
@@ -1121,7 +1372,7 @@ function MapViewingPage() {
                                             onClick={handleChoroplethClick}
                                         >
                                             <ListItemText
-                                                primary="Select heat map by"
+                                                primary={`Select ${store.currentMap.mapType} by ${store.byFeature}`}
                                                 secondary={selectedItem}
                                             />
                                         </ListItem>
@@ -1141,23 +1392,18 @@ function MapViewingPage() {
                                             horizontal: "left",
                                         }}
                                     >
-                                        {store.geojson &&
-                                            store.geojson.features &&
-                                            store.currentArea !== null &&
-                                            store.geojson.features[
+                                        {store.currentArea !== null &&
+                                            store.geojson?.features[
                                                 store.currentArea
-                                            ] &&
-                                            store.geojson.features[
-                                                store.currentArea
-                                            ].fields &&
+                                            ]?.fields?.mutable &&
                                             Object.entries(
                                                 store.geojson.features[
                                                     store.currentArea
-                                                ].fields
+                                                ].fields.mutable
                                             ).map(([key, value]) => {
                                                 if (
                                                     isNumeric(value) &&
-                                                    key != "_byFeature"
+                                                    key != "byFeature"
                                                 ) {
                                                     return (
                                                         <MenuItem
@@ -1178,46 +1424,6 @@ function MapViewingPage() {
                                                 return null;
                                             })}
                                     </Menu>
-                                    {/* <Box
-                                        sx={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                        }}
-                                    >
-                                        <Typography sx={{ m: "10px" }}>
-                                            {store.currentMap &&
-                                                store.currentMap.mapType}{" "}
-                                            by:
-                                        </Typography>
-                                        <Box sx={{ textAlign: "right" }}>
-                                            <Button
-                                                onClick={handleChoroplethClick}
-                                                variant="contained"
-                                                sx={{
-                                                    color: "black",
-                                                    width: "150px",
-                                                    bgcolor:
-                                                        theme.palette.secondary
-                                                            .main,
-                                                }}
-                                            >
-                                                <Box
-                                                    sx={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                            "space-between",
-                                                        width: "100%",
-                                                    }}
-                                                >
-                                                    <span>
-                                                        {store.byFeature &&
-                                                            store.byFeature}
-                                                    </span>
-                                                    <KeyboardArrowDown />
-                                                </Box>
-                                            </Button>
-                                        </Box>
-                                    </Box> */}
                                 </AccordionDetails>
                             </Accordion>
                         </Box>
