@@ -1,5 +1,5 @@
 //temp global store
-import { createContext, useState, useContext, useEffect} from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 import MUIAddFieldModal from "./components/modals/MUIAddFieldModal";
 import MUIAddTagModal from "./components/modals/MUIAddTagModal";
 import MUIChangeEmailModal from "./components/modals/MUIChangeEmailModal";
@@ -66,7 +66,7 @@ function GlobalStoreContextProvider(props) {
         commentLikes: 0,
         commentDislikes: 0,
 
-        // used in DFM to pick area to draw line to 
+        // used in DFM to pick area to draw line to
         isPickingDFM: false,
         selectedArea: -1,
     });
@@ -88,14 +88,14 @@ function GlobalStoreContextProvider(props) {
         }
     }, [store.sortBy, store.order]);
 
-    store.setIsPickingDFM =  async (value) => {
+    store.setIsPickingDFM = async (value) => {
         setStore((prevStore) => ({
             ...prevStore,
             isPickingDFM: value,
         }));
     };
 
-    store.setSelectedArea =  async (value) => {
+    store.setSelectedArea = async (value) => {
         setStore((prevStore) => ({
             ...prevStore,
             selectedArea: value,
@@ -307,13 +307,13 @@ function GlobalStoreContextProvider(props) {
 
     store.setCurrentArea = (value) => {
         setStore((prevStore) => {
-            let updatedStore = {}
-            if(prevStore.isPickingDFM){
+            let updatedStore = {};
+            if (prevStore.isPickingDFM) {
                 updatedStore = {
                     ...prevStore,
                     selectedArea: value,
                 };
-            }else{
+            } else {
                 updatedStore = {
                     ...prevStore,
                     currentArea: value,
@@ -321,7 +321,6 @@ function GlobalStoreContextProvider(props) {
             }
             return updatedStore;
         });
-
     };
 
     store.setField = async (value) => {
@@ -491,24 +490,23 @@ function GlobalStoreContextProvider(props) {
     };
 
     store.exportImage = async () => {
-        const mapElement = Document.getElementById("map");
+        const mapElement = document.getElementById("map");
 
-        // await new Promise((resolve) => tileLayer.on("load", () => resolve()));
+        try {
+            const dataURL = await domtoimage.toJpeg(mapElement);
+            const blob = dataURLtoBlob(dataURL);
+            const formData = new FormData();
+            formData.append("file", blob, "map_picture.jpg");
 
-        domtoimage
-            .toPng(mapElement)
-            .then(function (dataURL) {
-                // var base64 = dataURL.split("base64,")[1]
-                // var parseFile = new Parse.File(name, { base64: base64 })
+            const mapId = store.currentMap._id; // Replace with the actual mapId
 
-                const tempLink = document.createElement("a");
-                tempLink.href = dataURL;
-                tempLink.download = "prettypicture.png";
-                tempLink.click();
-            })
-            .catch(function (err) {
-                console.log("THIS FAILE D WHAHSHASHDH");
-            });
+            await api.updateMapPic(mapId, formData);
+
+            // Now you can do something after the picture is updated, e.g., reload the map
+        } catch (err) {
+            console.error("JPEG export failed", err);
+            // Handle the error appropriately
+        }
     };
 
     store.postComment = async (text, parentCommentId, mapId) => {
@@ -547,6 +545,27 @@ function GlobalStoreContextProvider(props) {
         }
         return null;
     };
+
+    //helper functions for pic generation
+    
+    function dataURLtoBlob(dataURL) {
+        const byteString = atob(dataURL.split(",")[1]);
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type: "image/jpeg" });
+    }
+
+    function blobToBuffer(blob) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(Buffer.from(reader.result));
+            reader.onerror = reject;
+            reader.readAsArrayBuffer(blob);
+        });
+    }
 
     return (
         <GlobalStoreContext.Provider value={{ store }}>

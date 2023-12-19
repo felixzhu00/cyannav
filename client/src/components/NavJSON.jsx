@@ -28,19 +28,18 @@ function NavJSON({ data, center, zoom }) {
             weight: 2,
             opacity: 1,
             color: "white",
-            dashArray: "3",
-            fillOpacity: store.currentMap.mapType == "heatmap" ? 0 : 0.7,
+            fillOpacity: store?.currentMap?.mapType == "heatmap" ? 0 : 0.7,
         });
 
         const colors = country.fields?.immutable?.color;
         // Set the calculated color only when choropleth else its white
-        if (store.currentMap.mapType == "choroplethmap") {
+        if (store?.currentMap?.mapType == "choroplethmap") {
             layer.setStyle({
                 fillColor:
                     store.byFeature == null
                         ? "#007dff"
                         : getColor(
-                              country.fields.mutable[store.byFeature],
+                              country?.fields?.mutable[store.byFeature],
                               min,
                               max,
                               colors?.colorA,
@@ -84,7 +83,7 @@ function NavJSON({ data, center, zoom }) {
             opacity: 1,
             color: "white",
             dashArray: "3",
-            fillOpacity: store.currentMap.mapType == "heatmap" ? 0 : 0.7,
+            fillOpacity: store?.currentMap?.mapType == "heatmap" ? 0 : 0.7,
         });
 
         // geolayer.current.resetStyle(e.target);
@@ -110,9 +109,8 @@ function NavJSON({ data, center, zoom }) {
                     weight: 2,
                     opacity: 1,
                     color: "white",
-                    dashArray: "3",
                     fillOpacity:
-                        store.currentMap.mapType == "heatmap" ? 0 : 0.7,
+                        store?.currentMap?.mapType == "heatmap" ? 0 : 0.7,
                 });
             }
         });
@@ -125,7 +123,7 @@ function NavJSON({ data, center, zoom }) {
                 opacity: 1,
                 color: "white",
                 dashArray: "3",
-                fillOpacity: store.currentMap.mapType == "heatmap" ? 0 : 0.7,
+                fillOpacity: store?.currentMap?.mapType == "heatmap" ? 0 : 0.7,
             });
             store.setCurrentArea(-1);
         } else {
@@ -134,7 +132,7 @@ function NavJSON({ data, center, zoom }) {
                 weight: 5,
                 color: "#666",
                 dashArray: "",
-                fillOpacity: store.currentMap.mapType == "heatmap" ? 0 : 0.7,
+                fillOpacity: store?.currentMap?.mapType == "heatmap" ? 0 : 0.7,
             });
             // layer.bringToFront();
             store.setCurrentArea(layerIndex);
@@ -160,7 +158,7 @@ function NavJSON({ data, center, zoom }) {
         }
 
         data.features.forEach((feature) => {
-            const value = parseInt(feature.fields.mutable[store.byFeature], 10);
+            const value = parseInt(feature?.fields?.mutable[store.byFeature], 10);
             if (value !== undefined && !isNaN(value)) {
                 if (value < min) {
                     min = value;
@@ -257,7 +255,9 @@ function NavJSON({ data, center, zoom }) {
             store.geojson.features[0]?.fields?.immutable?.color?.colorA;
         const color2 =
             store.geojson.features[0]?.fields?.immutable?.color?.colorB;
-        if (!hexColorPattern.test(color1) && !hexColorPattern.test(color2)) {
+        console.log(color1, color2)
+            if (!hexColorPattern.test(color1) && !hexColorPattern.test(color2)) {
+            
             return;
         }
 
@@ -292,7 +292,7 @@ function NavJSON({ data, center, zoom }) {
                         weight: 1,
                     }
                 ).addTo(map.current);
-                circle.bringToFront();
+                // circle.bringToFront();
 
                 // You can add additional customization for the circles if needed
             }
@@ -375,13 +375,16 @@ function NavJSON({ data, center, zoom }) {
         }
     
         store.geojson.features.forEach((feature) => {
+            if (!feature?.fields?.mutable) {
+                return;
+            }
             const center = [
                 
-                feature.fields.immutable.center.latitude,
-                feature.fields.immutable.center.longitude,
+                feature?.fields?.immutable?.center?.latitude,
+                feature?.fields?.immutable?.center?.longitude,
             ];
     
-            Object.entries(feature.fields.mutable).forEach(([key, value]) => {
+            Object.entries(feature?.fields?.mutable).forEach(([key, value]) => {
                 const match = key.match(/^(\d+)_(.+)/);
                 if (match) {
                     // Extract relevant information from the matched key
@@ -450,13 +453,13 @@ function NavJSON({ data, center, zoom }) {
     const updateMap = () => {
         setupGeoJSONLayer(data, store.isPickingDFM);
         // Possible map templates: 'heatmap', 'distributiveflowmap', 'pointmap', 'choroplethmap', '3drectangle'
-        if (store.currentMap.mapType === "heatmap") {
+        if (store?.currentMap?.mapType === "heatmap") {
             setupHeatMapLayer();
-        } else if (store.currentMap.mapType === "pointmap") {
+        } else if (store?.currentMap?.mapType === "pointmap") {
             setupPointMapLayer();
-        } else if (store.currentMap.mapType === "distributiveflowmap") {
+        } else if (store?.currentMap?.mapType === "distributiveflowmap") {
             setupDFM();
-        } else if (store.currentMap.mapType === "3drectangle") {
+        } else if (store?.currentMap?.mapType === "3drectangle") {
             setup3D();
         }
     }
@@ -464,7 +467,7 @@ function NavJSON({ data, center, zoom }) {
 
     useEffect(() => {
         // Initialize the Leaflet map and store its reference in the map ref
-        const mapInstance = L.map("map").setView([0, 0], 2);
+        const mapInstance = L.map("map")
         map.current = mapInstance;
 
         // Create and add the tile layer
@@ -485,15 +488,6 @@ function NavJSON({ data, center, zoom }) {
 
         geolayer.current = geo;
 
-        if (map.current && map.current.getBoundsZoom && geolayer.current) {
-            // Set the view of the map to fit the GeoJSON bounds
-            const geoBounds = geolayer.current.getBounds();
-            map.current.setView(
-                geoBounds.getCenter(),
-
-                map.current.getBoundsZoom(geoBounds) + 1
-            );
-        }
         updateMap()
 
         // Cleanup function to remove the map and associated layers when the component is unmounted
@@ -506,7 +500,7 @@ function NavJSON({ data, center, zoom }) {
     useEffect(() => {
         // Calcluate the min and max
         updateMap()
-    }, [data, store.isPickingDFM]);
+    }, [data, store.isPickingDFM, store.byFeature]);
 
     useEffect(() => {
         setupGeoJSONLayer(data);

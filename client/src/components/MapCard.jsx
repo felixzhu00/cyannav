@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useRef, useState, useContext, useEffect } from "react";
 import {
     Box,
     Card,
@@ -22,12 +22,13 @@ import usgeojsonpng from "../assets/usgeojson.png";
 import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
 import { useNavigate } from "react-router-dom";
+import LoginLogo from "../assets/cyannav_logo_wo_name.png";
 
 export default function MapCard({ map }) {
     const { store } = useContext(GlobalStoreContext);
     const { auth } = useContext(AuthContext);
     const navigate = useNavigate();
-
+    const canvasRef = useRef(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const theme = useTheme();
@@ -61,6 +62,49 @@ export default function MapCard({ map }) {
     useEffect(() => {
         setIsPublished(map.published);
     }, [map.published]);
+
+    useEffect(() => {
+        if (map && map.picture) {
+            const arrayBuffer = new Uint8Array(map.picture.data).buffer;
+            let blobType = "image/jpeg"; // Default to JPEG
+
+            // Check if the buffer is a PNG by checking the first byte
+            if (map.picture.data[0] === 137) {
+                blobType = "image/png";
+            }
+
+            const blob = new Blob([arrayBuffer], { type: blobType });
+            const imageUrl = URL.createObjectURL(blob);
+
+            const img = new Image();
+
+            if (!imageUrl) {
+                img.src = LoginLogo;
+            } else {
+                img.src = imageUrl;
+            }
+
+            const canvas = canvasRef.current;
+            if (canvas) {
+                const ctx = canvas.getContext("2d");
+                const cropWidth = 400; // Set your desired width for cropping
+                const cropHeight = 300; // Set your desired height for cropping
+
+                img.onload = () => {
+                    // Set canvas dimensions
+                    canvas.width = cropWidth;
+                    canvas.height = cropHeight;
+
+                    // Draw the cropped region onto the canvas
+                    // Adjust the cropping values as needed
+                    ctx.drawImage(img, -30, -30, cropWidth, cropHeight);
+
+                    // If you need to do something with the cropped image, you can use
+                    // ctx.getImageData(0, 0, cropWidth, cropHeight) to get pixel data.
+                };
+            }
+        }
+    }, [map]);
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -126,22 +170,65 @@ export default function MapCard({ map }) {
         navigate(`/mapview/${map._id}`);
     };
 
-    return (
-        <Card
-            sx={{ maxWidth: isSmallScreen ? 300 : "relative", height: "100%" }}
-        >
-            <Box sx={{ position: "relative" }}>
+    const renderMapImage = () => {
+        if (map && map.picture) {
+            const arrayBuffer = new Uint8Array(map.picture.data).buffer;
+            let blobType = "image/jpeg"; // Default to JPEG
+
+            // Check if the buffer is a PNG by checking the first byte
+            if (map.picture.data[0] === 137) {
+                blobType = "image/png";
+            }
+
+            const blob = new Blob([arrayBuffer], { type: blobType });
+            const imageUrl = URL.createObjectURL(blob);
+
+            const img = new Image();
+
+            if (!imageUrl) {
+                img.src = LoginLogo;
+            } else {
+                img.src = imageUrl;
+            }
+
+            return (
                 <Link
                     id="mapImage"
                     onClick={handleNavToMap}
                     style={{ textDecoration: "none" }}
                 >
                     <CardMedia
-                        sx={{ height: 300, cursor: "pointer" }}
-                        image={usgeojsonpng}
-                        title="mapImage"
+                        sx={{ height: 300, cursor: "pointer",  objectFit: "cover" }}
+                        component="canvas"
+                        ref={canvasRef}
                     />
                 </Link>
+            );
+        } else {
+            // Render a default image if map or map.picture is not available
+            return (
+                <Link
+                    id="mapImage"
+                    onClick={handleNavToMap}
+                    style={{ textDecoration: "none" }}
+                >
+                    <CardMedia
+                        sx={{ height: 300, cursor: "pointer", objectFit: "contain" }}
+                        component="img"
+                        src={LoginLogo} // Replace with your default image source
+                        alt="Default Image"
+                    />
+                </Link>
+            );
+        }
+    };
+
+    return (
+        <Card
+            sx={{ maxWidth: isSmallScreen ? 300 : "relative", height: "100%" }}
+        >
+            <Box sx={{ position: "relative" }}>
+                {renderMapImage()}
 
                 {/* Likes and Dislikes Display with Icons and Vertical Divider */}
                 <Box
