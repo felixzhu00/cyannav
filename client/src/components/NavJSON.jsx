@@ -10,9 +10,11 @@ function NavJSON({ data, center, zoom }) {
     const geolayer = useRef(null);
     const heatmap = useRef(null);
     const map = useRef(null);
+    const min = useRef(null);
+    const max = useRef(null);
 
     const onEachFeature = (country, layer) => {
-        const name1 = country.fields && country.fields.name;
+        const name1 = country?.fields?.immutable?.name;
         const name2 = country.properties && country.properties.admin;
         const name3 = country.properties && country.properties.NAME_0;
 
@@ -21,19 +23,6 @@ function NavJSON({ data, center, zoom }) {
         layer.bindPopup(name);
 
         // Possible map templates : 'heatmap', 'distributiveflowmap', 'pointmap', 'choroplethmap', '3drectangle'
-
-        // Calculate the range of value
-        const { min, max } = findMinMax(data);
-
-        // Logic for color picking (choropleth)
-        const choroColor =
-            store.byFeature == null
-                ? "#007dff"
-                : getColor(country.fields[store.byFeature], min, max);
-        const color =
-            store.currentMap.mapType == "choroplethmap"
-                ? choroColor
-                : "#007dff";
 
         // Set the style for every map
         layer.setStyle({
@@ -44,10 +33,20 @@ function NavJSON({ data, center, zoom }) {
             fillOpacity: store.currentMap.mapType == "heatmap" ? 0 : 0.7,
         });
 
+        const colors = country.fields?.immutable?.color;
         // Set the calculated color only when choropleth else its white
         if (store.currentMap.mapType == "choroplethmap") {
             layer.setStyle({
-                fillColor: color,
+                fillColor:
+                    store.byFeature == null
+                        ? "#007dff"
+                        : getColor(
+                              country.fields.mutable[store.byFeature],
+                              min.current,
+                              max.current,
+                              colors?.colorA,
+                              colors?.colorB
+                          ),
             });
         }
         // Control the styling when selecting a certain feature(area)
@@ -108,6 +107,7 @@ function NavJSON({ data, center, zoom }) {
     };
 
     const getColor = (d, min, max, color1 = "#FFEDA0", color2 = "#800026") => {
+        if (min == max) return color1;
         const percentage = (parseInt(d, 10) - min) / (max - min);
         return interpolateRgb(color1, color2)(percentage);
     };
@@ -121,7 +121,7 @@ function NavJSON({ data, center, zoom }) {
         }
 
         data.features.forEach((feature) => {
-            const value = parseInt(feature.fields[store.byFeature], 10);
+            const value = parseInt(feature.fields.mutable[store.byFeature], 10);
             if (value !== undefined && !isNaN(value)) {
                 if (value < min) {
                     min = value;
@@ -153,7 +153,9 @@ function NavJSON({ data, center, zoom }) {
 
     const setupHeatMapLayer = () => {
         //preliminary checking
-        const radius = Number(store.geojson.features[0]?.fields?.radius);
+        const radius = Number(
+            store.geojson.features[0]?.fields?.immutable?.radius
+        );
         if (isNaN(radius)) {
             return;
         }
@@ -180,10 +182,9 @@ function NavJSON({ data, center, zoom }) {
                 const center = turf.centerOfMass(feature);
 
                 // Check if the intensity value is available and not NaN
-                const intensity =
-                    feature.fields && feature.fields[store.byFeature]
-                        ? parseInt(feature.fields[store.byFeature], 10)
-                        : NaN;
+                const intensity = feature?.fields?.mutable[store.byFeature]
+                    ? parseInt(feature.fields.mutable[store.byFeature], 10)
+                    : NaN;
 
                 // Only push if intensity is a valid number
                 if (!isNaN(intensity)) {
@@ -204,7 +205,9 @@ function NavJSON({ data, center, zoom }) {
 
     const setupPointMapLayer = () => {
         //preliminary checking
-        const radius = Number(store.geojson.features[0]?.fields?.radius);
+        const radius = Number(
+            store.geojson.features[0]?.fields?.immutable?.radius
+        );
         if (isNaN(radius)) {
             return;
         }
@@ -222,11 +225,9 @@ function NavJSON({ data, center, zoom }) {
         store.geojson.features.forEach((feature) => {
             const center = turf.centerOfMass(feature);
 
-            const count =
-                feature.fields &&
-                (feature.fields[store.byFeature]
-                    ? parseInt(feature.fields[store.byFeature], 10)
-                    : NaN);
+            const count = feature?.fields.mutable[store.byFeature]
+                ? parseInt(feature.fields.mutable[store.byFeature], 10)
+                : NaN;
 
             // Only proceed if count is a valid number
             if (!isNaN(count)) {
@@ -253,7 +254,9 @@ function NavJSON({ data, center, zoom }) {
 
     const setup3D = () => {
         // Preliminary checking
-        const scale = Number(store.geojson.features[0]?.fields?.scale);
+        const scale = Number(
+            store.geojson.features[0]?.fields?.immutable?.scale
+        );
         if (isNaN(scale)) {
             return;
         }
@@ -272,17 +275,14 @@ function NavJSON({ data, center, zoom }) {
             const center = turf.centerOfMass(feature);
 
             // Check if the count value is available and not NaN
-            const count =
-                feature.fields &&
-                (feature.fields[store.byFeature]
-                    ? parseInt(feature.fields[store.byFeature], 10)
-                    : NaN);
+            const count = feature?.fields?.mutable[store.byFeature]
+                ? parseInt(feature.fields.mutable[store.byFeature], 10)
+                : NaN;
 
             // Only proceed if count is a valid number
             if (!isNaN(count)) {
                 // Create and add cube marker
 
-                console.log("count", count, feature.fields);
                 const cubeSize = 50; // Adjust the size as needed
                 const marker = L.marker(
                     [
@@ -299,7 +299,9 @@ function NavJSON({ data, center, zoom }) {
 
     const setupDFM = () => {
         // Preliminary checking
-        const weight = Number(store.geojson.features[0]?.fields?.weight);
+        const weight = Number(
+            store.geojson.features[0]?.fields?.immutable?.weight
+        );
         if (isNaN(weight)) {
             return;
         }
@@ -436,6 +438,10 @@ function NavJSON({ data, center, zoom }) {
 
     // Use another useEffect to set the view after the initial render
     useEffect(() => {
+        // Calcluate the min and max
+        const { small, big } = findMinMax(data);
+        min.current = small;
+        max.current = big;
         setupGeoJSONLayer(data);
         // Possible map templates: 'heatmap', 'distributiveflowmap', 'pointmap', 'choroplethmap', '3drectangle'
         if (store.currentMap.mapType === "heatmap") {
