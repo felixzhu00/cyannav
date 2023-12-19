@@ -36,12 +36,16 @@ export default function MUIAddFieldModal(props) {
      * Handler for adding a field to a map
      */
     const handleAdd = async () => {
-        if (fieldName != "") {
+        if (
+            store.geojson.features[0].fields.mutable.hasOwnProperty(fieldName)
+        ) {
+            setErrorMessage("Field already exists.");
+        } else if (fieldName == "") {
+            setErrorMessage("Please fill in the required fields.");
+        } else {
             await store.setField(fieldName);
             props.onNew(fieldName);
             props.onClose();
-        } else {
-            setErrorMessage("Please fill in the required fields.");
         }
     };
 
