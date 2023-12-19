@@ -1254,7 +1254,6 @@ function MapViewingPage() {
                                                     ); // or provide a default label
                                                 }
                                             })()}
-                                            
                                             // defaultValue="Enter A Value"
                                             value={value}
                                             onChange={(e) =>
@@ -1277,7 +1276,7 @@ function MapViewingPage() {
                                                 if (match) {
                                                     removeField(key, false);
                                                     addUndo([-2, key]);
-                                                    // TODO: Add this additional field that was added without any 
+                                                    // TODO: Add this additional field that was added without any
                                                     // notification to the undo/redo system.
                                                 } else {
                                                     removeField(key);
@@ -1386,7 +1385,28 @@ function MapViewingPage() {
                         </>
                     )
                 ) : store.currentArea === -1 ? (
-                    <Typography variant="h6">Choose an area to edit</Typography>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            height: "100%",
+                            padding: theme.spacing(2),
+                            textAlign: "center",
+                        }}
+                    >
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                color: theme.palette.text.primary,
+                                fontWeight: "bold",
+                            }}
+                        >
+                            {store.currentMap && store.currentMap.published
+                                ? "Choose an area to view values"
+                                : "Choose an area to edit"}
+                        </Typography>
+                    </Box>
                 ) : (
                     <>
                         {auth.loggedIn && (
@@ -1438,70 +1458,60 @@ function MapViewingPage() {
                                     </Typography>
                                 </AccordionSummary>
 
-                                    {features[store.currentArea]?.fields
-                                        ?.immutable &&
-                                        features[store.currentArea].fields
-                                            .immutable["center"] && (
-                                            <Box
-                                                sx={{
-                                                    display: "flex",
-                                                    mb: "5px",
-                                                }}
-                                            >
-                                                <TextField
-                                                    type="number"
-                                                    label="Longitude"
-                                                    value={
-                                                        features[
-                                                            store.currentArea
-                                                        ].fields.immutable
-                                                            .center.longitude
-                                                    }
-                                                    onChange={(e) =>
-                                                        changeFieldValue(
-                                                            "longitude",
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    onBlur={() =>
-                                                        setFocusedField(
-                                                            "longitude"
-                                                        )
-                                                    }
-                                                    sx={{ mr: "5px" }}
-                                                />
-                                                <TextField
-                                                    type="number"
-                                                    label="Latitude"
-                                                    value={
-                                                        features[
-                                                            store.currentArea
-                                                        ].fields.immutable
-                                                            .center.latitude
-                                                    }
-                                                    onChange={(e) =>
-                                                        changeFieldValue(
-                                                            "latitude",
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    onBlur={() =>
-                                                        setFocusedField(
-                                                            "latitude"
-                                                        )
-                                                    }
-                                                    sx={{ ml: "5px" }}
-                                                />
-                                            </Box>
-                                        )}
-                                    {features[store.currentArea]?.fields
-                                        ?.immutable &&
-                                        [
-                                            "radius",
-                                            "scale",
-                                            "weight",
-                                            "color",
-                                        ].map((key) => {
+                                {features[store.currentArea]?.fields
+                                    ?.immutable &&
+                                    features[store.currentArea].fields
+                                        .immutable["center"] && (
+                                        <Box
+                                            sx={{
+                                                display: "flex",
+                                                mb: "5px",
+                                            }}
+                                        >
+                                            <TextField
+                                                type="number"
+                                                label="Longitude"
+                                                value={
+                                                    features[store.currentArea]
+                                                        .fields.immutable.center
+                                                        .longitude
+                                                }
+                                                onChange={(e) =>
+                                                    changeFieldValue(
+                                                        "longitude",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                onBlur={() =>
+                                                    setFocusedField("longitude")
+                                                }
+                                                sx={{ mr: "5px" }}
+                                            />
+                                            <TextField
+                                                type="number"
+                                                label="Latitude"
+                                                value={
+                                                    features[store.currentArea]
+                                                        .fields.immutable.center
+                                                        .latitude
+                                                }
+                                                onChange={(e) =>
+                                                    changeFieldValue(
+                                                        "latitude",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                onBlur={() =>
+                                                    setFocusedField("latitude")
+                                                }
+                                                sx={{ ml: "5px" }}
+                                            />
+                                        </Box>
+                                    )}
+                                {features[store.currentArea]?.fields
+                                    ?.immutable &&
+                                    ["radius", "scale", "weight", "color"].map(
+                                        (key) => {
                                             // Define map types for each key
                                             const mapTypes = {
                                                 radius: ["pointmap", "heatmap"],
@@ -1704,20 +1714,19 @@ function MapViewingPage() {
                                             }}
                                         >
                                             <ListItem
-                                        aria-expanded={
-                                            handleChoroplethClick
-                                                ? "true"
-                                                : undefined
-                                        }
-                                        onClick={handleChoroplethClick}
-                                    >
-                                            <ListItemText
-                                                primary={`Select ${store.currentMap.mapType} by:`}
-                                                secondary={store.byFeature}
-                                            />
-                                        </ListItem>
-                                    </List>
-                                    
+                                                aria-expanded={
+                                                    handleChoroplethClick
+                                                        ? "true"
+                                                        : undefined
+                                                }
+                                                onClick={handleChoroplethClick}
+                                            >
+                                                <ListItemText
+                                                    primary={`Select ${store.currentMap.mapType} by:`}
+                                                    secondary={store.byFeature}
+                                                />
+                                            </ListItem>
+                                        </List>
                                         <Menu
                                             anchorEl={anchorElChoropleth}
                                             open={Boolean(anchorElChoropleth)}
