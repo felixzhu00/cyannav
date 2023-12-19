@@ -1438,12 +1438,6 @@ function MapViewingPage() {
                                     </Typography>
                                 </AccordionSummary>
 
-                                <AccordionDetails
-                                    sx={{
-                                        bgcolor:
-                                            theme.palette.background.default,
-                                    }}
-                                >
                                     {features[store.currentArea]?.fields
                                         ?.immutable &&
                                         features[store.currentArea].fields
@@ -1690,7 +1684,6 @@ function MapViewingPage() {
                                                 theme.palette.secondary.main,
                                             width: "100%",
                                             mb: "10px",
-                                                theme.palette.background.paper,
                                             borderRadius: 2,
                                             boxShadow: 2,
                                             mt: "10px",
@@ -1710,64 +1703,21 @@ function MapViewingPage() {
                                                 borderRadius: 2,
                                             }}
                                         >
+                                            <ListItem
+                                        aria-expanded={
+                                            handleChoroplethClick
+                                                ? "true"
+                                                : undefined
+                                        }
+                                        onClick={handleChoroplethClick}
+                                    >
                                             <ListItemText
                                                 primary={`Select ${store.currentMap.mapType} by:`}
                                                 secondary={store.byFeature}
                                             />
                                         </ListItem>
                                     </List>
-                                    <Menu
-                                        anchorEl={anchorElChoropleth}
-                                        open={Boolean(anchorElChoropleth)}
-                                        onClose={() => {
-                                            setAnchorElChoropleth(null);
-                                        }}
-                                        anchorOrigin={{
-                                            vertical: "bottom",
-                                            horizontal: "left",
-                                        }}
-                                        transformOrigin={{
-                                            vertical: "top",
-                                            horizontal: "left",
-                                        }}
-                                    >
-                                        {store.currentArea !== null &&
-                                            store.geojson?.features[
-                                                store.currentArea
-                                            ]?.fields?.mutable &&
-                                            Object.entries(
-                                                store.geojson.features[
-                                                    store.currentArea
-                                                ].fields.mutable
-                                            ).map(([key, value]) => {
-                                                if (
-                                                    isNumeric(value) &&
-                                                    key != "byFeature"
-                                                ) {
-                                                    return (
-                                                        <MenuItem
-                                                            key={key}
-                                                            onClick={() => {
-                                                                handleSelectedByFeature(
-                                                                    key
-                                                                );
-                                                                setSelectedItem(
-                                                                    key
-                                                                );
-                                                            }}
-                                                        >
-                                                            {key}
-                                                        </MenuItem>
-                                                    );
-                                                }
-                                                onClick={handleChoroplethClick}
-                                            >
-                                                <ListItemText
-                                                    primary={`Select ${store.currentMap.mapType} by ${store.byFeature}`}
-                                                    secondary={selectedItem}
-                                                />
-                                            </ListItem>
-                                        </List>
+                                    
                                         <Menu
                                             anchorEl={anchorElChoropleth}
                                             open={Boolean(anchorElChoropleth)}
