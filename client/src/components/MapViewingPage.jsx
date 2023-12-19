@@ -615,7 +615,16 @@ function MapViewingPage() {
         }
 
         var updatedFeatures = features;
-        updatedFeatures[step[0]].fields.mutable[step[1]] = step[2];
+
+        if (step[1] == "longitude" || step[1] == "latitude") {
+            updatedFeatures[step[0]].fields.immutable.center[step[1]] = step[2];
+        } else if (step[1] == "colorA" || step[1] == "colorB") {
+            updatedFeatures[step[0]].fields.immutable.color[step[1]] = step[2];
+        } else if (step[1] == "byFeature" || step[1] == "name") {
+            updatedFeatures[step[0]].fields.immutable[step[1]] = step[2];
+        } else {
+            updatedFeatures[step[0]].fields.mutable[step[1]] = step[2];
+        }
 
         setFeatures(updatedFeatures);
     };
@@ -627,7 +636,16 @@ function MapViewingPage() {
         }
 
         var updatedFeatures = features;
-        updatedFeatures[step[0]].fields.mutable[step[1]] = step[3];
+
+        if (step[1] == "longitude" || step[1] == "latitude") {
+            updatedFeatures[step[0]].fields.immutable.center[step[1]] = step[3];
+        } else if (step[1] == "colorA" || step[1] == "colorB") {
+            updatedFeatures[step[0]].fields.immutable.color[step[1]] = step[3];
+        } else if (step[1] == "byFeature" || step[1] == "name") {
+            updatedFeatures[step[0]].fields.immutable[step[1]] = step[3];
+        } else {
+            updatedFeatures[step[0]].fields.mutable[step[1]] = step[3];
+        }
 
         setFeatures(updatedFeatures);
     };
