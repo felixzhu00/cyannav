@@ -224,12 +224,60 @@ function MapViewingPage() {
     }, [store.geojson]);
 
     useEffect(() => {
-        if (
-            features.length !== 0 &&
-            focusedFieldRef.current !== focusedField
-        ) {
-            store.setGeoJsonFeatures(features);
-            console.log("W")
+        if (features.length !== 0 && focusedFieldRef.current !== focusedField) {
+            var diffIndex = findFeatureDiffIndex(
+                features,
+                store.geojson.features
+            );
+
+            if (diffIndex !== -1) {
+                store.setGeoJsonFeatures(features);
+
+                var oldValue, newValue;
+                if (focusedField == "colorA" || focusedField == "colorB") {
+                    oldValue =
+                        store.geojson.features[diffIndex].fields.immutable
+                            .color[focusedField];
+                    newValue =
+                        features[diffIndex].fields.immutable.color[
+                            focusedField
+                        ];
+                } else if (
+                    focusedField == "longitude" ||
+                    focusedField == "latitude"
+                ) {
+                    oldValue =
+                        store.geojson.features[diffIndex].fields.immutable
+                            .center[focusedField];
+                    newValue =
+                        features[diffIndex].fields.immutable.center[
+                            focusedField
+                        ];
+                } else if (focusedField == "name") {
+                    oldValue =
+                        store.geojson.features[diffIndex].fields.immutable[
+                            focusedField
+                        ];
+                    newValue =
+                        features[diffIndex].fields.immutable[focusedField];
+                } else {
+                    oldValue =
+                        store.geojson.features[diffIndex].fields.mutable[
+                            focusedField
+                        ];
+                    newValue = features[diffIndex].fields.mutable[focusedField];
+                }
+
+                const newTransaction = `
+                    ${diffIndex},
+                    ${focusedField},
+                    ${oldValue},
+                    ${newValue}
+                `;
+
+                console.log("New transaction");
+                console.log(newTransaction);
+            }
         }
         setFocusedField(null);
     }, [focusedField, features]);
@@ -246,6 +294,21 @@ function MapViewingPage() {
         }
 
         return true;
+    };
+
+    const findFeatureDiffIndex = (featuresA, featuresB) => {
+        if (featuresA.length !== featuresB.length) {
+            return featuresA.length;
+        }
+
+        for (let i = 0; i < featuresA.length; i++) {
+            // Use a deep equality check for the fields property
+            if (!deepEqual(featuresA[i].fields, featuresB[i].fields)) {
+                return i;
+            }
+        }
+
+        return -1;
     };
 
     // Recursive deep equality check
