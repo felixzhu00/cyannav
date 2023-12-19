@@ -33,13 +33,23 @@ function UndoRedo() {
     };
 
     const getUndo = () => {
+        if (undo.length == 0) {
+            return null;
+        }
+
         const prevStep = undo[undo.length - 1];
+        setUndo([...undo.slice(0, -1)]);
         addRedo(prevStep);
         return prevStep;
     };
 
     const getRedo = () => {
+        if (redo.length == 0) {
+            return null;
+        }
+
         const nextStep = redo[redo.length - 1];
+        setRedo([...redo.slice(0, -1)]);
         addUndo(nextStep);
         return nextStep;
     };
