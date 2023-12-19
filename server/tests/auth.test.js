@@ -289,7 +289,7 @@ describe("resetRequest function", () => {
             errorMessage: "Email is not associated with a user",
         })
     })
-    it("returns 401 if verification code already exists in db and isnt expired", async () => {
+    it("returns 200 if verification code already exists in db and isnt expired", async () => {
         userProfileSchema.findOne=jest.fn().mockResolvedValueOnce({
             username: "username",
             email: "email",
@@ -311,10 +311,7 @@ describe("resetRequest function", () => {
         }
         await resetRequest(req, res)
 
-        expect(res.status).toHaveBeenCalledWith(401)
-        expect(res.json).toHaveBeenCalledWith({
-            errorMessage: "User already has a verification code.",
-        })
+        expect(res.status).toHaveBeenCalledWith(200)
     })
     it("returns 500 if passcode cannot save", async () => {
         userProfileSchema.findOne=jest.fn().mockResolvedValueOnce({

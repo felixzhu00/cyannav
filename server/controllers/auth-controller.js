@@ -281,7 +281,7 @@ resetRequest = async (req, res) => {
                 targetPasscode.expirationData
             )
         ) {
-            return res.status(401).json({
+            return res.status(200).json({
                 errorMessage: "User already has a verification code.",
             })
         }
