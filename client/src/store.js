@@ -1,5 +1,5 @@
 //temp global store
-import { createContext, useState, useContext, useEffect } from "react";
+import { createContext, useState, useContext, useEffect} from "react";
 import MUIAddFieldModal from "./components/modals/MUIAddFieldModal";
 import MUIAddTagModal from "./components/modals/MUIAddTagModal";
 import MUIChangeEmailModal from "./components/modals/MUIChangeEmailModal";
@@ -65,11 +65,15 @@ function GlobalStoreContextProvider(props) {
         // Comment likes and dislikes
         commentLikes: 0,
         commentDislikes: 0,
+
+        // used in DFM to pick area to draw line to 
+        isPickingDFM: false,
+        selectedArea: -1,
     });
 
     useEffect(() => {
         if (store && store.geojson !== null && store.currentMap) {
-            store.updateMapGeoJson();
+            store.updateMapGeoJson(); 
         }
     }, [store.geojson]);
 
@@ -78,6 +82,20 @@ function GlobalStoreContextProvider(props) {
             store.sortMapBy(store.sortBy, store.order);
         }
     }, [store.sortBy, store.order]);
+
+    store.setIsPickingDFM =  async (value) => {
+        setStore((prevStore) => ({
+            ...prevStore,
+            isPickingDFM: value,
+        }));
+    };
+
+    store.setSelectedArea =  async (value) => {
+        setStore((prevStore) => ({
+            ...prevStore,
+            selectedArea: value,
+        }));
+    };
 
     store.setSortBy = async (sortBy) => {
         setStore((prevStore) => ({
@@ -117,7 +135,6 @@ function GlobalStoreContextProvider(props) {
     store.createMap = async (title, fileType, mapTemplate, file) => {
         const mapFile = file;
 
-        console.log("file", fileType);
         // Create a FileReader
         const reader = new FileReader();
         // Wrap the logic in a Promise
@@ -252,7 +269,6 @@ function GlobalStoreContextProvider(props) {
 
     store.dislikeMap = async (id) => {
         const response = await api.dislikeMap(id);
-        console.log(response);
         if (response.status === 200) {
             setStore((prevStore) => ({
                 ...prevStore,
@@ -286,13 +302,21 @@ function GlobalStoreContextProvider(props) {
 
     store.setCurrentArea = (value) => {
         setStore((prevStore) => {
-            const updatedStore = {
-                ...prevStore,
-                currentArea: value,
-            };
-
+            let updatedStore = {}
+            if(prevStore.isPickingDFM){
+                updatedStore = {
+                    ...prevStore,
+                    selectedArea: value,
+                };
+            }else{
+                updatedStore = {
+                    ...prevStore,
+                    currentArea: value,
+                };
+            }
             return updatedStore;
         });
+
     };
 
     store.setField = async (value) => {
@@ -467,7 +491,6 @@ function GlobalStoreContextProvider(props) {
 
     store.postComment = async (text, parentCommentId, mapId) => {
         const response = await api.postComment(text, parentCommentId, mapId);
-        console.log(response);
         return response;
     };
 
@@ -486,7 +509,6 @@ function GlobalStoreContextProvider(props) {
     // When the user likes a comment
     store.likeComment = async (id) => {
         const response = await api.likeComment(id);
-        console.log(response);
         if (response.status === 200) {
             // Return the updated comment data by getting the comments again
             return;
