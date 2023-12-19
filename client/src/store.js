@@ -122,7 +122,6 @@ function GlobalStoreContextProvider(props) {
     store.createMap = async (title, fileType, mapTemplate, file) => {
         const mapFile = file;
 
-        console.log("file", fileType);
         // Create a FileReader
         const reader = new FileReader();
         // Wrap the logic in a Promise
@@ -257,7 +256,6 @@ function GlobalStoreContextProvider(props) {
 
     store.dislikeMap = async (id) => {
         const response = await api.dislikeMap(id);
-        console.log(response);
         if (response.status === 200) {
             setStore((prevStore) => ({
                 ...prevStore,
@@ -332,8 +330,6 @@ function GlobalStoreContextProvider(props) {
         }
 
         let filteredArray = [];
-
-        // if (string !== "") {
         if (filter == "mapName") {
             filteredArray = response.filter((item) => {
                 return item.title.includes(string);
@@ -343,10 +339,13 @@ function GlobalStoreContextProvider(props) {
                 return item.user[0].username.includes(string);
             });
         } else if (filter == "tag") {
-            //Need UI implemenation and Backend
-            filteredArray = response.filter((item) => {
-                return item.tag[0].includes(string);
-            });
+            filteredArray = response.filter(
+                (item) =>
+                    item.tags &&
+                    item.tags.some((tag) =>
+                        tag.toLowerCase().includes(string.toLowerCase())
+                    )
+            );
         }
         // }
 
@@ -506,7 +505,6 @@ function GlobalStoreContextProvider(props) {
     // When the user likes a comment
     store.likeComment = async (id) => {
         const response = await api.likeComment(id);
-        console.log(response);
         if (response.status === 200) {
             // Return the updated comment data by getting the comments again
             return;
