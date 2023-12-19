@@ -35,16 +35,11 @@ function BrowsePage() {
     const [totalMaps, setTotalMaps] = useState("");
     const mapsPerPage = 8; // Display 8 MapCards per page
     const numberOfPages = Math.ceil(totalMaps / mapsPerPage);
+
     // Calculate the range of MapCards for the current page
     const firstMapIndex = (currentPage - 1) * mapsPerPage;
     const lastMapIndex = firstMapIndex + mapsPerPage;
 
-    // // Rerender the whole componenet when MapCollection is updated
-    // useEffect(() => {
-    // }, [store.mapCollection]);
-    // This useEffect runs when mapCollection changes
-
-    // Runs only when there is an user
     useEffect(() => {
         if (auth.user != null) {
             store.getMyMapCollection(auth.user.userId);
@@ -77,37 +72,58 @@ function BrowsePage() {
         }
     }, [store.mapCollection]);
 
+    /**
+     * Handler for changing the pages of maps in the Browse Page
+     * @param {*} event click
+     * @param {*} value page number
+     */
     const handleChangePage = (event, value) => {
         setCurrentPage(value);
     };
 
-    const handleClose = () => {
-        setAnchorElSort(null);
-        setAnchorElOption(null);
-    };
-
+    /**
+     * Handler for changing the search by drop down filter
+     * @param {*} event menu item changes
+     */
     const handleSearchByChange = (event) => {
         setSearchBy(event.target.value);
     };
 
+    /**
+     * Handler for changing the sort by drop down filter
+     * @param {*} event menu item changes
+     */
     const handleSortByChange = (event) => {
         store.setSortBy(event.target.value);
         // implemet the asc and dec order later
     };
 
+    /**
+     * Handler for changing what the user types in the textbox used for searching
+     * @param {*} event the string user types
+     */
     const handleSearchInputChange = (event) => {
         setSearchTerm(event.target.value);
     };
 
+    /**
+     * Handler for creating the map -> showing the create map modal
+     */
     const handleCreateMapModal = async () => {
         await store.setCurrentModal("CreateMapModal");
     };
 
-    //Search condition of pressing enter in search bar or search icon
+    /**
+     * Search condition of pressing enter in search bar or search icon
+     */
     const handleSearch = async () => {
         await store.searchForMapBy(searchBy, searchTerm);
     };
 
+    /**
+     * Handler for when the user pressed enter for search bar
+     * @param {*} e user's key press
+     */
     const handleKeyPress = async (e) => {
         if (e.key === "Enter") {
             await store.searchForMapBy(searchBy, searchTerm);
@@ -144,9 +160,13 @@ function BrowsePage() {
                 >
                     <InputBase
                         sx={{ ml: 1, flex: 1 }}
-                        placeholder={`Search by ${
-                            searchBy === "mapName" ? "Map Name" : "Username"
-                        }...`}
+                        placeholder={
+                            searchBy === "mapName"
+                                ? "Search by Map Name..."
+                                : searchBy === "username"
+                                ? "Search by Username..."
+                                : "Search by Tag..."
+                        }
                         inputProps={{ "aria-label": "search" }}
                         value={searchTerm}
                         onChange={handleSearchInputChange}
@@ -175,6 +195,9 @@ function BrowsePage() {
                         </MenuItem>
                         <MenuItem id="byUsernameBtn" value="username">
                             Username
+                        </MenuItem>
+                        <MenuItem id="byTagBtn" value="tag">
+                            Tag
                         </MenuItem>
                     </Select>
                 </FormControl>
