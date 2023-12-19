@@ -985,6 +985,7 @@ function MapViewingPage() {
                                 ([key, value]) => (
                                     <Box key={key} sx={{ display: "flex" }}>
                                         <TextField
+                                            type="number"
                                             label={
                                                 key.charAt(0).toUpperCase() +
                                                 key.slice(1)
@@ -998,6 +999,11 @@ function MapViewingPage() {
                                                 )
                                             }
                                             onBlur={() => setFocusedField(key)}
+                                            sx={{
+                                                width: "100%",
+                                                mr: "10px",
+                                                mt: "10px",
+                                            }}
                                         />
                                         <IconButton
                                             onClick={() => removeField(key)}
@@ -1149,7 +1155,8 @@ function MapViewingPage() {
                             <Accordion
                                 sx={{
                                     width: "100%",
-                                    bgcolor: theme.palette.secondary.main,
+                                    bgcolor: theme.palette.background.default,
+                                    boxShadow: 2,
                                 }}
                             >
                                 <AccordionSummary expandIcon={<ExpandMore />}>
@@ -1158,57 +1165,76 @@ function MapViewingPage() {
                                     </Typography>
                                 </AccordionSummary>
 
-                                {features[store.currentArea]?.fields
-                                    ?.immutable &&
-                                    features[store.currentArea].fields
-                                        .immutable["center"] && (
-                                        <Box
-                                            sx={{
-                                                display: "flex",
-                                            }}
-                                        >
-                                            <TextField
-                                                label="Longitude"
-                                                value={
-                                                    features[store.currentArea]
-                                                        .fields.immutable.center
-                                                        .longitude
-                                                }
-                                                onChange={(e) =>
-                                                    changeFieldValue(
-                                                        "longitude",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                onBlur={() =>
-                                                    setFocusedField("longitude")
-                                                }
-                                                sx={{ mr: "5px" }}
-                                            />
-                                            <TextField
-                                                label="Latitude"
-                                                value={
-                                                    features[store.currentArea]
-                                                        .fields.immutable.center
-                                                        .latitude
-                                                }
-                                                onChange={(e) =>
-                                                    changeFieldValue(
-                                                        "latitude",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                onBlur={() =>
-                                                    setFocusedField("latitude")
-                                                }
-                                                sx={{ ml: "5px" }}
-                                            />
-                                        </Box>
-                                    )}
-                                {features[store.currentArea]?.fields
-                                    ?.immutable &&
-                                    ["radius", "scale", "weight", "color"].map(
-                                        (key) => {
+                                <AccordionDetails
+                                    sx={{
+                                        bgcolor:
+                                            theme.palette.background.default,
+                                    }}
+                                >
+                                    {features[store.currentArea]?.fields
+                                        ?.immutable &&
+                                        features[store.currentArea].fields
+                                            .immutable["center"] && (
+                                            <Box
+                                                sx={{
+                                                    display: "flex",
+                                                    mb: "5px",
+                                                }}
+                                            >
+                                                <TextField
+                                                    type="number"
+                                                    label="Longitude"
+                                                    value={
+                                                        features[
+                                                            store.currentArea
+                                                        ].fields.immutable
+                                                            .center.longitude
+                                                    }
+                                                    onChange={(e) =>
+                                                        changeFieldValue(
+                                                            "longitude",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    onBlur={() =>
+                                                        setFocusedField(
+                                                            "longitude"
+                                                        )
+                                                    }
+                                                    sx={{ mr: "5px" }}
+                                                />
+                                                <TextField
+                                                    type="number"
+                                                    label="Latitude"
+                                                    value={
+                                                        features[
+                                                            store.currentArea
+                                                        ].fields.immutable
+                                                            .center.latitude
+                                                    }
+                                                    onChange={(e) =>
+                                                        changeFieldValue(
+                                                            "latitude",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    onBlur={() =>
+                                                        setFocusedField(
+                                                            "latitude"
+                                                        )
+                                                    }
+                                                    sx={{ ml: "5px" }}
+                                                />
+                                            </Box>
+                                        )}
+                                    {features[store.currentArea]?.fields
+                                        ?.immutable &&
+                                        [
+                                            "radius",
+                                            "scale",
+                                            "weight",
+                                            "color",
+                                        ].map((key) => {
                                             // Define map types for each key
                                             const mapTypes = {
                                                 radius: ["pointmap", "heatmap"],
@@ -1308,12 +1334,13 @@ function MapViewingPage() {
                                                                         )
                                                                     }
                                                                     sx={{
-                                                                        mr: "5px",
+                                                                        ml: "5px",
                                                                     }}
                                                                 />
                                                             </>
                                                         ) : (
                                                             <TextField
+                                                                type="number"
                                                                 label={
                                                                     key
                                                                         .charAt(
@@ -1344,23 +1371,25 @@ function MapViewingPage() {
                                                                         key
                                                                     )
                                                                 }
+                                                                sx={{
+                                                                    mt: "10px",
+                                                                    width: "100%",
+                                                                }}
                                                             />
                                                         )}
                                                     </Box>
                                                 )
                                             );
-                                        }
-                                    )}
-
-                                <AccordionDetails>
+                                        })}
                                     <List
                                         component="nav"
                                         aria-label="Device settings"
                                         sx={{
                                             bgcolor:
-                                                theme.palette.background
-                                                    .default,
+                                                theme.palette.background.paper,
                                             borderRadius: 2,
+                                            boxShadow: 2,
+                                            mt: "10px",
                                         }}
                                     >
                                         <ListItem
@@ -1372,8 +1401,8 @@ function MapViewingPage() {
                                             onClick={handleChoroplethClick}
                                         >
                                             <ListItemText
-                                                primary={`Select ${store.currentMap.mapType} by ${store.byFeature}`}
-                                                secondary={selectedItem}
+                                                primary={`Select ${store.currentMap.mapType} by:`}
+                                                secondary={store.byFeature}
                                             />
                                         </ListItem>
                                     </List>
