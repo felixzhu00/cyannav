@@ -41,6 +41,8 @@ import { GlobalStoreContext } from "../store";
 import AuthContext from "../auth";
 import * as turf from "@turf/turf";
 
+import UndoRedo from "./UndoRedo";
+
 function MapViewingPage() {
     const theme = useTheme();
     const { store } = useContext(GlobalStoreContext);
@@ -80,6 +82,8 @@ function MapViewingPage() {
      * Field selection for map type
      */
     const [selectedItem, setSelectedItem] = useState("");
+
+    const { addUndo, addRedo, getUndo, getRedo, printUndoRedo } = UndoRedo();
 
     // Redirect
     const navigate = useNavigate();
@@ -225,6 +229,12 @@ function MapViewingPage() {
 
     useEffect(() => {
         if (features.length !== 0 && focusedFieldRef.current !== focusedField) {
+            // First load of vanilla geojson, convert to navjson
+            if (store.geojson.features[0].fields == null) {
+                store.geojson.features = features;
+                return;
+            }
+
             var diffIndex = findFeatureDiffIndex(
                 features,
                 store.geojson.features
@@ -283,8 +293,8 @@ function MapViewingPage() {
                     oldValue,
                     newValue,
                 ];
-                console.log("New transaction");
-                console.log(newTransaction);
+
+                addUndo(newTransaction);
             }
         }
         setFocusedField(null);
