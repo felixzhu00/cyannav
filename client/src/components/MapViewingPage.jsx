@@ -117,7 +117,6 @@ function MapViewingPage() {
       const updatedFeatures = store.geojson.features.map((feature) => {
         const originalFields = feature.fields || { immutable: {} };
 
-        console.log(store.currentMap.mapType);
         if (!originalFields.immutable) {
           originalFields.immutable = {};
         }
@@ -146,56 +145,54 @@ function MapViewingPage() {
             store.currentMap.mapType === "pointmap")
         ) {
           originalFields.immutable.radius = 0;
-        }else
-        if (
+        } else if (
           originalFields?.immutable?.weight === undefined &&
           store.currentMap.mapType === "distributiveflowmap"
         ) {
           originalFields.immutable.weight = 0;
-        }else
-
-        if (
+        } else if (
           originalFields?.immutable?.scale === undefined &&
           store.currentMap.mapType === "3drectangle"
         ) {
           originalFields.immutable.scale = 0;
-        }else if(originalFields?.immutable?.color === undefined && store.currentMap.mapType === "choroplethmap"){
+        } else if (
+          originalFields?.immutable?.color === undefined &&
+          store.currentMap.mapType === "choroplethmap"
+        ) {
           originalFields.immutable.color = {};
-          originalFields.immutable.center.colorA = "#FFEDA0";
-          originalFields.immutable.center.colorB = "#800026";
+          originalFields.immutable.color.colorA = "#FFEDA0";
+          originalFields.immutable.color.colorB = "#800026";
         }
-        
+
         return {
           ...feature,
           fields: originalFields,
         };
       });
       setFeatures(updatedFeatures);
-
-      //Sets the exisitng map by feature if it exist
-      if (store.geojson.features[0]?.fields?.immutable?.byFeature) {
-        const currentFeature =
-          store.geojson.features[0].fields.immutable.byFeature;
-        if (
-          store.geojson.features[0].fields.immutable.hasOwnProperty(
-            currentFeature
-          )
-        ) {
-          store.setByFeature(
-            store.geojson.features[0].fields.immutable.byFeature
-          );
-        }
+    }
+    //Sets the exisitng map by feature if it exist
+    if (store.geojson?.features[0]?.fields?.immutable?.byFeature) {
+      const currentFeature =
+        store.geojson.features[0].fields.immutable.byFeature;
+      if (
+        store.geojson.features[0].fields.mutable.hasOwnProperty(
+          currentFeature
+        )
+      ) {
+        store.setByFeature(
+          store.geojson.features[0].fields.immutable.byFeature
+        );
       }
     }
   }, [store.geojson]);
 
   useEffect(() => {
-    // Compare current focusedField with the previous one
-    console.log(features);
     if (
       features.length !== 0 &&
-      focusedFieldRef.current !== focusedField &&
-      !areFeaturesEqual(features, store.geojson.features)
+      focusedFieldRef.current !== focusedField
+      // &&
+      // !areFeaturesEqual(features, store.geojson.features)
     ) {
       store.setGeoJsonFeatures(features);
     }
@@ -203,16 +200,11 @@ function MapViewingPage() {
     setFocusedField(null);
   }, [focusedField, features]);
 
-  // // Used for Indexing currentArea Feature in geojson array
-  // useEffect(() => {
-  //   console.log("current",store.currentArea)
-  // }, [store.currentArea]);
 
   const areFeaturesEqual = (featuresA, featuresB) => {
     if (featuresA.length !== featuresB.length) {
       return false;
     }
-
     for (let i = 0; i < featuresA.length; i++) {
       // Use a deep equality check for the fields property
       if (!deepEqual(featuresA[i].fields, featuresB[i].fields)) {
@@ -256,7 +248,6 @@ function MapViewingPage() {
 
   useEffect(() => {
     if (store.byFeature !== null) {
-      setFocusedField("feature");
       addField("byFeature", store.byFeature);
     }
   }, [store.byFeature]);
@@ -352,30 +343,53 @@ function MapViewingPage() {
           "longitude",
           "latitude",
           "byFeature",
+          "weight",
+          "name",
         ].includes(key);
 
         const updatedFeatures = [...prevFeatures];
-        const updatedFeature = {
-          ...updatedFeatures[store.currentArea],
-          fields: {
-            immutable: isImmutable
-              ? {
-                  ...updatedFeatures[store.currentArea].fields.immutable,
+
+        let updatedFeature = {};
+
+        if (key == "longitude" || key == "latitude") {
+          updatedFeature = {
+            ...updatedFeatures[store.currentArea],
+            fields: {
+              immutable: {
+                ...updatedFeatures[store.currentArea].fields.immutable,
+                center: {
+                  ...updatedFeatures[store.currentArea].fields.immutable.center,
                   [key]: newValue,
-                }
-              : {
-                  ...updatedFeatures[store.currentArea].fields.immutable,
                 },
-            mutable: !isImmutable
-              ? {
-                  ...updatedFeatures[store.currentArea].fields.mutable,
-                  [key]: newValue,
-                }
-              : {
-                  ...updatedFeatures[store.currentArea].fields.mutable,
-                },
-          },
-        };
+              },
+              mutable: {
+                ...updatedFeatures[store.currentArea].fields.mutable,
+              },
+            },
+          };
+        } else {
+          updatedFeature = {
+            ...updatedFeatures[store.currentArea],
+            fields: {
+              immutable: isImmutable
+                ? {
+                    ...updatedFeatures[store.currentArea].fields.immutable,
+                    [key]: newValue,
+                  }
+                : {
+                    ...updatedFeatures[store.currentArea].fields.immutable,
+                  },
+              mutable: !isImmutable
+                ? {
+                    ...updatedFeatures[store.currentArea].fields.mutable,
+                    [key]: newValue,
+                  }
+                : {
+                    ...updatedFeatures[store.currentArea].fields.mutable,
+                  },
+            },
+          };
+        }
 
         updatedFeatures[store.currentArea] = updatedFeature;
         return updatedFeatures;
@@ -386,22 +400,46 @@ function MapViewingPage() {
             "scale",
             "longitude",
             "latitude",
+            "byFeature",
           ].includes(key);
 
-          return {
-            ...feature,
-            fields: {
-              immutable: isImmutable
-                ? {
-                    ...feature.fields.immutable,
+          let updatedFeature = {};
+
+          if (key === "colorA" || key === "colorB") {
+            updatedFeature = {
+              ...feature,
+              fields: {
+                immutable: {
+                  ...feature.fields.immutable,
+                  color: {
+                    ...feature.fields.immutable.color,
                     [key]: newValue,
-                  }
-                : { ...feature.fields.immutable },
-              mutable: !isImmutable
-                ? { ...feature.fields.mutable, [key]: newValue }
-                : { ...feature.fields.mutable },
-            },
-          };
+                  },
+                },
+                mutable: {
+                  ...feature.fields.mutable,
+                },
+              },
+            };
+          } else {
+            updatedFeature = {
+              ...feature,
+              fields: {
+                immutable: isImmutable
+                  ? {
+                      ...feature.fields.immutable,
+                      [key]: newValue,
+                    }
+                  : { ...feature.fields.immutable },
+                mutable: !isImmutable
+                  ? { ...feature.fields.mutable, [key]: newValue }
+                  : { ...feature.fields.mutable },
+              },
+            };
+          }
+
+          console.log("updatedFeature", updatedFeature);
+          return updatedFeature;
         });
       }
     });
@@ -838,8 +876,8 @@ function MapViewingPage() {
               <TextField
                 label="Name"
                 value={selectedFeature?.fields?.immutable?.name}
-                onChange={(e) => changeFieldValue(key, e.target.value)}
-                onBlur={() => setFocusedField(key)}
+                onChange={(e) => changeFieldValue("name", e.target.value)}
+                onBlur={() => setFocusedField("name")}
                 sx={{ width: "100%" }}
               />
             </Box>
@@ -848,7 +886,7 @@ function MapViewingPage() {
             {selectedFeature?.fields?.mutable &&
               Object.entries(selectedFeature.fields.mutable).map(
                 ([key, value]) => (
-                  <Box sx={{ display: "flex" }}>
+                  <Box key={key} sx={{ display: "flex" }}>
                     <TextField
                       label={key.charAt(0).toUpperCase() + key.slice(1)}
                       // defaultValue="Enter A Value"
@@ -1003,8 +1041,10 @@ function MapViewingPage() {
                           features[store.currentArea].fields.immutable.center
                             .longitude
                         }
-                        onChange={(e) => changeFieldValue(key, e.target.value)}
-                        onBlur={() => setFocusedField(key)}
+                        onChange={(e) =>
+                          changeFieldValue("longitude", e.target.value)
+                        }
+                        onBlur={() => setFocusedField("longitude")}
                         sx={{ mr: "5px" }}
                       />
                       <TextField
@@ -1013,8 +1053,10 @@ function MapViewingPage() {
                           features[store.currentArea].fields.immutable.center
                             .latitude
                         }
-                        onChange={(e) => changeFieldValue(key, e.target.value)}
-                        onBlur={() => setFocusedField(key)}
+                        onChange={(e) =>
+                          changeFieldValue("latitude", e.target.value)
+                        }
+                        onBlur={() => setFocusedField("latitude")}
                         sx={{ ml: "5px" }}
                       />
                     </Box>
@@ -1051,19 +1093,43 @@ function MapViewingPage() {
                         >
                           {key === "color" && mapType === "choroplethmap" ? (
                             <>
-                              <MuiColorInput sx={{ mr: "5px" }} />
-                              <MuiColorInput sx={{ ml: "5px" }} />
+                              <MuiColorInput
+                                format="hex"
+                                fallbackValue="#FFEDA0"
+                                value={
+                                  features[store.currentArea]?.fields?.immutable
+                                    ?.color?.colorA || "#000000"
+                                }
+                                onChange={(e) =>
+                                  changeFieldValue("colorA", e, true)
+                                }
+                                onBlur={() => setFocusedField("colorA")}
+                                sx={{ mr: "5px" }}
+                              />
+                              <MuiColorInput
+                                format="hex"
+                                fallbackValue="#800026"
+                                value={
+                                  features[store.currentArea]?.fields?.immutable
+                                    ?.color?.colorB || "#000000"
+                                }
+                                onChange={(e) =>
+                                  changeFieldValue("colorB", e, true)
+                                }
+                                onBlur={() => setFocusedField("colorB")}
+                                sx={{ mr: "5px" }}
+                              />
                             </>
                           ) : (
                             <TextField
                               label={key.charAt(0).toUpperCase() + key.slice(1)} // Capitalize the first letter of the key
-                              defaultValue={
+                              value={
                                 features[store.currentArea].fields.immutable[
                                   key
                                 ]
                               }
                               onChange={(e) =>
-                                changeFieldValue(key, e.target.value)
+                                changeFieldValue(key, e.target.value, true)
                               }
                               onBlur={() => setFocusedField(key)}
                             />
@@ -1087,7 +1153,7 @@ function MapViewingPage() {
                       onClick={handleChoroplethClick}
                     >
                       <ListItemText
-                        primary="Select heat map by"
+                        primary={`Select ${store.currentMap.mapType} by ${store.byFeature}`}
                         secondary={selectedItem}
                       />
                     </ListItem>
