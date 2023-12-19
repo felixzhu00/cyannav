@@ -17,6 +17,7 @@ import {
     TextField,
     Tabs,
     Tab,
+    Tooltip,
     useTheme,
 } from "@mui/material";
 import {
@@ -204,7 +205,7 @@ function MapViewingPage() {
                     originalFields.immutable.color.colorA = "#808080";
                     originalFields.immutable.color.colorB = "#000000";
                 }
-                
+
                 return {
                     ...feature,
                     fields: originalFields,
@@ -304,7 +305,6 @@ function MapViewingPage() {
 
                 addUndo(newTransaction);
             }
-            
         }
         setFocusedField(null);
     }, [focusedField, features]);
@@ -1190,6 +1190,24 @@ function MapViewingPage() {
     };
 
     const editBar = () => {
+        let tooltipTitleFirstInput = "";
+        let tooltipTitleSecondInput = ""; // Default for second input
+        if (store.currentMap) {
+            if (store.currentMap.mapType === "choroplethmap") {
+                tooltipTitleFirstInput = "Min Color";
+                tooltipTitleSecondInput = "Max Color";
+            } else if (store.currentMap.mapType === "pointmap") {
+                tooltipTitleFirstInput = "In-fill Color";
+                tooltipTitleSecondInput = "Border Color";
+            } else if (store.currentMap.mapType === "3drectangle") {
+                tooltipTitleFirstInput = "In-fill Color";
+                tooltipTitleSecondInput = "Border Color";
+            } else {
+                tooltipTitleFirstInput = "Color 1";
+                tooltipTitleSecondInput = "Color 2";
+            }
+        }
+
         const fieldEdit = () => {
             if (store.currentArea === -1) {
                 return null;
@@ -1207,7 +1225,7 @@ function MapViewingPage() {
                         <Box
                             key={"name"}
                             sx={{
-                                display: "flex", // Add this line
+                                display: "flex",
                                 mb: "10px",
                             }}
                         >
@@ -1268,8 +1286,16 @@ function MapViewingPage() {
                                                 mr: "10px",
                                                 mt: "10px",
                                             }}
+                                            disabled={
+                                                store.currentMap &&
+                                                store.currentMap.published
+                                            }
                                         />
                                         <IconButton
+                                            disabled={
+                                                store.currentMap &&
+                                                store.currentMap.published
+                                            }
                                             onClick={() => {
                                                 const match =
                                                     key.match(/^(\d+)_(.+)/);
@@ -1421,6 +1447,10 @@ function MapViewingPage() {
                                     width: "100%",
                                     mb: "10px",
                                 }}
+                                disabled={
+                                    store.currentMap &&
+                                    store.currentMap.published
+                                }
                             >
                                 + Add Field
                             </Button>
@@ -1457,61 +1487,81 @@ function MapViewingPage() {
                                         Advanced Editing Features
                                     </Typography>
                                 </AccordionSummary>
-
-                                {features[store.currentArea]?.fields
-                                    ?.immutable &&
-                                    features[store.currentArea].fields
-                                        .immutable["center"] && (
-                                        <Box
-                                            sx={{
-                                                display: "flex",
-                                                mb: "5px",
-                                            }}
-                                        >
-                                            <TextField
-                                                type="number"
-                                                label="Longitude"
-                                                value={
-                                                    features[store.currentArea]
-                                                        .fields.immutable.center
-                                                        .longitude
-                                                }
-                                                onChange={(e) =>
-                                                    changeFieldValue(
-                                                        "longitude",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                onBlur={() =>
-                                                    setFocusedField("longitude")
-                                                }
-                                                sx={{ mr: "5px" }}
-                                            />
-                                            <TextField
-                                                type="number"
-                                                label="Latitude"
-                                                value={
-                                                    features[store.currentArea]
-                                                        .fields.immutable.center
-                                                        .latitude
-                                                }
-                                                onChange={(e) =>
-                                                    changeFieldValue(
-                                                        "latitude",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                onBlur={() =>
-                                                    setFocusedField("latitude")
-                                                }
-                                                sx={{ ml: "5px" }}
-                                            />
-                                        </Box>
-                                    )}
-                                {features[store.currentArea]?.fields
-                                    ?.immutable &&
-                                    ["radius", "scale", "weight", "color"].map(
-                                        (key) => {
+                                <AccordionDetails>
+                                    {features[store.currentArea]?.fields
+                                        ?.immutable &&
+                                        features[store.currentArea].fields
+                                            .immutable["center"] && (
+                                            <Box
+                                                sx={{
+                                                    display: "flex",
+                                                    mb: "5px",
+                                                }}
+                                            >
+                                                <TextField
+                                                    type="number"
+                                                    label="Longitude"
+                                                    value={
+                                                        features[
+                                                            store.currentArea
+                                                        ].fields.immutable
+                                                            .center.longitude
+                                                    }
+                                                    onChange={(e) =>
+                                                        changeFieldValue(
+                                                            "longitude",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    onBlur={() =>
+                                                        setFocusedField(
+                                                            "longitude"
+                                                        )
+                                                    }
+                                                    sx={{ mr: "5px" }}
+                                                    disabled={
+                                                        store.currentMap &&
+                                                        store.currentMap
+                                                            .published
+                                                    }
+                                                />
+                                                <TextField
+                                                    type="number"
+                                                    label="Latitude"
+                                                    value={
+                                                        features[
+                                                            store.currentArea
+                                                        ].fields.immutable
+                                                            .center.latitude
+                                                    }
+                                                    onChange={(e) =>
+                                                        changeFieldValue(
+                                                            "latitude",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    onBlur={() =>
+                                                        setFocusedField(
+                                                            "latitude"
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        store.currentMap &&
+                                                        store.currentMap
+                                                            .published
+                                                    }
+                                                    sx={{ ml: "5px" }}
+                                                />
+                                            </Box>
+                                        )}
+                                    {features[store.currentArea]?.fields
+                                        ?.immutable &&
+                                        [
+                                            "radius",
+                                            "scale",
+                                            "weight",
+                                            "color",
+                                        ].map((key) => {
                                             // Define map types for each key
                                             const mapTypes = {
                                                 radius: ["pointmap", "heatmap"],
@@ -1560,82 +1610,106 @@ function MapViewingPage() {
                                                             mapType ===
                                                                 "3drectangle") ? (
                                                             <>
-                                                                <MuiColorInput
-                                                                    format="hex"
-                                                                    fallbackValue="#FFEDA0"
-                                                                    value={
-                                                                        features[
+                                                                <Tooltip
+                                                                    title={
+                                                                        tooltipTitleFirstInput
+                                                                    }
+                                                                >
+                                                                    <MuiColorInput
+                                                                        format="hex"
+                                                                        fallbackValue="#FFEDA0"
+                                                                        value={
+                                                                            features[
+                                                                                store
+                                                                                    .currentArea
+                                                                            ]
+                                                                                ?.fields
+                                                                                ?.immutable
+                                                                                ?.color
+                                                                                ?.colorA ||
+                                                                            "#000000"
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) => {
+                                                                            mapType !==
+                                                                            "pointmap"
+                                                                                ? changeFieldValue(
+                                                                                      "colorA",
+                                                                                      e,
+                                                                                      true
+                                                                                  )
+                                                                                : changeFieldValue(
+                                                                                      "colorA",
+                                                                                      e
+                                                                                  );
+                                                                        }}
+                                                                        onBlur={() =>
+                                                                            setFocusedField(
+                                                                                "colorA"
+                                                                            )
+                                                                        }
+                                                                        sx={{
+                                                                            mr: "5px",
+                                                                        }}
+                                                                        disabled={
+                                                                            store.currentMap &&
                                                                             store
-                                                                                .currentArea
-                                                                        ]
-                                                                            ?.fields
-                                                                            ?.immutable
-                                                                            ?.color
-                                                                            ?.colorA ||
-                                                                        "#000000"
+                                                                                .currentMap
+                                                                                .published
+                                                                        }
+                                                                    />
+                                                                </Tooltip>
+                                                                <Tooltip
+                                                                    title={
+                                                                        tooltipTitleSecondInput
                                                                     }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) => {
-                                                                        mapType !==
-                                                                        "pointmap"
-                                                                            ? changeFieldValue(
-                                                                                  "colorA",
-                                                                                  e,
-                                                                                  true
-                                                                              )
-                                                                            : changeFieldValue(
-                                                                                  "colorA",
-                                                                                  e
-                                                                              );
-                                                                    }}
-                                                                    onBlur={() =>
-                                                                        setFocusedField(
-                                                                            "colorA"
-                                                                        )
-                                                                    }
-                                                                    sx={{
-                                                                        mr: "5px",
-                                                                    }}
-                                                                />
-                                                                <MuiColorInput
-                                                                    format="hex"
-                                                                    fallbackValue="#800026"
-                                                                    value={
-                                                                        features[
+                                                                >
+                                                                    <MuiColorInput
+                                                                        format="hex"
+                                                                        fallbackValue="#800026"
+                                                                        value={
+                                                                            features[
+                                                                                store
+                                                                                    .currentArea
+                                                                            ]
+                                                                                ?.fields
+                                                                                ?.immutable
+                                                                                ?.color
+                                                                                ?.colorB ||
+                                                                            "#000000"
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) => {
+                                                                            mapType !==
+                                                                            "pointmap"
+                                                                                ? changeFieldValue(
+                                                                                      "colorA",
+                                                                                      e,
+                                                                                      true
+                                                                                  )
+                                                                                : changeFieldValue(
+                                                                                      "colorA",
+                                                                                      e
+                                                                                  );
+                                                                        }}
+                                                                        onBlur={() =>
+                                                                            setFocusedField(
+                                                                                "colorB"
+                                                                            )
+                                                                        }
+                                                                        sx={{
+                                                                            ml: "5px",
+                                                                        }}
+                                                                        disabled={
+                                                                            store.currentMap &&
                                                                             store
-                                                                                .currentArea
-                                                                        ]
-                                                                            ?.fields
-                                                                            ?.immutable
-                                                                            ?.color
-                                                                            ?.colorB ||
-                                                                        "#000000"
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) => {
-                                                                        mapType !==
-                                                                        "pointmap"
-                                                                            ? changeFieldValue(
-                                                                                  "colorA",
-                                                                                  e,
-                                                                                  true
-                                                                              )
-                                                                            : changeFieldValue(
-                                                                                  "colorA",
-                                                                                  e
-                                                                              );
-                                                                    }}
-                                                                    onBlur={() =>
-                                                                        setFocusedField(
-                                                                            "colorB"
-                                                                        )
-                                                                    }
-                                                                    sx={{
-                                                                        ml: "5px",
-                                                                    }}
-                                                                />
+                                                                                .currentMap
+                                                                                .published
+                                                                        }
+                                                                    />
+                                                                </Tooltip>
                                                             </>
                                                         ) : (
                                                             <TextField
@@ -1672,125 +1746,142 @@ function MapViewingPage() {
                                                                 }
                                                                 sx={{
                                                                     mt: "10px",
+                                                                    mb: "10px",
                                                                     width: "100%",
                                                                 }}
+                                                                disabled={
+                                                                    store.currentMap &&
+                                                                    store
+                                                                        .currentMap
+                                                                        .published
+                                                                }
                                                             />
                                                         )}
                                                     </Box>
                                                 )
                                             );
-                                        }
-                                    )}
-                                {store.currentMap?.mapType ===
-                                "distributiveflowmap" ? (
-                                    <Button
-                                        id="addLineBtn"
-                                        variant="contained"
-                                        color="primary"
-                                        onClick={handleAddLine}
-                                        sx={{
-                                            color: "black",
-                                            bgcolor:
-                                                theme.palette.secondary.main,
-                                            width: "100%",
-                                            mb: "10px",
-                                            borderRadius: 2,
-                                            boxShadow: 2,
-                                            mt: "10px",
-                                        }}
-                                    >
-                                        + Add Line
-                                    </Button>
-                                ) : (
-                                    <AccordionDetails>
-                                        <List
-                                            component="nav"
+                                        })}
+                                    {store.currentMap?.mapType ===
+                                    "distributiveflowmap" ? (
+                                        <Button
+                                            id="addLineBtn"
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={handleAddLine}
                                             sx={{
+                                                color: "black",
                                                 bgcolor:
-                                                    theme.palette.background
-                                                        .default,
+                                                    theme.palette.secondary
+                                                        .main,
+                                                width: "100%",
+                                                mb: "10px",
                                                 borderRadius: 2,
+                                                boxShadow: 2,
+                                                mt: "10px",
                                             }}
                                         >
-                                            <ListItem
-                                                aria-expanded={
-                                                    handleChoroplethClick
-                                                        ? "true"
-                                                        : undefined
-                                                }
-                                                onClick={handleChoroplethClick}
+                                            + Add Line
+                                        </Button>
+                                    ) : (
+                                        <>
+                                            <List
+                                                component="nav"
+                                                sx={{
+                                                    bgcolor:
+                                                        theme.palette.background
+                                                            .default,
+                                                    borderRadius: 1,
+                                                    boxShadow: 4,
+                                                    mt: "10px",
+                                                }}
                                             >
-                                                <ListItemText
-                                                    primary={`Select ${store.currentMap.mapType} by:`}
-                                                    secondary={store.byFeature}
-                                                />
-                                            </ListItem>
-                                        </List>
-                                        <Menu
-                                            anchorEl={anchorElChoropleth}
-                                            open={Boolean(anchorElChoropleth)}
-                                            onClose={() => {
-                                                setAnchorElChoropleth(null);
-                                            }}
-                                            anchorOrigin={{
-                                                vertical: "bottom",
-                                                horizontal: "left",
-                                            }}
-                                            transformOrigin={{
-                                                vertical: "top",
-                                                horizontal: "left",
-                                            }}
-                                        >
-                                            {(() => {
-                                                const addedKeys = [];
-                                                return store.geojson?.features.flatMap(
-                                                    
-                                                    (feature) =>
-                                                        Object.entries(
-                                                            feature?.fields
-                                                                ?.mutable
-                                                        ).map(
-                                                            ([key, value]) => {
-                                                                if (
-                                                                    isNumeric(
-                                                                        value
-                                                                    ) &&
-                                                                    !addedKeys.includes(
-                                                                        key
-                                                                    )
-                                                                ) {
-                                                                    addedKeys.push(
-                                                                        key
-                                                                    );
-                                                                    return (
-                                                                        <MenuItem
-                                                                            key={
-                                                                                key
-                                                                            }
-                                                                            onClick={() => {
-                                                                                handleSelectedByFeature(
+                                                <ListItem
+                                                    aria-expanded={
+                                                        handleChoroplethClick
+                                                            ? "true"
+                                                            : undefined
+                                                    }
+                                                    onClick={
+                                                        handleChoroplethClick
+                                                    }
+                                                >
+                                                    <ListItemText
+                                                        primary={`Select ${store.currentMap.mapType} by:`}
+                                                        secondary={
+                                                            store.byFeature
+                                                        }
+                                                    />
+                                                </ListItem>
+                                            </List>
+                                            <Menu
+                                                anchorEl={anchorElChoropleth}
+                                                open={Boolean(
+                                                    anchorElChoropleth
+                                                )}
+                                                onClose={() => {
+                                                    setAnchorElChoropleth(null);
+                                                }}
+                                                anchorOrigin={{
+                                                    vertical: "bottom",
+                                                    horizontal: "left",
+                                                }}
+                                                transformOrigin={{
+                                                    vertical: "top",
+                                                    horizontal: "left",
+                                                }}
+                                            >
+                                                {(() => {
+                                                    const addedKeys = [];
+                                                    return store.geojson?.features.flatMap(
+                                                        (feature) =>
+                                                            Object.entries(
+                                                                feature?.fields
+                                                                    ?.mutable
+                                                            ).map(
+                                                                ([
+                                                                    key,
+                                                                    value,
+                                                                ]) => {
+                                                                    if (
+                                                                        isNumeric(
+                                                                            value
+                                                                        ) &&
+                                                                        !addedKeys.includes(
+                                                                            key
+                                                                        )
+                                                                    ) {
+                                                                        addedKeys.push(
+                                                                            key
+                                                                        );
+                                                                        return (
+                                                                            <MenuItem
+                                                                                key={
                                                                                     key
-                                                                                );
-                                                                                setSelectedItem(
+                                                                                }
+                                                                                onClick={() => {
+                                                                                    handleSelectedByFeature(
+                                                                                        key
+                                                                                    );
+                                                                                    setSelectedItem(
+                                                                                        key
+                                                                                    );
+                                                                                }}
+                                                                            >
+                                                                                {
                                                                                     key
-                                                                                );
-                                                                            }}
-                                                                        >
-                                                                            {
-                                                                                key
-                                                                            }
-                                                                        </MenuItem>
-                                                                    );
+                                                                                }
+                                                                            </MenuItem>
+                                                                        );
+                                                                    }
+                                                                    return null;
                                                                 }
-                                                                return null;
-                                                            }
-                                                        )
-                                                );
-                                            })()}
-                                        </Menu>
-                                        
-                                    </AccordionDetails>
-                                )}
+                                                            )
+                                                    );
+                                                })()}
+                                            </Menu>
+                                        </>
+                                    )}
+                                </AccordionDetails>
                             </Accordion>
                         </Box>
                     </>

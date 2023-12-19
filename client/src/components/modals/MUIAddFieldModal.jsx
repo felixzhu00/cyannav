@@ -36,12 +36,16 @@ export default function MUIAddFieldModal(props) {
      * Handler for adding a field to a map
      */
     const handleAdd = async () => {
-        if (fieldName != "") {
+        if (
+            store.geojson.features[0].fields.mutable.hasOwnProperty(fieldName)
+        ) {
+            setErrorMessage("Field already exists.");
+        } else if (fieldName == "") {
+            setErrorMessage("Please fill in the required fields.");
+        } else {
             await store.setField(fieldName);
             props.onNew(fieldName);
             props.onClose();
-        } else {
-            setErrorMessage("Please fill in the required fields.");
         }
     };
 
@@ -76,7 +80,6 @@ export default function MUIAddFieldModal(props) {
                         What is the name of the field you would like to add?
                     </Typography>
                     <Box
-                        component="form"
                         sx={{
                             "& .MuiTextField-root": { m: 1, width: "95%" },
                             mt: 2,
