@@ -9,7 +9,7 @@ function UndoRedo() {
 
     const addUndo = (newStep) => {
         if (undo.length > MAX_UNDOS - 1) {
-            setUndo([undo.slice(1), newStep]);
+            setUndo([...undo.slice(1), newStep]);
         } else {
             setUndo([...undo, newStep]);
         }
@@ -26,7 +26,7 @@ function UndoRedo() {
 
     const addRedo = (newStep) => {
         if (redo.length > MAX_REDOS - 1) {
-            setRedo([redo.slice(1), newStep]);
+            setRedo([...redo.slice(1), newStep]);
         } else {
             setRedo([...redo, newStep]);
         }
