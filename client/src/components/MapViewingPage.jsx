@@ -170,7 +170,10 @@ function MapViewingPage() {
                 }
 
                 //Set center if center doesnt exist
-                if (originalFields?.immutable?.center === undefined) {
+                if (
+                    originalFields?.immutable?.center === undefined &&
+                    store.currentMap.mapType !== "choroplethmap"
+                ) {
                     originalFields.immutable.center = {};
                     const coordinates =
                         turf.centerOfMass(feature).geometry.coordinates;
@@ -1491,6 +1494,8 @@ function MapViewingPage() {
                                 <AccordionDetails>
                                     {features[store.currentArea]?.fields
                                         ?.immutable &&
+                                        store.currentMap.mapType !==
+                                        "choroplethmap" &&
                                         features[store.currentArea].fields
                                             .immutable["center"] && (
                                             <Box
@@ -1686,12 +1691,12 @@ function MapViewingPage() {
                                                                             mapType !==
                                                                             "pointmap"
                                                                                 ? changeFieldValue(
-                                                                                      "colorA",
+                                                                                      "colorB",
                                                                                       e,
                                                                                       true
                                                                                   )
                                                                                 : changeFieldValue(
-                                                                                      "colorA",
+                                                                                      "colorB",
                                                                                       e
                                                                                   );
                                                                         }}
