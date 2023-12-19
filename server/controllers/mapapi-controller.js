@@ -248,17 +248,20 @@ createForkMapById = async (req, res) => {
         }
 
         var newMapTitle = `${srcMap.title} (1)`
-        srcMap.parentMapId = srcMap._id
-        delete srcMap._id
-        srcMap.title = newMapTitle
-        srcMap.user = res.locals.userId
-        srcMap.commentsId = []
-        srcMap.like = []
-        srcMap.dislike = []
-        srcMap.published = false
-        srcMap.dateCreated = Date.now()
 
-        const newMap = new MapMetadata(srcMap)
+        const newMap = new MapMetadata({
+            parentMapId: srcMap._id,
+            title: newMapTitle,
+            user: res.locals.userId,
+            commentsId: [],
+            like: [],
+            dislike: [],
+            mapType: srcMap.mapType,
+            published: false,
+            dateCreated: Date.now(),
+            geojsonId: srcMap.geojsonId
+        })
+
         const saved = await newMap.save()
 
         if (!saved) {
