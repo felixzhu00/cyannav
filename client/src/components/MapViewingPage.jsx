@@ -227,12 +227,10 @@ function MapViewingPage() {
         if (
             features.length !== 0 &&
             focusedFieldRef.current !== focusedField
-            // &&
-            // !areFeaturesEqual(features, store.geojson.features)
         ) {
             store.setGeoJsonFeatures(features);
+            console.log("W")
         }
-        focusedFieldRef.current = focusedField;
         setFocusedField(null);
     }, [focusedField, features]);
 
