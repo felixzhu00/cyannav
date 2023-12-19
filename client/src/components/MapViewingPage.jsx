@@ -255,6 +255,13 @@ function MapViewingPage() {
                         features[diffIndex].fields.immutable.center[
                             focusedField
                         ];
+                } else if (focusedField == "byFeature") {
+                    oldValue =
+                        store.geojson.features[diffIndex].fields.immutable[
+                            focusedField
+                        ];
+                    newValue =
+                        features[diffIndex].fields.immutable[focusedField];
                 } else if (focusedField == "name") {
                     oldValue =
                         store.geojson.features[diffIndex].fields.immutable[
