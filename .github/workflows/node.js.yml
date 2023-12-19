@@ -37,15 +37,6 @@ jobs:
                   echo JWT_EXPIRATION_TIME=${{ vars.JWT_EXPIRATION_TIME }} >> .env.production
                   echo DATABASE_ADDR=${{ vars.DATABASE_ADDR }} >> .env.production
 
-    lint:
-        needs: setup
-        runs-on: self-hosted
-
-        steps:
-            - name: Lint
-              run: |
-                  echo "Linting to be implemented"
-
     frontend-test:
         needs: backend-test
         runs-on: self-hosted
