@@ -638,6 +638,7 @@ function MapViewingPage() {
         }
 
         setFeatures(updatedFeatures);
+        store.setGeoJsonFeatures(updatedFeatures);
     };
     const handleRedo = () => {
         const step = getRedo();
@@ -659,6 +660,7 @@ function MapViewingPage() {
         }
 
         setFeatures(updatedFeatures);
+        store.setGeoJsonFeatures(updatedFeatures);
     };
     const handleAddField = () => {
         setCurrentModel("addfield");
