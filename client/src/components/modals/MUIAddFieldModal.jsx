@@ -76,7 +76,6 @@ export default function MUIAddFieldModal(props) {
                         What is the name of the field you would like to add?
                     </Typography>
                     <Box
-                        component="form"
                         sx={{
                             "& .MuiTextField-root": { m: 1, width: "95%" },
                             mt: 2,
