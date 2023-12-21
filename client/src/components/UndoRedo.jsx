@@ -4,17 +4,17 @@ function UndoRedo() {
     const MAX_UNDOS = 20;
     const MAX_REDOS = 20;
 
-    const [undo, setUndo] = useState([]);
-    const [redo, setRedo] = useState([]);
+    // const [undo, setUndo] = useState([]);
+    // const [redo, setRedo ] = useState([]);
 
     const undoRef = useRef([]);
     const redoRef = useRef([]);
 
     const addUndo = (newStep) => {
         if (undoRef.current.length > MAX_UNDOS - 1) {
-            setUndo([...undoRef.current.slice(1), newStep]);
+            undoRef.current = [...undoRef.current.slice(1), newStep];
         } else {
-            setUndo([...undoRef.current, newStep]);
+            undoRef.current = [...undoRef.current, newStep];
         }
 
         // Remove any redo steps that involves the same field
@@ -24,17 +24,17 @@ function UndoRedo() {
                 newStep[0] == redoRef.current[i][0] &&
                 newStep[1] == redoRef.current[i][1]
             ) {
-                setRedo(redoRef.current.splice(i, 1));
+                redoRef.current = redoRef.current.splice(i, 1);
                 i--;
             }
         }
     };
 
     const addRedo = (newStep) => {
-        if (redoRef.length > MAX_REDOS - 1) {
-            setRedo([...redoRef.current.slice(1), newStep]);
+        if (redoRef.current.length > MAX_REDOS - 1) {
+            redoRef.current = [...redoRef.current.slice(1), newStep];
         } else {
-            setRedo([...redoRef.current, newStep]);
+            redoRef.current = [...redoRef.current, newStep];
         }
     };
 
@@ -43,8 +43,8 @@ function UndoRedo() {
             return null;
         }
 
-        const prevStep = undoRef.current[undoRef.length - 1];
-        setUndo([...undoRef.current.slice(0, -1)]);
+        const prevStep = undoRef.current[undoRef.current.length - 1];
+        undoRef.current = [...undoRef.current.slice(0, -1)];
         addRedo(prevStep);
         return prevStep;
     };
@@ -55,7 +55,7 @@ function UndoRedo() {
         }
 
         const nextStep = redoRef.current[redoRef.current.length - 1];
-        setRedo([...redoRef.current.slice(0, -1)]);
+        redoRef.current = [...redoRef.current.slice(0, -1)];
         addUndo(nextStep);
         return nextStep;
     };
@@ -69,7 +69,7 @@ function UndoRedo() {
     };
 
     const getAllSteps = () => {
-        return [undo, redo];
+        return [undoRef.current, redoRef.current];
     };
 
     return { addUndo, addRedo, getUndo, getRedo, printUndoRedo, getAllSteps };
