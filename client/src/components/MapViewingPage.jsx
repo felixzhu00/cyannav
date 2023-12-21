@@ -727,7 +727,7 @@ function MapViewingPage() {
         }
         // Redo field delete
         if (step[0] == -2) {
-            addField(step[1]);
+            addField(step[1], "");
             return;
         }
 
@@ -761,7 +761,7 @@ function MapViewingPage() {
 
         // Redo field add
         if (step[0] == -1) {
-            addField(step[1]);
+            addField(step[1], "");
             return;
         }
         // Redo field remove
