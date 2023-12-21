@@ -106,7 +106,7 @@ function MapViewingPage() {
             return;
         }
         if (store.currentMap == "Notfound") {
-            navigate("/notfound");
+            navigate("/mapnotfound");
             return;
         }
 

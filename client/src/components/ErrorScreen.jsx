@@ -11,6 +11,16 @@ const ErrorScreen = ({ errorType }) => {
     const goHome = () => navigate("/"); // Replace '/' with your home page route
 
     const errorContent = {
+        mapNotFound: {
+            icon: (
+                <ReportProblemIcon
+                    sx={{ fontSize: 100, color: "primary.main" }}
+                />
+            ),
+            title: "Map not found",
+            message:
+                "The map you're looking for does not exist or has been deleted by its owner. Go back, or head over to the home page to choose a new page.",
+        },
         notFound: {
             icon: (
                 <ReportProblemIcon
