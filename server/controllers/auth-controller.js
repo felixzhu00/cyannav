@@ -141,7 +141,7 @@ login = async (req, res) => {
 
 register = async (req, res) => {
     try {
-        const { email, username, password, passwordVerify } = req.body;
+        const { email, username, password, passwordVerify } = req.body
         if (!email || !username || !password || !passwordVerify) {
             return res.status(400).json({
                 loggedIn: false,
@@ -336,7 +336,8 @@ resetRequest = async (req, res) => {
         console.error(err)
 
         return res.status(500).json({
-            errorMessage: "Internal server error. This is likely not a valid email address"
+            errorMessage:
+                "Internal server error. This is likely not a valid email address",
         })
     }
 }
@@ -624,11 +625,26 @@ deleteAccount = async (req, res) => {
             })
         }
 
-        var deleteUser = await User.findByIdAndDelete(res.locals.userId)
-        if (deleteUser) {
-            return res.status(200).end()
-        } else {
+        // Instead of deleting the user, and deleting everything that
+        // is associated, we instead just set the username to <Deleted User>
+        // This allows us to have published maps stay published
+        // and also make sure that if the deleted user is queried,
+        // there wouldn't be any errors.
+        // (Though error should have been handled in the frontend :/)
+
+        // Reset user information
+        currentUser.username = "<Deleted User>"
+        currentUser.email = "deleted@cyannav.tech" // Can't reset since this email doesn't exist
+        currentUser.password = "---" // No hash to map to this (hopefully)
+
+        // Delete unpublished maps
+        // TODO: Find all unpublished maps that this user has and delete them
+
+        const saved = currentUser.save()
+        if (!saved) {
             return res.status(500).end()
+        } else {
+            return res.status(200).end()
         }
     } catch (err) {
         console.err("auth-controller::deleteAccount")

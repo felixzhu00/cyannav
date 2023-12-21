@@ -127,9 +127,16 @@ const App = () => {
                             />
                             <Route
                                 path="/unauthorized"
-                                element={<ErrorScreen errorType="unauthorized" />}
+                                element={
+                                    <ErrorScreen errorType="unauthorized" />
+                                }
                             />
-
+                            <Route
+                                path="/mapnotfound"
+                                element={
+                                    <ErrorScreen errorType="mapNotFound" />
+                                }
+                            />
                         </Routes>
                     </BrowserRouter>
                 </GlobalStoreContextProvider>
