@@ -93,11 +93,15 @@ function MapViewingPage() {
     //Runs on initial load
     useEffect(() => {
         if (id != null) {
-            store.setByFeature(null);
             store.getMapById(id);
             store.getGeojson(id);
-            store.setCurrentArea(-1);
         }
+        return () => {
+            store.setGeoJson(null)
+            store.setCurrentMap(null)
+            store.setCurrentArea(-1);
+            store.setByFeature(null);
+        };
     }, [id]);
 
     useEffect(() => {
