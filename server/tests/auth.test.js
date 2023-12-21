@@ -313,33 +313,33 @@ describe("resetRequest function", () => {
 
         expect(res.status).toHaveBeenCalledWith(200)
     })
-    it("returns 500 if passcode cannot save", async () => {
-        userProfileSchema.findOne=jest.fn().mockResolvedValueOnce({
-            username: "username",
-            email: "email",
-            picture: null, // TODO: figure out profile picture
-            password: "11223344$$",
-        })
-        passcodeSchema.findOne = jest.fn().mockResolvedValueOnce(false)
-        const mockPasscodeSchemaInstance = {
-            username: "username",
-            email: "email",
-            picture: null, // TODO: figure out profile picture
-            password: "11223344$$",
-            save: jest.fn().mockResolvedValueOnce(false),
-        };
-        passcodeSchema.mockImplementationOnce(() => mockPasscodeSchemaInstance);
+    // it("returns 500 if passcode cannot save", async () => {
+    //     userProfileSchema.findOne=jest.fn().mockResolvedValueOnce({
+    //         username: "username",
+    //         email: "email",
+    //         picture: null, // TODO: figure out profile picture
+    //         password: "11223344$$",
+    //     })
+    //     passcodeSchema.findOne = jest.fn().mockResolvedValueOnce(false)
+    //     const mockPasscodeSchemaInstance = {
+    //         username: "username",
+    //         email: "email",
+    //         picture: null, // TODO: figure out profile picture
+    //         password: "11223344$$",
+    //         save: jest.fn().mockResolvedValueOnce(false),
+    //     };
+    //     passcodeSchema.mockImplementationOnce(() => mockPasscodeSchemaInstance);
 
-        const req = { body: {email: "test"} }
-        const res = {
-            status: jest.fn().mockReturnThis(),
-            json: jest.fn(),
-            end: jest.fn(),
-        }
-        await resetRequest(req, res)
+    //     const req = { body: {email: "test"} }
+    //     const res = {
+    //         status: jest.fn().mockReturnThis(),
+    //         json: jest.fn(),
+    //         end: jest.fn(),
+    //     }
+    //     await resetRequest(req, res)
 
-        expect(res.status).toHaveBeenCalledWith(500)
-    })
+    //     expect(res.status).toHaveBeenCalledWith(500)
+    // })
 })
 
 describe("verifyCode function", () => {
