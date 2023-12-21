@@ -42,10 +42,13 @@ export default function MUIExportMapModal(props) {
     const handleExport = (event) => {
         const mapElement = document.getElementById("map");
 
+        const width = document.getElementById("map").clientWidth;
+        const height = document.getElementById("map").clientHeight;
+
         switch (fileType) {
             case "jpeg":
                 domtoimage
-                    .toJpeg(mapElement) // Creates image
+                    .toJpeg(mapElement, { width: width, height: height }) // Creates image
                     .then(function (dataURL) {
                         // Temporary link to created image
                         const tempLink = document.createElement("a");
@@ -60,7 +63,7 @@ export default function MUIExportMapModal(props) {
                 break;
             case "png":
                 domtoimage
-                    .toPng(mapElement) // Creates image
+                    .toPng(mapElement, { width: width, height: height }) // Creates image
                     .then(function (dataURL) {
                         // Temporary link to created image
                         const tempLink = document.createElement("a");
