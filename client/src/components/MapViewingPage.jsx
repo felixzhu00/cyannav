@@ -419,11 +419,11 @@ function MapViewingPage() {
     }, [store.fieldString]);
 
     // Handler to add a new field to the selected feature
-    const addField = (key, value, applyAll = true) => {
+    const addField = (key, value, applyAll = true, values = null) => {
         setFocusedField(key);
         setFeatures((prevFeatures) => {
             if (applyAll) {
-                const updatedFeatures = prevFeatures.map((feature) => {
+                const updatedFeatures = prevFeatures.map((feature, index) => {
                     const isImmutable = [
                         "radius",
                         "scale",
@@ -432,14 +432,33 @@ function MapViewingPage() {
                         "byFeature",
                     ].includes(key);
 
-                    const updatedFields = {
-                        immutable: isImmutable
-                            ? { ...feature.fields.immutable, [key]: value }
-                            : { ...feature.fields.immutable },
-                        mutable: !isImmutable
-                            ? { ...feature.fields.mutable, [key]: value }
-                            : { ...feature.fields.mutable },
-                    };
+                    var updatedFields;
+
+                    if (values !== null) {
+                        updatedFields = {
+                            immutable: isImmutable
+                                ? {
+                                      ...feature.fields.immutable,
+                                      [key]: values[index],
+                                  }
+                                : { ...feature.fields.immutable },
+                            mutable: !isImmutable
+                                ? {
+                                      ...feature.fields.mutable,
+                                      [key]: values[index],
+                                  }
+                                : { ...feature.fields.mutable },
+                        };
+                    } else {
+                        updatedFields = {
+                            immutable: isImmutable
+                                ? { ...feature.fields.immutable, [key]: value }
+                                : { ...feature.fields.immutable },
+                            mutable: !isImmutable
+                                ? { ...feature.fields.mutable, [key]: value }
+                                : { ...feature.fields.mutable },
+                        };
+                    }
 
                     return {
                         ...feature,
@@ -721,9 +740,9 @@ function MapViewingPage() {
             removeField(step[1]);
             return;
         }
-        // Redo field delete
+        // Undo field delete
         if (step[0] == -2) {
-            addField(step[1], "");
+            addField(step[1], "", true, step[2]);
             return;
         }
 
@@ -1320,11 +1339,21 @@ function MapViewingPage() {
                                                 if (match) {
                                                     removeField(key, false);
                                                     addUndo([-2, key]);
-                                                    // TODO: Add this additional field that was added without any
-                                                    // notification to the undo/redo system.
+                                                    // TODO: DFM edgecase
                                                 } else {
+                                                    const values = features.map(
+                                                        function (feature) {
+                                                            console.log(
+                                                                feature
+                                                            );
+                                                            return feature
+                                                                .fields.mutable[
+                                                                key
+                                                            ];
+                                                        }
+                                                    );
                                                     removeField(key);
-                                                    addUndo([-2, key]);
+                                                    addUndo([-2, key, values]);
                                                 }
                                             }}
                                         >
