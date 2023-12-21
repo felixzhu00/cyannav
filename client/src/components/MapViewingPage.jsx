@@ -101,7 +101,6 @@ function MapViewingPage() {
             store.setCurrentMap(null)
             store.setCurrentArea(-1);
             store.setByFeature(null);
-            store.exportImage();
         };
     }, [id]);
 
