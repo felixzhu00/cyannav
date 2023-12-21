@@ -97,7 +97,8 @@ export default function MUIDeleteAccountModal(props) {
                     >
                         Fill in the information below to delete your account.
                         <br></br>
-                        Note: All your maps will be permanently removed.
+                        Note: Your published maps will NOT be removed, please
+                        delete them manually if you wish to remove them.
                     </Typography>
                     <Box
                         component="form"
