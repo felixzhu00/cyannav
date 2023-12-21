@@ -406,6 +406,7 @@ function MapViewingPage() {
                     .name;
 
             addField(name, 10, false);
+            addUndo([-1, name, 10, store.currentArea]);
             handleAddLineDone();
         }
     }, [store.currentArea, store.selectedArea]);
@@ -493,7 +494,7 @@ function MapViewingPage() {
         });
     };
 
-    const removeField = (key, applyAll = true) => {
+    const removeField = (key, applyAll = true, currArea = null) => {
         setFocusedField(key);
 
         setFeatures((prevFeatures) => {
@@ -518,6 +519,13 @@ function MapViewingPage() {
                 }
 
                 if (!applyAll) {
+                    // For undo, if there was a currArea recorded
+                    if (currArea) {
+                        return index === currArea
+                            ? { ...feature, fields: updatedFields }
+                            : feature;
+                    }
+
                     return index === store.currentArea
                         ? { ...feature, fields: updatedFields }
                         : feature;
@@ -734,13 +742,19 @@ function MapViewingPage() {
             return;
         }
 
-        if (store.currentMap.mapType == "distributiveflowmap") {
+        if (
+            store.currentMap.mapType == "distributiveflowmap" &&
+            step[0] == -1
+        ) {
             // Undo field add when it is DFM (single field for single feature)
-            removeField(step[1], false);
+            removeField(step[1], false, step[3]);
             return;
         }
 
-        if (store.currentMap.mapType == "distributiveflowmap") {
+        if (
+            store.currentMap.mapType == "distributiveflowmap" &&
+            step[0] == -2
+        ) {
             // Undo field delete when it is DFM (single field)
             addField(step[1], step[2], false);
             return;
@@ -1350,17 +1364,14 @@ function MapViewingPage() {
                                                     key.match(/^(\d+)_(.+)/);
                                                 if (match) {
                                                     const values =
-                                                        features.fields.mutable[
+                                                        features[
                                                             store.currentArea
-                                                        ];
+                                                        ].fields.mutable[key];
                                                     removeField(key, false);
                                                     addUndo([-2, key, values]);
                                                 } else {
                                                     const values = features.map(
                                                         function (feature) {
-                                                            console.log(
-                                                                feature
-                                                            );
                                                             return feature
                                                                 .fields.mutable[
                                                                 key
