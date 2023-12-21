@@ -703,15 +703,11 @@ function MapViewingPage() {
         // Handle edit logic
     };
     useHotkeys("ctrl+z, ctrl+y", (_, handler) => {
-        switch (handler.keys.join("")) {
-            case "z":
-                handleUndo();
-                break;
-            case "y":
-                handleRedo();
-                break;
-        }
+        handleKeyboardShortcuts();
     });
+    const handleKeyboardShortcuts = () => {
+        alert("Replace this with the snack bar with autohide please.");
+    };
     const handleUndo = () => {
         const step = getUndo();
 
@@ -727,7 +723,7 @@ function MapViewingPage() {
         }
         // Redo field delete
         if (step[0] == -2) {
-            addField(step[1]);
+            addField(step[1], "");
             return;
         }
 
@@ -736,8 +732,14 @@ function MapViewingPage() {
         if (step[1] == "longitude" || step[1] == "latitude") {
             updatedFeatures[step[0]].fields.immutable.center[step[1]] = step[2];
         } else if (step[1] == "colorA" || step[1] == "colorB") {
-            updatedFeatures[step[0]].fields.immutable.color[step[1]] = step[2];
-        } else if (step[1] == "byFeature" || step[1] == "name") {
+            for (let i = 0; i < updatedFeatures.length; i++) {
+                updatedFeatures[i].fields.immutable.color[step[1]] = step[2];
+            }
+        } else if (step[1] == "byFeature") {
+            for (let i = 0; i < updatedFeatures.length; i++) {
+                updatedFeatures[i].fields.immutable[step[1]] = step[2];
+            }
+        } else if (step[1] == "name") {
             updatedFeatures[step[0]].fields.immutable[step[1]] = step[2];
         } else {
             updatedFeatures[step[0]].fields.mutable[step[1]] = step[2];
@@ -755,7 +757,7 @@ function MapViewingPage() {
 
         // Redo field add
         if (step[0] == -1) {
-            addField(step[1]);
+            addField(step[1], "");
             return;
         }
         // Redo field remove
@@ -769,8 +771,14 @@ function MapViewingPage() {
         if (step[1] == "longitude" || step[1] == "latitude") {
             updatedFeatures[step[0]].fields.immutable.center[step[1]] = step[3];
         } else if (step[1] == "colorA" || step[1] == "colorB") {
-            updatedFeatures[step[0]].fields.immutable.color[step[1]] = step[3];
-        } else if (step[1] == "byFeature" || step[1] == "name") {
+            for (let i = 0; i < updatedFeatures.length; i++) {
+                updatedFeatures[i].fields.immutable.color[step[1]] = step[3];
+            }
+        } else if (step[1] == "byFeature") {
+            for (let i = 0; i < updatedFeatures.length; i++) {
+                updatedFeatures[i].fields.immutable[step[1]] = step[3];
+            }
+        } else if (step[1] == "name") {
             updatedFeatures[step[0]].fields.immutable[step[1]] = step[3];
         } else {
             updatedFeatures[step[0]].fields.mutable[step[1]] = step[3];
