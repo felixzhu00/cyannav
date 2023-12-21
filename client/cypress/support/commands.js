@@ -43,6 +43,7 @@ Cypress.Commands.add('registerUser', (email, username, password, passwordVerify)
     cy.get('#password').type(password)
     cy.get('#verify-password').type(passwordVerify)
     cy.get("#registerBtn").click()
+    cy.wait(2000)
     cy.url().then((url) => {
         if(!url.includes("browsepage")){
             cy.get("#alreadyHaveAccountLink").click()
