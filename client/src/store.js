@@ -493,7 +493,7 @@ function GlobalStoreContextProvider(props) {
         const mapElement = document.getElementById("map");
 
         try {
-            const dataURL = await domtoimage.toJpeg(mapElement);
+            const dataURL = await domtoimage.toPng(mapElement);
             const blob = dataURLtoBlob(dataURL);
             const formData = new FormData();
             formData.append("file", blob, "map_picture.jpg");
@@ -547,7 +547,7 @@ function GlobalStoreContextProvider(props) {
     };
 
     //helper functions for pic generation
-    
+
     function dataURLtoBlob(dataURL) {
         const byteString = atob(dataURL.split(",")[1]);
         const ab = new ArrayBuffer(byteString.length);
