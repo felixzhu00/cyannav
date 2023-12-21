@@ -225,32 +225,36 @@ function AppBanner() {
                             mr: 2,
                         }}
                     >
-                        <IconButton
-                            disabled={!auth.loggedIn}
-                            sx={{
-                                color:
-                                    store.togglebrowseHome === true &&
-                                    pathname === "/browsepage"
-                                        ? "black"
-                                        : theme.palette.text.secondary,
-                            }}
-                            onClick={handleHome}
-                        >
-                            <Home sx={{ fontSize: "30px" }} />
-                        </IconButton>
-                        <IconButton
-                            id="marketplaceBtn"
-                            sx={{
-                                color:
-                                    store.togglebrowseHome !== true &&
-                                    pathname === "/browsepage"
-                                        ? "black"
-                                        : theme.palette.text.secondary,
-                            }}
-                            onClick={handleStore}
-                        >
-                            <Store sx={{ fontSize: "30px" }} />
-                        </IconButton>
+                        <Tooltip title="My Maps">
+                            <IconButton
+                                disabled={!auth.loggedIn}
+                                sx={{
+                                    color:
+                                        store.togglebrowseHome === true &&
+                                        pathname === "/browsepage"
+                                            ? "black"
+                                            : theme.palette.text.secondary,
+                                }}
+                                onClick={handleHome}
+                            >
+                                <Home sx={{ fontSize: "30px" }} />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Marketplace">
+                            <IconButton
+                                id="marketplaceBtn"
+                                sx={{
+                                    color:
+                                        store.togglebrowseHome !== true &&
+                                        pathname === "/browsepage"
+                                            ? "black"
+                                            : theme.palette.text.secondary,
+                                }}
+                                onClick={handleStore}
+                            >
+                                <Store sx={{ fontSize: "30px" }} />
+                            </IconButton>
+                        </Tooltip>
                     </Box>
 
                     {/* Title and Author of map */}
@@ -266,9 +270,14 @@ function AppBanner() {
                                 display: { xs: "none", sm: "block" },
                             }}
                         >
-                            {store.currentMap !== null
-                                ? store.currentMap.title
-                                : ""}
+                            {store.currentMap !== null ? (
+                                <span>
+                                    <strong>Map Title:</strong>{" "}
+                                    {store.currentMap.title}
+                                </span>
+                            ) : (
+                                ""
+                            )}
                         </Typography>
                     )}
 
@@ -278,7 +287,7 @@ function AppBanner() {
                     {/* User Avatar and Menu */}
                     {auth.loggedIn && (
                         <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <Tooltip title="Open settings">
+                            <Tooltip title="Open Menu">
                                 <IconButton
                                     id="settingsDropdown"
                                     onClick={handleOpenUserMenu}
