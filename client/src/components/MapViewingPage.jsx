@@ -420,7 +420,13 @@ function MapViewingPage() {
     }, [store.fieldString]);
 
     // Handler to add a new field to the selected feature
-    const addField = (key, value, applyAll = true, values = null) => {
+    const addField = (
+        key,
+        value,
+        applyAll = true,
+        values = null,
+        currArea = null
+    ) => {
         setFocusedField(key);
         setFeatures((prevFeatures) => {
             if (applyAll) {
@@ -471,7 +477,10 @@ function MapViewingPage() {
             } else {
                 // Apply changes only to prevFeatures[store.currentArea]
                 const updatedFeatures = prevFeatures.map((feature, index) => {
-                    if (index === store.currentArea) {
+                    if (
+                        index ===
+                        (currArea == null ? store.currentArea : currArea)
+                    ) {
                         const updatedFields = {
                             immutable: { ...feature.fields.immutable },
                             mutable: {
@@ -756,7 +765,7 @@ function MapViewingPage() {
             step[0] == -2
         ) {
             // Undo field delete when it is DFM (single field)
-            addField(step[1], step[2], false);
+            addField(step[1], step[2], false, null, step[3]);
             return;
         }
 
@@ -803,7 +812,7 @@ function MapViewingPage() {
         // Redo field add
         if (step[0] == -1) {
             if (store.currentMap.mapType == "distributiveflowmap") {
-                addField(step[1], step[2], false);
+                addField(step[1], step[2], false, null, step[3]);
                 return;
             }
 
@@ -1373,7 +1382,12 @@ function MapViewingPage() {
                                                             store.currentArea
                                                         ].fields.mutable[key];
                                                     removeField(key, false);
-                                                    addUndo([-2, key, values]);
+                                                    addUndo([
+                                                        -2,
+                                                        key,
+                                                        values,
+                                                        store.currentArea,
+                                                    ]);
                                                 } else {
                                                     const values = features.map(
                                                         function (feature) {
