@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, useEffect } from "react";
+import { createContext, useState, useContext, useEffect, useRef } from "react";
 
 function UndoRedo() {
     const MAX_UNDOS = 20;
@@ -7,49 +7,55 @@ function UndoRedo() {
     const [undo, setUndo] = useState([]);
     const [redo, setRedo] = useState([]);
 
+    const undoRef = useRef([]);
+    const redoRef = useRef([]);
+
     const addUndo = (newStep) => {
-        if (undo.length > MAX_UNDOS - 1) {
-            setUndo([...undo.slice(1), newStep]);
+        if (undoRef.current.length > MAX_UNDOS - 1) {
+            setUndo([...undoRef.current.slice(1), newStep]);
         } else {
-            setUndo([...undo, newStep]);
+            setUndo([...undoRef.current, newStep]);
         }
 
         // Remove any redo steps that involves the same field
         // and geometry
-        for (let i = 0; i < redo.length; i++) {
-            if (newStep[0] == redo[i][0] && newStep[1] == redo[i][1]) {
-                redo.splice(i, 1);
+        for (let i = 0; i < redoRef.current.length; i++) {
+            if (
+                newStep[0] == redoRef.current[i][0] &&
+                newStep[1] == redoRef.current[i][1]
+            ) {
+                setRedo(redoRef.current.splice(i, 1));
                 i--;
             }
         }
     };
 
     const addRedo = (newStep) => {
-        if (redo.length > MAX_REDOS - 1) {
-            setRedo([...redo.slice(1), newStep]);
+        if (redoRef.length > MAX_REDOS - 1) {
+            setRedo([...redoRef.current.slice(1), newStep]);
         } else {
-            setRedo([...redo, newStep]);
+            setRedo([...redoRef.current, newStep]);
         }
     };
 
     const getUndo = () => {
-        if (undo.length == 0) {
+        if (undoRef.current.length == 0) {
             return null;
         }
 
-        const prevStep = undo[undo.length - 1];
-        setUndo([...undo.slice(0, -1)]);
+        const prevStep = undoRef.current[undoRef.length - 1];
+        setUndo([...undoRef.current.slice(0, -1)]);
         addRedo(prevStep);
         return prevStep;
     };
 
     const getRedo = () => {
-        if (redo.length == 0) {
+        if (redoRef.current.length == 0) {
             return null;
         }
 
-        const nextStep = redo[redo.length - 1];
-        setRedo([...redo.slice(0, -1)]);
+        const nextStep = redoRef.current[redoRef.current.length - 1];
+        setRedo([...redoRef.current.slice(0, -1)]);
         addUndo(nextStep);
         return nextStep;
     };
@@ -62,7 +68,11 @@ function UndoRedo() {
         console.log(redo);
     };
 
-    return { addUndo, addRedo, getUndo, getRedo, printUndoRedo };
+    const getAllSteps = () => {
+        return [undo, redo];
+    };
+
+    return { addUndo, addRedo, getUndo, getRedo, printUndoRedo, getAllSteps };
 }
 
 export default UndoRedo;
