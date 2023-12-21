@@ -557,8 +557,8 @@ updateUsername = async (req, res) => {
 
         return res.status(200).end()
     } catch (err) {
-        console.err("auth-controller::updateUsername")
-        console.err(err)
+        console.error("auth-controller::updateUsername")
+        console.error(err)
         return res.status(500).end()
     }
 }
@@ -590,8 +590,8 @@ updateEmail = async (req, res) => {
 
         return res.status(200).end()
     } catch (err) {
-        console.err("auth-controller::updateEmail")
-        console.err(err)
+        console.error("auth-controller::updateEmail")
+        console.error(err)
         return res.status(500).end()
     }
 }
@@ -655,8 +655,8 @@ deleteAccount = async (req, res) => {
             return res.status(200).end()
         }
     } catch (err) {
-        console.err("auth-controller::deleteAccount")
-        console.err(err)
+        console.error("auth-controller::deleteAccount")
+        console.error(err)
         return res.status(500).end()
     }
 }
