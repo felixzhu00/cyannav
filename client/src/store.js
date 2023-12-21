@@ -444,6 +444,13 @@ function GlobalStoreContextProvider(props) {
         });
     };
 
+    store.setGeoJson = (geojson) => {
+        return setStore({
+            ...store,
+            geojson: geojson,
+        });
+    };
+
     store.getMapById = async (id) => {
         const response = await api.getMapById(id);
         if (response.status === 200) {

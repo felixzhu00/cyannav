@@ -93,11 +93,15 @@ function MapViewingPage() {
     //Runs on initial load
     useEffect(() => {
         if (id != null) {
-            store.setByFeature(null);
             store.getMapById(id);
             store.getGeojson(id);
-            store.setCurrentArea(-1);
         }
+        return () => {
+            store.setGeoJson(null)
+            store.setCurrentMap(null)
+            store.setCurrentArea(-1);
+            store.setByFeature(null);
+        };
     }, [id]);
 
     useEffect(() => {
@@ -398,7 +402,6 @@ function MapViewingPage() {
                 return match && Number(match[1]) === store.selectedArea;
             })
         ) {
-            console.log("trigger when not");
             const name =
                 store.selectedArea +
                 "_" +
@@ -693,7 +696,6 @@ function MapViewingPage() {
                         };
                     }
 
-                    console.log("updatedFeature", updatedFeature);
                     return updatedFeature;
                 });
             }
@@ -769,7 +771,6 @@ function MapViewingPage() {
             return;
         }
 
-        console.log(step);
         // Undo field add
         if (step[0] == -1) {
             removeField(step[1]);
@@ -851,7 +852,6 @@ function MapViewingPage() {
     };
 
     const handleAddLine = () => {
-        console.log(store.isPickingDFM);
         store.setIsPickingDFM(true);
     };
     const handleAddLineDone = () => {
