@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 import {
+    Alert,
     Accordion,
     AccordionDetails,
     AccordionSummary,
@@ -19,13 +20,13 @@ import {
     Tab,
     Tooltip,
     useTheme,
+    Snackbar,
 } from "@mui/material";
 import {
     Undo,
     Redo,
     Delete,
     ExpandMore,
-    KeyboardArrowDown,
     ThumbUp,
     ThumbDown,
 } from "@mui/icons-material";
@@ -89,6 +90,9 @@ function MapViewingPage() {
 
     // Redirect
     const navigate = useNavigate();
+
+    // Snackbar to tell the user that CTRL+Z and CTRL+Y does not work. Must use buttons.
+    const [openSnackbar, setOpenSnackbar] = useState(false);
 
     //Runs on initial load
     useEffect(() => {
@@ -740,12 +744,18 @@ function MapViewingPage() {
     const handleEdit = () => {
         // Handle edit logic
     };
+
     useHotkeys("ctrl+z, ctrl+y", (_, handler) => {
         handleKeyboardShortcuts();
     });
+
+    /**
+     * Handler for when the user clicks on the keyboard hotkeys for undo/redo
+     */
     const handleKeyboardShortcuts = () => {
-        alert("Replace this with the snack bar with autohide please.");
+        setOpenSnackbar(true);
     };
+
     const handleUndo = () => {
         const step = getUndo();
 
@@ -771,7 +781,7 @@ function MapViewingPage() {
             return;
         }
 
-        // Undo field add
+      // Undo field add
         if (step[0] == -1) {
             removeField(step[1]);
             return;
@@ -1104,41 +1114,45 @@ function MapViewingPage() {
                     }}
                 >
                     {auth.loggedIn && (
-                        <IconButton
-                            id="undoBtn"
-                            sx={{
-                                backgroundColor: "#fff",
-                                padding: "10px",
-                                borderRadius: "5px",
-                                color: "black",
-                                margin: "0 5px 0 0",
-                                border: "2px solid #ccc",
-                                "&:hover": {
-                                    backgroundColor: "#CCCCCC",
-                                },
-                            }}
-                            onClick={() => handleUndo()}
-                        >
-                            <Undo />
-                        </IconButton>
+                        <Tooltip title="Undo">
+                            <IconButton
+                                id="undoBtn"
+                                sx={{
+                                    backgroundColor: "#fff",
+                                    padding: "10px",
+                                    borderRadius: "5px",
+                                    color: "black",
+                                    margin: "0 5px 0 0",
+                                    border: "2px solid #ccc",
+                                    "&:hover": {
+                                        backgroundColor: "#CCCCCC",
+                                    },
+                                }}
+                                onClick={() => handleUndo()}
+                            >
+                                <Undo />
+                            </IconButton>
+                        </Tooltip>
                     )}
                     {auth.loggedIn && (
-                        <IconButton
-                            id="redoBtn"
-                            sx={{
-                                backgroundColor: "#fff",
-                                padding: "10px",
-                                borderRadius: "5px",
-                                color: "black",
-                                border: "2px solid #ccc",
-                                "&:hover": {
-                                    backgroundColor: "#CCCCCC",
-                                },
-                            }}
-                            onClick={() => handleRedo()}
-                        >
-                            <Redo />
-                        </IconButton>
+                        <Tooltip title="Redo">
+                            <IconButton
+                                id="redoBtn"
+                                sx={{
+                                    backgroundColor: "#fff",
+                                    padding: "10px",
+                                    borderRadius: "5px",
+                                    color: "black",
+                                    border: "2px solid #ccc",
+                                    "&:hover": {
+                                        backgroundColor: "#CCCCCC",
+                                    },
+                                }}
+                                onClick={() => handleRedo()}
+                            >
+                                <Redo />
+                            </IconButton>
+                        </Tooltip>
                     )}
                 </Box>
             </Box>
@@ -1529,10 +1543,20 @@ function MapViewingPage() {
                     <>
                         {auth.loggedIn && (
                             <Button
-                                id="addFieldBtn"
+                                id={
+                                    store.currentMap?.mapType ===
+                                    "distributiveflowmap"
+                                        ? "addLineBtn"
+                                        : "addFieldBtn"
+                                }
                                 variant="contained"
                                 color="primary"
-                                onClick={handleAddField}
+                                onClick={
+                                    store.currentMap.mapType ===
+                                    "distributiveflowmap"
+                                        ? handleAddLine
+                                        : handleAddField
+                                }
                                 sx={{
                                     color: "black",
                                     bgcolor: theme.palette.secondary.main,
@@ -1544,7 +1568,10 @@ function MapViewingPage() {
                                     store.currentMap.published
                                 }
                             >
-                                + Add Field
+                                {store.currentMap.mapType ===
+                                "distributiveflowmap"
+                                    ? "+ Add Line"
+                                    : "+ Add Field"}
                             </Button>
                         )}
                         <Box
@@ -1857,27 +1884,9 @@ function MapViewingPage() {
                                         })}
                                     {store.currentMap?.mapType ===
                                     "distributiveflowmap" ? (
-                                        <Button
-                                            id="addLineBtn"
-                                            variant="contained"
-                                            color="primary"
-                                            onClick={handleAddLine}
-                                            sx={{
-                                                color: "black",
-                                                bgcolor:
-                                                    theme.palette.secondary
-                                                        .main,
-                                                width: "100%",
-                                                mb: "10px",
-                                                borderRadius: 2,
-                                                boxShadow: 2,
-                                                mt: "10px",
-                                            }}
-                                        >
-                                            + Add Line
-                                        </Button>
+                                        <Box></Box>
                                     ) : (
-                                        <>
+                                        <Box>
                                             <List
                                                 component="nav"
                                                 sx={{
@@ -1903,6 +1912,8 @@ function MapViewingPage() {
                                                         primary={`Select ${store.currentMap.mapType} by:`}
                                                         secondary={
                                                             store.byFeature
+                                                                ? store.byFeature
+                                                                : "Click to select a feature"
                                                         }
                                                     />
                                                 </ListItem>
@@ -1926,7 +1937,7 @@ function MapViewingPage() {
                                             >
                                                 {(() => {
                                                     const addedKeys = [];
-                                                    return (
+                                                    const arr =
                                                         store.geojson?.features?.flatMap(
                                                             (feature) => {
                                                                 if (
@@ -1980,11 +1991,27 @@ function MapViewingPage() {
                                                                 }
                                                                 return null;
                                                             }
-                                                        ) || []
-                                                    );
+                                                        ) || [];
+                                                    const hasNonNullItem =
+                                                        arr.some(
+                                                            (item) =>
+                                                                item !== null
+                                                        );
+                                                    if (!hasNonNullItem) {
+                                                        return (
+                                                            <MenuItem disabled>
+                                                                No fields to
+                                                                select. Please
+                                                                add a field with
+                                                                value.
+                                                            </MenuItem>
+                                                        );
+                                                    } else {
+                                                        return arr;
+                                                    }
                                                 })()}
                                             </Menu>
-                                        </>
+                                        </Box>
                                     )}
                                 </AccordionDetails>
                             </Accordion>
@@ -2061,6 +2088,24 @@ function MapViewingPage() {
                     onNew={(newField) => addUndo(["-1", newField])}
                 />
             )}
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={() => setOpenSnackbar(false)}
+                anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "center",
+                }}
+            >
+                <Alert
+                    onClose={() => setOpenSnackbar(false)}
+                    severity="info"
+                    sx={{ width: "100%" }}
+                >
+                    Commands CTRL+Z & CTRL+Y are disabled. Please use the
+                    undo/redo buttons.
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }
