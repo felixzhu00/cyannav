@@ -19,14 +19,11 @@ export default function LoginScreen(props) {
     const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
-
-
-
         if (auth.user == null) {
             setErrorMessage(auth.error);
         } else {
-            if(auth.loggedIn){
-                navigate('/browsepage');
+            if (auth.loggedIn) {
+                navigate("/browsepage");
             }
         }
     }, [auth]);
@@ -46,7 +43,6 @@ export default function LoginScreen(props) {
             await auth.loginUser(input.email, input.password);
             setErrorMessage("");
         } catch (error) {
-            console.log(error.message);
             setErrorMessage(error.message);
         }
     };

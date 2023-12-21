@@ -57,7 +57,6 @@ export default function MUIDeleteAccountModal(props) {
                 await auth.logoutUser();
                 navigate("/login");
             } catch (error) {
-                console.log(error.message);
                 setErrorMessage(error.message);
             }
         } else {
