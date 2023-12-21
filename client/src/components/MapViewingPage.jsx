@@ -224,6 +224,7 @@ function MapViewingPage() {
             });
             setFocusedField("feature");
             setFeatures(updatedFeatures);
+            store.exportImage();
         }
         //Sets the exisitng map by feature if it exist
         if (store.geojson?.features[0]?.fields?.immutable?.byFeature) {
@@ -401,7 +402,6 @@ function MapViewingPage() {
                 return match && Number(match[1]) === store.selectedArea;
             })
         ) {
-            console.log("trigger when not");
             const name =
                 store.selectedArea +
                 "_" +
@@ -696,7 +696,6 @@ function MapViewingPage() {
                         };
                     }
 
-                    console.log("updatedFeature", updatedFeature);
                     return updatedFeature;
                 });
             }
@@ -772,7 +771,6 @@ function MapViewingPage() {
             return;
         }
 
-        console.log(step);
         // Undo field add
         if (step[0] == -1) {
             removeField(step[1]);
@@ -854,7 +852,6 @@ function MapViewingPage() {
     };
 
     const handleAddLine = () => {
-        console.log(store.isPickingDFM);
         store.setIsPickingDFM(true);
     };
     const handleAddLineDone = () => {
