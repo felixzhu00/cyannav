@@ -151,6 +151,14 @@ register = async (req, res) => {
             })
         }
 
+        if (username == "<Deleted User>") {
+            return res.status(400).json({
+                loggedIn: false,
+                user: null,
+                errorMessage: "Invalid Username",
+            })
+        }
+
         if (password != passwordVerify) {
             return res.status(401).json({
                 loggedIn: false,

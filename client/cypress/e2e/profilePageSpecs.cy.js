@@ -1,4 +1,11 @@
 describe('profile page specs', () => {
+
+    before(() => {
+        cy.registerUser("autotest55", "autotest55", "12345678&&", "12345678&&")
+        cy.wait(2000)
+        cy.logoutUser()
+      });
+      
     beforeEach(() => {
         cy.signInUser("autotest55", "12345678&&")
         cy.get("#settingsDropdown").click()
