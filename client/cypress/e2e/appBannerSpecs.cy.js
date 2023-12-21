@@ -2,11 +2,7 @@ describe('app banner specs', () => {
     before(() => {
         cy.registerUser("autotest55", "autotest55", "12345678&&", "12345678&&")
         cy.wait(2000)
-        cy.get("#settingsDropdown").click()
-        cy.get("#settingsDropdownOption").first().click()
-        cy.get("#logoutBtn").click()
-        cy.url().should('include', '/login')
-        cy.visit('localhost:3000/browsepage')
+        cy.logoutUser()
       });
       
     beforeEach(() => {
