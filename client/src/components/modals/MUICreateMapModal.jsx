@@ -80,8 +80,6 @@ export default function MUICreateMapModal(props) {
      * @param {*} fileRejections bad files
      */
     const onDrop = (acceptedFiles, fileRejections) => {
-        console.log(acceptedFiles);
-        console.log(fileRejections);
         if (acceptedFiles.length > 0) {
             setFile(acceptedFiles[0]);
             setDropzoneErrorMessage("");

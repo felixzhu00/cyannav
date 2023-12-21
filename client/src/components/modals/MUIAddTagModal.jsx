@@ -40,7 +40,6 @@ export default function MUIAddTagModal(props) {
     const currentMapId = store.currentModalMapId;
 
     useEffect(() => {
-        console.log("test");
         const filteredMap = store.mapCollection.filter(
             (map) => map._id === currentMapId
         );
