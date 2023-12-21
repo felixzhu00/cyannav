@@ -12,7 +12,7 @@ function NavJSON({ data, center, zoom }) {
     const heatmap = useRef(null);
     const map = useRef(null);
 
-    const onEachFeature = (country, layer, isPicking=false) => {
+    const onEachFeature = (country, layer, isPicking = false) => {
         const name1 = country?.fields?.immutable?.name;
         const name2 = country.properties && country.properties.admin;
         const name3 = country.properties && country.properties.NAME_0;
@@ -116,7 +116,6 @@ function NavJSON({ data, center, zoom }) {
             }
         });
 
-
         if (!isLayerSelected) {
             // Revert to original style
             layer.setStyle({
@@ -159,7 +158,10 @@ function NavJSON({ data, center, zoom }) {
         }
 
         data.features.forEach((feature) => {
-            const value = parseInt(feature?.fields?.mutable[store.byFeature], 10);
+            const value = parseInt(
+                feature?.fields?.mutable[store.byFeature],
+                10
+            );
             if (value !== undefined && !isNaN(value)) {
                 if (value < min) {
                     min = value;
@@ -196,7 +198,6 @@ function NavJSON({ data, center, zoom }) {
         const radius = Number(
             store.geojson.features[0]?.fields?.immutable?.radius
         );
-        console.log(radius);
         if (isNaN(radius) || !store.byFeature) {
             return;
         }
@@ -256,9 +257,7 @@ function NavJSON({ data, center, zoom }) {
             store.geojson.features[0]?.fields?.immutable?.color?.colorA;
         const color2 =
             store.geojson.features[0]?.fields?.immutable?.color?.colorB;
-        console.log(color1, color2)
-            if (!hexColorPattern.test(color1) && !hexColorPattern.test(color2)) {
-            
+        if (!hexColorPattern.test(color1) && !hexColorPattern.test(color2)) {
             return;
         }
 
@@ -364,42 +363,43 @@ function NavJSON({ data, center, zoom }) {
         });
     };
 
-
     const setupDFM = () => {
         if (map.current) {
             // Remove existing icon markers that are not in geolayer.current
             map.current.eachLayer((layer) => {
-                if (layer instanceof L.Polyline && !geolayer.current.hasLayer(layer)) {
+                if (
+                    layer instanceof L.Polyline &&
+                    !geolayer.current.hasLayer(layer)
+                ) {
                     map.current.removeLayer(layer);
                 }
             });
         }
-    
+
         store.geojson.features.forEach((feature) => {
             if (!feature?.fields?.mutable) {
                 return;
             }
             const center = [
-                
                 feature?.fields?.immutable?.center?.latitude,
                 feature?.fields?.immutable?.center?.longitude,
             ];
-    
+
             Object.entries(feature?.fields?.mutable).forEach(([key, value]) => {
                 const match = key.match(/^(\d+)_(.+)/);
                 if (match) {
                     // Extract relevant information from the matched key
-                    const [, country_index, ] = match;
+                    const [, country_index] = match;
                     const target_country =
-                        store.geojson.features[country_index]?.fields?.immutable;
+                        store.geojson.features[country_index]?.fields
+                            ?.immutable;
                     if (target_country) {
                         const target_center = [
-                            
                             target_country.center.latitude,
                             target_country.center.longitude,
                         ];
                         const count = value ? parseInt(value, 10) : NaN;
-    
+
                         // Create polyline based on extracted information
                         let polyline = L.polyline([center, target_center], {
                             color: "red",
@@ -424,8 +424,6 @@ function NavJSON({ data, center, zoom }) {
         let iconHtml = "<div class='container'>";
 
         for (let i = 0; i < numCubes; i++) {
-            // Calculate the offset for the right face
-
             // Add inline styles for each left and right face
             iconHtml += `
                 <div class='left' style="transform: translateY(-${
@@ -463,12 +461,16 @@ function NavJSON({ data, center, zoom }) {
         } else if (store?.currentMap?.mapType === "3drectangle") {
             setup3D();
         }
-    }
-
+    };
 
     useEffect(() => {
         // Initialize the Leaflet map and store its reference in the map ref
-        const mapInstance = L.map("map")
+        const mapInstance = L.map("map" , {
+            maxBounds: [[-90, -260],[90, 260]],
+            maxBoundsViscosity: 1,
+            minZoom: 2.3,
+            zoomSnap: 0.15 // enables fractional zooms
+      });
         map.current = mapInstance;
 
         // Create and add the tile layer
@@ -489,18 +491,18 @@ function NavJSON({ data, center, zoom }) {
 
         geolayer.current = geo;
 
-        updateMap()
+        updateMap();
 
         // Cleanup function to remove the map and associated layers when the component is unmounted
         return () => {
-            mapInstance.remove();
+            map.current.remove();
         };
     }, []);
 
     // Use another useEffect to set the view after the initial render
     useEffect(() => {
         // Calcluate the min and max
-        updateMap()
+        updateMap();
     }, [data, store.isPickingDFM, store.byFeature]);
 
     useEffect(() => {
@@ -510,7 +512,7 @@ function NavJSON({ data, center, zoom }) {
             const geoBounds = geolayer.current.getBounds();
             map.current.setView(
                 geoBounds.getCenter(),
-                map.current.getBoundsZoom(geoBounds) + 1
+                map.current.getBoundsZoom(geoBounds)
             );
         }
     }, [store.currentMap]);
