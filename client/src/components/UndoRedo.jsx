@@ -19,12 +19,15 @@ function UndoRedo() {
 
         // Remove any redo steps that involves the same field
         // and geometry
+        // Also redo steps that involves this field.
         for (let i = 0; i < redoRef.current.length; i++) {
             if (
-                newStep[0] == redoRef.current[i][0] &&
+                (newStep[0] == redoRef.current[i][0] ||
+                    redoRef.current[i][0] < 0) &&
                 newStep[1] == redoRef.current[i][1]
             ) {
-                redoRef.current = redoRef.current.splice(i, 1);
+                console.log("w");
+                redoRef.current.splice(i, 1);
                 i--;
             }
         }
