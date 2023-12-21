@@ -734,6 +734,18 @@ function MapViewingPage() {
             return;
         }
 
+        if (store.currentMap.mapType == "distributiveflowmap") {
+            // Undo field add when it is DFM (single field for single feature)
+            removeField(step[1], false);
+            return;
+        }
+
+        if (store.currentMap.mapType == "distributiveflowmap") {
+            // Undo field delete when it is DFM (single field)
+            addField(step[1], step[2], false);
+            return;
+        }
+
         console.log(step);
         // Undo field add
         if (step[0] == -1) {
@@ -1337,9 +1349,12 @@ function MapViewingPage() {
                                                 const match =
                                                     key.match(/^(\d+)_(.+)/);
                                                 if (match) {
+                                                    const values =
+                                                        features.fields.mutable[
+                                                            store.currentArea
+                                                        ];
                                                     removeField(key, false);
-                                                    addUndo([-2, key]);
-                                                    // TODO: DFM edgecase
+                                                    addUndo([-2, key, values]);
                                                 } else {
                                                     const values = features.map(
                                                         function (feature) {
