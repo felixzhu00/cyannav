@@ -26,7 +26,6 @@ function UndoRedo() {
                     redoRef.current[i][0] < 0) &&
                 newStep[1] == redoRef.current[i][1]
             ) {
-                console.log("w");
                 redoRef.current.splice(i, 1);
                 i--;
             }
