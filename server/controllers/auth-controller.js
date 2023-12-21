@@ -1,6 +1,7 @@
 const auth = require("../auth") // This is the auth manager, so some code should be abstracted to this file.
 const User = require("../schemas/userProfileSchema")
 const Passcode = require("../schemas/passcodeSchema")
+const MapMetadata = require("../schemas/Map/mapMetadataSchema")
 const nodemailer = require("nodemailer")
 
 const bcrypt = require("bcrypt")
@@ -638,8 +639,15 @@ deleteAccount = async (req, res) => {
         currentUser.password = "---" // No hash to map to this (hopefully)
 
         // Delete unpublished maps
-        // TODO: Find all unpublished maps that this user has and delete them
+        const delResult = await MapMetadata.deleteMany({
+            user: currentUser._id,
+            published: false
+        })
 
+        if (!delResult) {
+            return res.status(500)
+        }
+        
         const saved = currentUser.save()
         if (!saved) {
             return res.status(500).end()
