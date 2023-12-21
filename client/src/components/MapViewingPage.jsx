@@ -802,6 +802,11 @@ function MapViewingPage() {
 
         // Redo field add
         if (step[0] == -1) {
+            if (store.currentMap.mapType == "distributiveflowmap") {
+                addField(step[1], step[2], false);
+                return;
+            }
+
             addField(step[1], "");
             return;
         }
