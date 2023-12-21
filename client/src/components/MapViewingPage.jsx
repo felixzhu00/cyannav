@@ -97,11 +97,15 @@ function MapViewingPage() {
     //Runs on initial load
     useEffect(() => {
         if (id != null) {
-            store.setByFeature(null);
             store.getMapById(id);
             store.getGeojson(id);
-            store.setCurrentArea(-1);
         }
+        return () => {
+            store.setGeoJson(null)
+            store.setCurrentMap(null)
+            store.setCurrentArea(-1);
+            store.setByFeature(null);
+        };
     }, [id]);
 
     useEffect(() => {
@@ -402,7 +406,6 @@ function MapViewingPage() {
                 return match && Number(match[1]) === store.selectedArea;
             })
         ) {
-            console.log("trigger when not");
             const name =
                 store.selectedArea +
                 "_" +
@@ -410,6 +413,7 @@ function MapViewingPage() {
                     .name;
 
             addField(name, 10, false);
+            addUndo([-1, name, 10, store.currentArea]);
             handleAddLineDone();
         }
     }, [store.currentArea, store.selectedArea]);
@@ -423,11 +427,17 @@ function MapViewingPage() {
     }, [store.fieldString]);
 
     // Handler to add a new field to the selected feature
-    const addField = (key, value, applyAll = true) => {
+    const addField = (
+        key,
+        value,
+        applyAll = true,
+        values = null,
+        currArea = null
+    ) => {
         setFocusedField(key);
         setFeatures((prevFeatures) => {
             if (applyAll) {
-                const updatedFeatures = prevFeatures.map((feature) => {
+                const updatedFeatures = prevFeatures.map((feature, index) => {
                     const isImmutable = [
                         "radius",
                         "scale",
@@ -436,14 +446,33 @@ function MapViewingPage() {
                         "byFeature",
                     ].includes(key);
 
-                    const updatedFields = {
-                        immutable: isImmutable
-                            ? { ...feature.fields.immutable, [key]: value }
-                            : { ...feature.fields.immutable },
-                        mutable: !isImmutable
-                            ? { ...feature.fields.mutable, [key]: value }
-                            : { ...feature.fields.mutable },
-                    };
+                    var updatedFields;
+
+                    if (values !== null) {
+                        updatedFields = {
+                            immutable: isImmutable
+                                ? {
+                                      ...feature.fields.immutable,
+                                      [key]: values[index],
+                                  }
+                                : { ...feature.fields.immutable },
+                            mutable: !isImmutable
+                                ? {
+                                      ...feature.fields.mutable,
+                                      [key]: values[index],
+                                  }
+                                : { ...feature.fields.mutable },
+                        };
+                    } else {
+                        updatedFields = {
+                            immutable: isImmutable
+                                ? { ...feature.fields.immutable, [key]: value }
+                                : { ...feature.fields.immutable },
+                            mutable: !isImmutable
+                                ? { ...feature.fields.mutable, [key]: value }
+                                : { ...feature.fields.mutable },
+                        };
+                    }
 
                     return {
                         ...feature,
@@ -455,7 +484,10 @@ function MapViewingPage() {
             } else {
                 // Apply changes only to prevFeatures[store.currentArea]
                 const updatedFeatures = prevFeatures.map((feature, index) => {
-                    if (index === store.currentArea) {
+                    if (
+                        index ===
+                        (currArea == null ? store.currentArea : currArea)
+                    ) {
                         const updatedFields = {
                             immutable: { ...feature.fields.immutable },
                             mutable: {
@@ -478,7 +510,7 @@ function MapViewingPage() {
         });
     };
 
-    const removeField = (key, applyAll = true) => {
+    const removeField = (key, applyAll = true, currArea = null) => {
         setFocusedField(key);
 
         setFeatures((prevFeatures) => {
@@ -503,6 +535,13 @@ function MapViewingPage() {
                 }
 
                 if (!applyAll) {
+                    // For undo, if there was a currArea recorded
+                    if (currArea) {
+                        return index === currArea
+                            ? { ...feature, fields: updatedFields }
+                            : feature;
+                    }
+
                     return index === store.currentArea
                         ? { ...feature, fields: updatedFields }
                         : feature;
@@ -661,7 +700,6 @@ function MapViewingPage() {
                         };
                     }
 
-                    console.log("updatedFeature", updatedFeature);
                     return updatedFeature;
                 });
             }
@@ -725,14 +763,32 @@ function MapViewingPage() {
             return;
         }
 
-        // Undo field add
+        if (
+            store.currentMap.mapType == "distributiveflowmap" &&
+            step[0] == -1
+        ) {
+            // Undo field add when it is DFM (single field for single feature)
+            removeField(step[1], false, step[3]);
+            return;
+        }
+
+        if (
+            store.currentMap.mapType == "distributiveflowmap" &&
+            step[0] == -2
+        ) {
+            // Undo field delete when it is DFM (single field)
+            addField(step[1], step[2], false, null, step[3]);
+            return;
+        }
+
+      // Undo field add
         if (step[0] == -1) {
             removeField(step[1]);
             return;
         }
-        // Redo field delete
+        // Undo field delete
         if (step[0] == -2) {
-            addField(step[1], "");
+            addField(step[1], "", true, step[2]);
             return;
         }
 
@@ -766,6 +822,11 @@ function MapViewingPage() {
 
         // Redo field add
         if (step[0] == -1) {
+            if (store.currentMap.mapType == "distributiveflowmap") {
+                addField(step[1], step[2], false, null, step[3]);
+                return;
+            }
+
             addField(step[1], "");
             return;
         }
@@ -801,7 +862,6 @@ function MapViewingPage() {
     };
 
     const handleAddLine = () => {
-        console.log(store.isPickingDFM);
         store.setIsPickingDFM(true);
     };
     const handleAddLineDone = () => {
@@ -1331,13 +1391,28 @@ function MapViewingPage() {
                                                 const match =
                                                     key.match(/^(\d+)_(.+)/);
                                                 if (match) {
+                                                    const values =
+                                                        features[
+                                                            store.currentArea
+                                                        ].fields.mutable[key];
                                                     removeField(key, false);
-                                                    addUndo([-2, key]);
-                                                    // TODO: Add this additional field that was added without any
-                                                    // notification to the undo/redo system.
+                                                    addUndo([
+                                                        -2,
+                                                        key,
+                                                        values,
+                                                        store.currentArea,
+                                                    ]);
                                                 } else {
+                                                    const values = features.map(
+                                                        function (feature) {
+                                                            return feature
+                                                                .fields.mutable[
+                                                                key
+                                                            ];
+                                                        }
+                                                    );
                                                     removeField(key);
-                                                    addUndo([-2, key]);
+                                                    addUndo([-2, key, values]);
                                                 }
                                             }}
                                         >

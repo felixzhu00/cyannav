@@ -11,6 +11,7 @@ function UndoRedo() {
     const redoRef = useRef([]);
 
     const addUndo = (newStep) => {
+        console.log(newStep);
         if (undoRef.current.length > MAX_UNDOS - 1) {
             undoRef.current = [...undoRef.current.slice(1), newStep];
         } else {
@@ -33,6 +34,7 @@ function UndoRedo() {
     };
 
     const addRedo = (newStep) => {
+        console.log(newStep);
         if (redoRef.current.length > MAX_REDOS - 1) {
             redoRef.current = [...redoRef.current.slice(1), newStep];
         } else {
@@ -41,6 +43,7 @@ function UndoRedo() {
     };
 
     const getUndo = () => {
+        console.log(undoRef.current);
         if (undoRef.current.length == 0) {
             return null;
         }
@@ -52,6 +55,7 @@ function UndoRedo() {
     };
 
     const getRedo = () => {
+        console.log(redoRef.current);
         if (redoRef.current.length == 0) {
             return null;
         }

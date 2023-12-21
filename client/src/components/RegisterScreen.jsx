@@ -139,6 +139,7 @@ export default function RegisterScreen() {
                     <Grid container justifyContent="center">
                         <Grid item>
                             <Link
+                                id="alreadyHaveAccountLink"
                                 onClick={() => {
                                     navigate("/login");
                                     auth.updateError("");

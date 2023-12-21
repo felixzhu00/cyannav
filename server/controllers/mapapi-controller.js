@@ -208,6 +208,18 @@ createDuplicateMapById = async (req, res) => {
             }
         }
 
+        const copiedGeojsonDoc = await GeoJsonSchema.findById(srcMap.geojsonId)
+        if (!copiedGeojsonDoc) {
+            return res.status(500).end()
+        }
+        const copiedGeojson = copiedGeojsonDoc.toObject()
+        delete copiedGeojson._id
+        const newGeojson = new GeoJsonSchema(copiedGeojson)
+        const geoJsonCopied = await newGeojson.save()
+        if (!geoJsonCopied) {
+            return res.status(500).end()
+        }
+
         let x = srcMap.toObject()
         delete x._id
         x.title = newMapTitle
@@ -215,6 +227,7 @@ createDuplicateMapById = async (req, res) => {
         x.like = []
         x.dislike = []
         x.published = false
+        x.geojsonId = geoJsonCopied
 
         const newMap = new MapMetadata(x)
         const saved = await newMap.save()
@@ -249,6 +262,18 @@ createForkMapById = async (req, res) => {
 
         var newMapTitle = `${srcMap.title} (1)`
 
+        const copiedGeojsonDoc = await GeoJsonSchema.findById(srcMap.geojsonId)
+        if (!copiedGeojsonDoc) {
+            return res.status(500).end()
+        }
+        const copiedGeojson = copiedGeojsonDoc.toObject()
+        delete copiedGeojson._id
+        const newGeojson = new GeoJsonSchema(copiedGeojson)
+        const geoJsonCopied = await newGeojson.save()
+        if (!geoJsonCopied) {
+            return res.status(500).end()
+        }
+
         const newMap = new MapMetadata({
             parentMapId: srcMap._id,
             title: newMapTitle,
@@ -259,7 +284,7 @@ createForkMapById = async (req, res) => {
             mapType: srcMap.mapType,
             published: false,
             dateCreated: Date.now(),
-            geojsonId: srcMap.geojsonId
+            geojsonId: geoJsonCopied._id,
         })
 
         const saved = await newMap.save()
@@ -704,7 +729,7 @@ updateMapGeoJson = async (req, res) => {
         const { id, geoBuf } = req.body // Extract the id from the URL parameter
 
         // console.log(geoBuf)
-        if(!geoBuf){
+        if (!geoBuf) {
             return res.status(400).end()
         }
         let bufferArray = Object.values(geoBuf)
@@ -744,41 +769,44 @@ updateMapGeoJson = async (req, res) => {
     }
 }
 
-
 updateMapPic = async (req, res) => {
     try {
-        const mapId = req.query.mapId; // Make sure to send the mapId from the frontend
+        const mapId = req.query.mapId // Make sure to send the mapId from the frontend
 
         // Validate if the mapId is valid (you may want to add more validation)
         if (!mongoose.Types.ObjectId.isValid(mapId)) {
-            return res.status(400).json({ errorMessage: "Invalid mapId" });
+            return res.status(400).json({ errorMessage: "Invalid mapId" })
         }
 
-        const map = await MapMetadata.findById(mapId);
+        const map = await MapMetadata.findById(mapId)
 
         if (!map) {
-            return res.status(404).json({ errorMessage: "Map not found" });
+            return res.status(404).json({ errorMessage: "Map not found" })
         }
 
         if (req.files.file) {
-            const { data, mimetype } = req.files.file;
+            const { data, mimetype } = req.files.file
             console.log(data, mimetype)
             // Check if the file is of a valid image type
             if (!["image/jpeg", "image/png"].includes(mimetype)) {
-                return res.status(400).json({ errorMessage: "Invalid file type" });
+                return res
+                    .status(400)
+                    .json({ errorMessage: "Invalid file type" })
             }
 
-            map.picture = data;
-            await map.save();
+            map.picture = data
+            await map.save()
 
-            return res.status(200).json({ message: "Map picture updated successfully" });
+            return res
+                .status(200)
+                .json({ message: "Map picture updated successfully" })
         } else {
-            return res.status(400).json({ errorMessage: "No file uploaded" });
+            return res.status(400).json({ errorMessage: "No file uploaded" })
         }
     } catch (err) {
-        console.error("map-controller::updateMapPic");
-        console.error(err);
-        return res.status(500).end();
+        console.error("map-controller::updateMapPic")
+        console.error(err)
+        return res.status(500).end()
     }
 }
 
