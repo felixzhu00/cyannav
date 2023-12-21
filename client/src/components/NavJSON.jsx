@@ -112,6 +112,7 @@ function NavJSON({ data, center, zoom }) {
                     fillOpacity:
                         store?.currentMap?.mapType == "heatmap" ? 0 : 0.7,
                 });
+                otherLayer.bringToBack();
             }
         });
 
@@ -125,6 +126,7 @@ function NavJSON({ data, center, zoom }) {
                 dashArray: "3",
                 fillOpacity: store?.currentMap?.mapType == "heatmap" ? 0 : 0.7,
             });
+            layer.bringToBack();
             store.setCurrentArea(-1);
         } else {
             // Set the selected style
@@ -134,7 +136,6 @@ function NavJSON({ data, center, zoom }) {
                 dashArray: "",
                 fillOpacity: store?.currentMap?.mapType == "heatmap" ? 0 : 0.7,
             });
-            // layer.bringToFront();
             store.setCurrentArea(layerIndex);
         }
 
