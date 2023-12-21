@@ -1,6 +1,7 @@
 const auth = require("../auth") // This is the auth manager, so some code should be abstracted to this file.
 const User = require("../schemas/userProfileSchema")
 const Passcode = require("../schemas/passcodeSchema")
+const MapMetadata = require("../schemas/Map/mapMetadataSchema")
 const nodemailer = require("nodemailer")
 
 const bcrypt = require("bcrypt")
@@ -147,6 +148,14 @@ register = async (req, res) => {
                 loggedIn: false,
                 user: null,
                 errorMessage: "Required fields empty.",
+            })
+        }
+
+        if (username == "<Deleted User>") {
+            return res.status(400).json({
+                loggedIn: false,
+                user: null,
+                errorMessage: "Invalid Username",
             })
         }
 
@@ -556,8 +565,8 @@ updateUsername = async (req, res) => {
 
         return res.status(200).end()
     } catch (err) {
-        console.err("auth-controller::updateUsername")
-        console.err(err)
+        console.error("auth-controller::updateUsername")
+        console.error(err)
         return res.status(500).end()
     }
 }
@@ -589,8 +598,8 @@ updateEmail = async (req, res) => {
 
         return res.status(200).end()
     } catch (err) {
-        console.err("auth-controller::updateEmail")
-        console.err(err)
+        console.error("auth-controller::updateEmail")
+        console.error(err)
         return res.status(500).end()
     }
 }
@@ -638,8 +647,15 @@ deleteAccount = async (req, res) => {
         currentUser.password = "---" // No hash to map to this (hopefully)
 
         // Delete unpublished maps
-        // TODO: Find all unpublished maps that this user has and delete them
+        const delResult = await MapMetadata.deleteMany({
+            user: currentUser._id,
+            published: false
+        })
 
+        if (!delResult) {
+            return res.status(500)
+        }
+        
         const saved = currentUser.save()
         if (!saved) {
             return res.status(500).end()
@@ -647,8 +663,8 @@ deleteAccount = async (req, res) => {
             return res.status(200).end()
         }
     } catch (err) {
-        console.err("auth-controller::deleteAccount")
-        console.err(err)
+        console.error("auth-controller::deleteAccount")
+        console.error(err)
         return res.status(500).end()
     }
 }

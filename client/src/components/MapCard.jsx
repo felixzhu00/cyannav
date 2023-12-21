@@ -87,17 +87,17 @@ export default function MapCard({ map }) {
             const canvas = canvasRef.current;
             if (canvas) {
                 const ctx = canvas.getContext("2d");
-                const cropWidth = 400; // Set your desired width for cropping
-                const cropHeight = 300; // Set your desired height for cropping
+                const cropWidth = 500; // Set your desired width for cropping
+                const cropHeight = 500; // Set your desired height for cropping
 
                 img.onload = () => {
                     // Set canvas dimensions
                     canvas.width = cropWidth;
-                    canvas.height = cropHeight;
+                    // canvas.height = cropHeight;
 
                     // Draw the cropped region onto the canvas
                     // Adjust the cropping values as needed
-                    ctx.drawImage(img, -30, -30, cropWidth, cropHeight);
+                    ctx.drawImage(img, -20, -20, cropWidth, cropHeight);
 
                     // If you need to do something with the cropped image, you can use
                     // ctx.getImageData(0, 0, cropWidth, cropHeight) to get pixel data.
@@ -198,7 +198,11 @@ export default function MapCard({ map }) {
                     style={{ textDecoration: "none" }}
                 >
                     <CardMedia
-                        sx={{ height: 300, cursor: "pointer",  objectFit: "cover" }}
+                        sx={{
+                            cursor: "pointer",
+                            objectFit: "cover",
+                            height: "250px",
+                        }}
                         component="canvas"
                         ref={canvasRef}
                     />
@@ -213,7 +217,11 @@ export default function MapCard({ map }) {
                     style={{ textDecoration: "none" }}
                 >
                     <CardMedia
-                        sx={{ height: 300, cursor: "pointer", objectFit: "contain" }}
+                        sx={{
+                            height: "250px",
+                            cursor: "pointer",
+                            objectFit: "contain",
+                        }}
                         component="img"
                         src={LoginLogo} // Replace with your default image source
                         alt="Default Image"
@@ -224,9 +232,7 @@ export default function MapCard({ map }) {
     };
 
     return (
-        <Card
-            sx={{ maxWidth: isSmallScreen ? 300 : "relative", height: "100%" }}
-        >
+        <Card sx={{ maxWidth: isSmallScreen ? 300 : "relative" }}>
             <Box sx={{ position: "relative" }}>
                 {renderMapImage()}
 
