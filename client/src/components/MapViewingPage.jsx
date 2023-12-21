@@ -703,15 +703,11 @@ function MapViewingPage() {
         // Handle edit logic
     };
     useHotkeys("ctrl+z, ctrl+y", (_, handler) => {
-        switch (handler.keys.join("")) {
-            case "z":
-                handleUndo();
-                break;
-            case "y":
-                handleRedo();
-                break;
-        }
+        handleKeyboardShortcuts();
     });
+    const handleKeyboardShortcuts = () => {
+        alert("Replace this with the snack bar with autohide please.");
+    };
     const handleUndo = () => {
         const step = getUndo();
 
