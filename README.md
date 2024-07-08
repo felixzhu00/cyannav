@@ -4,8 +4,6 @@
 
 Free and open-source collaborative map editing software.
 
-Try out our website here: **URL:** [cyannav.tech](http://cyannav.tech)
-
 ## Features
 
 -   Shapefiles, GeoJSON, and Keyhole Markup Language import support
