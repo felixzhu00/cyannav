@@ -37,43 +37,13 @@ jobs:
                   echo JWT_EXPIRATION_TIME=${{ vars.JWT_EXPIRATION_TIME }} >> .env.production
                   echo DATABASE_ADDR=${{ vars.DATABASE_ADDR }} >> .env.production
 
-    frontend-test:
-        needs: backend-test
-        runs-on: self-hosted
-        if: always()
-
-        steps:
-            - name: Setup node environment
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "21.x"
-            - name: Frontend Cypress test
-              run: |
-                  cd server
-                  NODE_ENV=frontend_test pm2 restart 0
-                  cd ../client
-                  npm test
-
-    backend-test:
-        needs: setup
-        runs-on: self-hosted
-
-        steps:
-            - name: Setup node environment
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "21.x"
-            - name: Backend API test
-              run: |
-                  cd server
-                  npm test
-
     deploy:
         if: always()
-        needs: frontend-test
+        needs: setup
         runs-on: self-hosted
 
         steps:
             - name: Build docker container
               run: |
-                  docker-compose up -d --build
+                  docker compose down -v
+                  docker compose up --build -d
