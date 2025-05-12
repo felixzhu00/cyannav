@@ -1,5 +1,7 @@
 const webpack = require('webpack');
+
 module.exports = function override(config, env) {
+    // Adding fallbacks for Node.js modules
     config.resolve.fallback = {
         url: require.resolve('url'),
         fs: require.resolve('fs'),
@@ -11,6 +13,8 @@ module.exports = function override(config, env) {
         buffer: require.resolve('buffer'),
         stream: require.resolve('stream-browserify'),
     };
+
+    // Adding ProvidePlugin for `process` and `Buffer`
     config.plugins.push(
         new webpack.ProvidePlugin({
             process: 'process/browser',
@@ -18,5 +22,13 @@ module.exports = function override(config, env) {
         }),
     );
 
+    // Adding the rule to resolve fully specified imports for `.js` and `.mjs` files
+    config.module.rules.push({
+        test: /\.m?js/, 
+        resolve: { 
+            fullySpecified: false 
+        }
+    });
+
     return config;
-}
+};
